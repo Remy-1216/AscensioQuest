@@ -1,0 +1,560 @@
+﻿#include "DxLib.h"
+#include "EffekseerForDXLib.h"
+#include "Player.h"
+#include "PlayerStateIdle.h"
+#include "PlayerStatus.h"
+#include "SoundManager.h"
+#include "EffectManager.h"
+#include "LoadCsv.h"
+#include "Pad.h"
+#include "Camera.h"
+#include "Stage.h"
+#include <cmath>
+#include <memory>
+
+namespace 
+{
+	const char* const kPlayerName = "player";
+
+	//アニメーションの切り替えにかかるフレーム数
+	constexpr float kAnimChangeFrame = 4.0f;
+	constexpr float kAnimChangeRateSpeed = 1.0f / kAnimChangeFrame;
+
+	//球の半径
+	constexpr float kSphereRadius = 45.0f;
+
+	//球の位置調整
+	constexpr float kSpherePosY = 25.0f;
+
+	// 重力
+	constexpr float kGravity = -5.0f; 
+
+	//必殺技仕様ゲージ
+	constexpr int kSuperMeter = 100;
+
+	//攻撃アニメーション時、当たり判定を出す時間
+	constexpr float kAttack1Time = 19.0f;
+
+	constexpr float kAttack2StartTime = 3.0f;
+	
+	constexpr float kAttack2EndTime = 7.0f;
+
+	constexpr float kAttack3StartTime = 5.0f;
+
+	constexpr float kAttack3EndTime = 11.0f;
+
+	//魔法攻撃の進むスピード
+	constexpr float kMagicAttackSpeed = 5.0f;
+
+	//魔法攻撃が進む距離
+	constexpr float kMagicAttackDistance = 400.0f;
+
+	//攻撃当たり判定の初期位置
+	constexpr float kAttackPosY = -200.0f;
+}
+
+Player::Player() :CharacterBase(m_handle),m_hpUp(0), m_attackUp(0), m_magicAttackUp(0), m_defensePowerUp(0),
+m_superMeter(0), m_sphereRadius(0.0f), m_isAttack(false), m_isAttackCollision(false),m_isMagicAttack(false),
+m_isMagicAttackMove(false), m_isSpecialMoveAvailable(false), m_isSpecialMove(false), m_isHitEnemy(false),
+m_isHitEnemyAttack(false), m_isWarpPoint(false),m_movementDirection(VGet(0.0f, 0.0f, 0.0f)), m_spherePos(VGet(0.0f,0.0f,0.0f)),
+m_magicDirection(VGet(0.0f,0.0f,0.0f))
+{
+	//モデルをロード
+	m_handle = MV1LoadModel("data/model/player/Player.mv1");
+
+	//アニメーションのデータを読み込む
+	LoadCsv::GetInstance().LoadPlayerAnimData(m_animData);
+
+	// ステータスを読み込む
+	LoadCsv::GetInstance().LoadStatus(m_status, kPlayerName);
+
+	//胴体の当たり判定時に使うカプセルの情報を読み込む
+	LoadCsv::GetInstance().LoadCollisionInfo(m_collisionInfo, kPlayerName);
+
+	//プレイヤーの座標位置情報を読み込む
+	LoadCsv::GetInstance().LoadPlayerPosData(m_characterPos, kPlayerName);
+
+	//ステータスを受け取る
+	m_hp = m_status.maxHp;
+	m_mp = m_status.maxMp;
+	m_attackPower = m_status.attackPower;
+	m_magicAttackPower = m_status.magicAttackPower;
+	m_defensePower = m_status.defensePower;
+	m_walkSpeed = m_status.walkSpeed;
+	m_runSpeed = m_status.runSpeed;
+
+	//胴体の当たり判定用カプセルの座標を受け取る
+	m_capsuleStartPoint = m_collisionInfo.capsuleStartPoint;
+	m_capsuleEndPoint = m_collisionInfo.capsuleEndPoint;
+	m_radius = m_collisionInfo.radius;
+	
+	//攻撃時に使用するカプセルの座標を受け取る
+	m_attackCapsuleStartPoint = m_collisionInfo.attackCapsuleStartPoint;
+	m_attackCapsuleEndPoint = m_collisionInfo.attackCapsuleEndPoint;
+	m_attackRadius = m_collisionInfo.attackRadius;
+
+	//魔法攻撃時に使用するカプセルの座標を受け取る
+	m_magicCapsuleStartPoint = m_collisionInfo.magicCapsuleStartPoint;
+	m_magicCapsuleEndPoint = m_collisionInfo.magicCapsuleEndPoint;
+	m_magicRadius = m_collisionInfo.magicRadius;
+
+	//必殺技時に使用するカプセルの座標を受け取る
+	m_specialMoveStartPoint = m_collisionInfo.specialMoveStartPoint;
+	m_specialMoveEndPoint = m_collisionInfo.specialMoveEndPoint;
+	m_specialMoveRadius = m_collisionInfo.specialMoveRadius;
+}
+
+Player::~Player()
+{
+	//モデルの削除
+	MV1DeleteModel(m_handle);
+
+	m_pEffectManager->ClearEffect();
+	m_pEffectManager.reset();
+	m_pEffectManager = nullptr;
+}
+
+void Player::Init()
+{
+	//初期化
+	m_isDie = false;
+
+	m_isHitEnemy = false;
+
+	m_isAttack = false;
+
+	m_isMagicAttack = false;
+
+	m_isMagicAttackMove = false;
+
+	m_isSpecialMove = false;
+
+	m_isSpecialMoveAvailable = false;
+
+	m_superMeter = 0;
+
+	m_characterAngle = 0.0f;
+
+	m_sphereRadius = kSpherePosY;
+
+	//座標の初期化
+	m_pos = VGet(m_characterPos.posX, m_characterPos.posY, m_characterPos.posZ);
+
+	//重力の設定
+	m_gravity = kGravity;
+
+	m_pPlayerStatus = std::make_shared<PlayerStatus>();
+	m_pPlayerStatus->Init();
+
+	//ステータスUPした値をステータスに足す
+	m_hp += m_pPlayerStatus->GetHpUp();
+	m_attackPower += m_pPlayerStatus->GetAttackUp();
+	m_magicAttackPower += m_pPlayerStatus->GetMagicAttackUp();
+	m_defensePower += m_pPlayerStatus->GetDefensePowerUp();
+
+
+	m_pState = std::make_shared<PlayerStateIdle>(shared_from_this());
+	m_pState->m_nextState = m_pState;
+
+	auto state = std::dynamic_pointer_cast<PlayerStateIdle>(m_pState);
+	state->Init();
+
+	m_pSoundManager = std::make_shared<SoundManager>();
+}
+
+void Player::Update(Stage& stage, const Pad&pad,const Camera& camera)
+{
+	m_isAttack = false;
+	m_isMagicAttack = false;
+	m_isWarpPoint = false;
+	m_isAttackCollision = false;
+
+	// 前のフレームと違うstateの場合
+	if (m_pState->GetKind() != m_pState->m_nextState->GetKind())
+	{
+		// stateを変更する
+		m_pState = m_pState->m_nextState;
+		m_pState->m_nextState = m_pState;
+	}
+
+	// 重力を足す
+	m_pos = VAdd(m_pos, VGet(0.0f, m_gravity, 0.0f));
+
+	//ステージから落ちると、ゲームオーバー
+	if (m_pos.y <= -1000.0f)
+	{
+		m_isDie = true;
+	}
+	else
+	{
+		m_isDie = m_pState->GetIsDie();
+	}
+
+	//カプセルの座標をプレイヤーと同じ位置に調整
+	m_capsuleStart = VAdd(m_pos, m_capsuleStartPoint);
+	m_capsuleEnd = VAdd(m_pos, m_capsuleEndPoint);
+	m_spherePos = VAdd(m_pos, VGet(0.0f, kSpherePosY, 0.0f));
+
+	// stateの更新
+	m_pState->Update(stage,pad,camera); 	
+
+	m_pEffectManager->Update();
+
+	//ワープ処理
+	stage.WarpPoint(*this, pad);
+
+	if (m_superMeter >= kSuperMeter)
+	{
+		m_isSpecialMoveAvailable = true;
+	}
+	else
+	{
+		m_isSpecialMoveAvailable =false;
+	}
+	
+	//アニメーションの更新
+	UpdateAnim();
+
+	//当たり判定の更新
+	UpdateCol();
+
+	//モデルの位置
+	MV1SetPosition(m_handle, m_pos);
+}
+
+//描画
+void Player::Draw()
+{
+	//シャドウマップでプレイヤーモデルを描画する
+	MV1DrawModel(m_handle);
+
+	// シャドウマップへの描画を終了
+	ShadowMap_DrawEnd();
+
+	//モデルの表示
+	MV1DrawModel(m_handle);
+
+	//エフェクトの描画
+	m_pEffectManager->Draw();
+
+	
+
+//#ifdef _DEBUG
+//
+//	//現在の状態
+//	m_pState->Draw();
+//
+//	//プレイヤーの座標表示
+//	DrawFormatString(0, 400, GetColor(0, 0, 0), "playerの座標(%.2f,%.2f,%.2f)", m_pos.x, m_pos.y, m_pos.z);
+//
+//	//足元のカプセルを表示
+//	DrawSphere3D(m_spherePos, m_sphereRadius, 5,0x000000, 0x000000, false);
+//
+//	//胴体のカプセルの表示
+//	DrawCapsule3D(m_capsuleStart, m_capsuleEnd, m_radius, 40, GetColor(0, 255, 0), GetColor(0,0,0), false);
+//	
+//	//攻撃のカプセルの表示
+//	DrawCapsule3D(m_attackCapsuleStart, m_attackCapsuleEnd, m_attackRadius, 40, GetColor(255, 255, 0), GetColor(0,0,0), false);
+//
+//	//魔法攻撃のカプセルの表示
+//	DrawCapsule3D(m_magicCapsuleStart, m_magicCapsuleEnd, m_magicRadius, 40, GetColor(255, 0, 0), GetColor(0,0,0), false);
+//
+//	//必殺技時のカプセルの表示
+//	DrawCapsule3D(m_specialMoveStart, m_specialMoveEnd, m_specialMoveRadius, 40, GetColor(255, 0, 0), GetColor(0,0,0), false);
+//
+//
+//	
+//
+//	DrawFormatString(0,450, GetColor(0,0,0), "playerのHP:%4d", m_hp);
+//
+//	DrawFormatString(0, 500, GetColor(0,0,0), "playerの必殺技ゲージ:%4d", m_superMeter);
+//
+//#endif
+}
+
+//動いた時の処理
+void Player::Move( Stage& stage,const VECTOR& moveVec)
+{
+	// 移動中のみ向きを更新する
+	if (VSize(moveVec) > 0.0f)
+	{
+		m_characterAngle = atan2f(-moveVec.x, -moveVec.z);
+
+		m_attackAngle = atan2f(moveVec.x, moveVec.z);
+	}
+
+	m_pos = stage.CheckObjectCol(*this, moveVec);
+
+	//モデルの位置
+	MV1SetPosition(m_handle, m_pos);
+
+	//モデルの回転更新
+	MV1SetRotationXYZ(m_handle, VGet(0.0f, m_characterAngle, 0.0f));
+
+}
+
+//攻撃をした時の処理
+void Player::Attack(int buttonCount,float animTime)
+{
+	m_isAttack = true; 
+
+	if (animTime >= kAttack1Time&& buttonCount == 0)
+	{
+		m_isAttackCollision = true;
+	}
+
+	if (animTime >= kAttack2StartTime && buttonCount == 1)
+	{
+		m_isAttackCollision = true;
+	}
+	else if (animTime >= kAttack2EndTime && buttonCount == 1)
+	{
+		m_isAttackCollision = false;
+	}
+
+	if (animTime >= kAttack3StartTime && buttonCount == 2)
+	{
+		m_isAttackCollision = true;
+	}
+	else if (animTime >= kAttack3EndTime && buttonCount == 2)
+	{
+		m_isAttackCollision = false;
+	}
+
+}
+
+//魔法攻撃をした時の処理
+void Player::MagicAttack()
+{
+	m_mp -= 5.0f;
+	m_isMagicAttack = true;
+}
+
+//必殺技を行った時の処理
+void Player::SpecialMove(const Pad& pad,bool isSpecialMove)
+{
+	if (m_superMeter > kSuperMeter && pad.IsTrigger("Y"))
+	{
+		m_isSpecialMove = true;
+
+		m_superMeter = 0;
+	}
+
+	if (isSpecialMove)
+	{
+		m_isSpecialMove = false;
+	}
+}
+
+//ワープ移動時の処理
+void Player::Warp(const Pad& pad,VECTOR warpTarget)
+{
+	m_isWarpPoint = true;
+
+	if (pad.IsTrigger("X"))
+	{
+		m_pos = warpTarget;
+	}
+
+#ifdef _DEBUG
+
+	DrawFormatString(0, 150, GetColor(0,0,0), "ワープできます");
+
+#endif
+}
+
+
+//敵の胴体か敵の攻撃によって変わるダメージ処理
+void Player::Damage(float damage,int enemyType)
+{
+	//近距離攻撃が当たった時の処理
+	if (m_isHitEnemyAttack && !m_isPlayerGuard && enemyType == kShortDistanceEnemy)
+	{
+		m_pSoundManager->HitShortDistanceAttackSE();
+		m_hp -= damage;
+		m_pEffectManager->DrawPlayerDamageEffect(m_pos);
+		KnockBack(m_subVector);
+	}
+	//ガード中に近距離攻撃が当たった時の処理
+	else if (m_isHitEnemyAttack && m_isPlayerGuard && enemyType == kShortDistanceEnemy)
+	{
+		m_pSoundManager->HitShortDistanceAttackSE();
+		m_hp -= damage * 0.5;
+		m_pEffectManager->DrawPlayerGuardEffect(m_pos);
+		KnockBack(m_subVector);
+	}
+	
+	//遠距離攻撃が当たった時の処理
+	if (m_isHitEnemyAttack && !m_isPlayerGuard &&enemyType == kLongDistanceEnemy)
+	{
+		m_pSoundManager->HitLongDistanceAttackSE();
+		m_hp -= damage;
+		m_pEffectManager->DrawPlayerDamageEffect(m_pos);
+		KnockBack(m_subVector);
+	}
+
+	//ガード中に遠距離攻撃に当たった時の処理
+	else if (m_isHitEnemyAttack && m_isPlayerGuard && enemyType == kLongDistanceEnemy)
+	{
+		m_pSoundManager->HitLongDistanceAttackSE();
+		m_hp -= damage*0.5f;
+		m_pEffectManager->DrawPlayerGuardEffect(m_pos);
+		KnockBack(m_subVector);
+	}
+
+	//敵に当たった時の処理
+	if (m_isHitEnemy && !m_isPlayerGuard)
+	{
+		m_pSoundManager->HitShortDistanceAttackSE();
+		m_hp -= damage;
+
+		KnockBack(m_subVector);
+	}
+	else if (m_isHitEnemy && m_isPlayerGuard)
+	{
+		m_pSoundManager->HitShortDistanceAttackSE();
+		m_hp -= damage*0.5f;
+
+		KnockBack(m_subVector);
+	}
+}
+
+//回復処理
+void Player::RecoverHp(int recoveryQuantity)
+{
+	m_hp += recoveryQuantity;
+}
+
+
+//敵の胴体と当たったかどうか
+bool Player::HitEnemy(VECTOR enemyPos,VECTOR HitEnemyCollisionStart, VECTOR HitEnemyCollisionEnd, float HitEnemyRadius)
+{
+	m_subVector = VSub(enemyPos, m_pos);
+
+	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyCollisionStart, HitEnemyCollisionEnd, HitEnemyRadius))
+	{
+		m_isHitEnemy = true;
+
+	}
+	else
+	{
+		m_isHitEnemy = false;
+	}
+
+	return m_isHitEnemy;
+}
+
+//敵の攻撃が当たったかどうか
+bool Player::HitEnemyAttack(VECTOR enemyPos, VECTOR HitEnemyAttackCollisionStart, VECTOR HitEnemyAttackCollisionEnd, float HitAttackEnemyRadius)
+{
+	m_subVector = VSub(enemyPos, m_pos);
+
+	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyAttackCollisionStart, HitEnemyAttackCollisionEnd, HitAttackEnemyRadius))
+	{
+		m_isHitEnemyAttack = true;
+
+	}
+	else
+	{
+		m_isHitEnemyAttack = false;
+	}
+
+	return m_isHitEnemyAttack;
+}
+
+//攻撃が当たった時の処理
+void Player::HitAttack(bool hitAttack)
+{
+	//当たった時の処理
+	if (hitAttack&& m_isAttack)
+	{
+		m_superMeter += 5;
+		m_pSoundManager->SwordSE();
+
+		return;
+	}
+
+	//当たっていない時の処理
+	else if(!hitAttack && m_isAttack)
+	{
+		m_pSoundManager->RollSwordSE();
+
+		return;
+	}
+}
+
+//向いている方向を変更する処理
+void Player::UpdateCol()
+{
+	// プレイヤーの向きをもとに当たり判定の位置を調整する
+	MATRIX rotationMatrixY = MGetRotY(m_attackAngle);
+
+	// カプセルの移動方向を計算
+	if (m_isAttackCollision)
+	{
+		//剣の当たり判定を更新
+		m_attackCapsuleStart = VAdd(m_pos, (VTransform(m_attackCapsuleStartPoint, rotationMatrixY)));
+
+		m_attackCapsuleEnd = VAdd(m_attackCapsuleStart, (VTransform(m_attackCapsuleEndPoint, rotationMatrixY)));
+	}
+
+	else
+	{
+		//剣の当たり判定を更新
+		m_attackCapsuleStart = VGet(0.0f, kAttackPosY, 0.0f);
+		m_attackCapsuleEnd = VGet(0.0f, kAttackPosY, 0.0f);
+	}
+
+
+	//魔法攻撃の当たり判定を更新
+	//魔法攻撃を行っているが、魔法攻撃がまだ動いていない場合
+	if (m_isMagicAttack && !m_isMagicAttackMove)
+	{
+		//カプセルの二点のうちひとつを設定
+		m_magicCapsuleStart = VAdd(m_pos, (VTransform(m_magicCapsuleStartPoint, rotationMatrixY)));
+
+		//カプセルの二点の残り一つを設定
+		m_magicCapsuleEnd = VAdd(m_magicCapsuleStart, (VTransform(m_magicCapsuleEndPoint, rotationMatrixY)));
+	
+		//カプセルの進行方向を計算で出す
+		m_magicDirection = VTransform({ 0.0f, 0.0f, 1.0f }, rotationMatrixY);
+
+		//進行方向などの処理が終わったので魔法攻撃を動かす
+		m_isMagicAttackMove = true;
+	}
+
+	//魔法攻撃が動いているときの処理
+	if (m_isMagicAttackMove)
+	{
+		//魔法攻撃の進む方向とスピードを計算して出す
+		m_magicCapsuleStart = VAdd(m_magicCapsuleStart, VScale(m_magicDirection, kMagicAttackSpeed));
+		m_magicCapsuleEnd = VAdd(m_magicCapsuleEnd, VScale(m_magicDirection, kMagicAttackSpeed));
+
+		//エフェクトの演出を描画する
+		m_pEffectManager->DrawMagicAttackEffect(m_magicCapsuleStart);
+
+		// 最大距離に達したら停止
+		if (VSize(VSub(m_magicCapsuleStart, m_pos)) > kMagicAttackDistance)
+		{
+			//最大距離まで来たのですべてfalseにする
+			m_isMagicAttackMove = false;
+			m_isMagicAttack = false;
+
+			m_magicCapsuleStart = VGet(0.0f, kAttackPosY, 0.0f);
+			m_magicCapsuleEnd =  VGet(0.0f, kAttackPosY, 0.0f);
+		}
+	}
+
+
+	//必殺技の当たり判定を更新
+	if (m_isSpecialMove)
+	{
+		m_specialMoveStart = VAdd(m_pos, (VTransform(m_specialMoveStartPoint, rotationMatrixY)));
+		m_specialMoveEnd = VAdd(m_specialMoveStart, (VTransform(m_specialMoveEndPoint, rotationMatrixY)));
+	}
+	else
+	{
+		m_specialMoveStart = VGet(0.0f, kAttackPosY, 0.0f);
+		m_specialMoveEnd = VGet(0.0f, kAttackPosY, 0.0f);
+	}
+}
