@@ -27,7 +27,7 @@ namespace
 	constexpr float kAttackRadius = 20.0f;
 
 	//ボスが倒れた時に渡すステータスポイント
-	constexpr int  kStatusPoint = 40;
+	constexpr int  kStatusPoint = 100;
 
 	//遠距離攻撃の進むスピード
 	constexpr float kAttackSpeed =10.0f;
@@ -60,12 +60,6 @@ m_leftElbowPos(VGet(0.0f,0.0f,0.0f)), m_leftHandPos(VGet(0.0f,0.0f,0.0f))
 	//ボスの座標位置情報を読み込む
 	LoadCsv::GetInstance().LoadPlayerPosData(m_characterPos, kBossName);
 
-	//初期化
-	m_attackCapsuleStart = VGet(0.0f, kAttackPosY, 0.0f);
-	m_attackCapsuleEnd = VGet(0.0f, kAttackPosY, 0.0f);
-	m_capsuleStart = VGet(0.0f, 0.0f, 0.0f);
-	m_capsuleEnd = VGet(0.0f, 0.0f, 0.0f);
-
 	//ステータスを与える
 	m_hp = m_status.maxHp;
 	m_mp = m_status.maxMp;
@@ -85,11 +79,14 @@ m_leftElbowPos(VGet(0.0f,0.0f,0.0f)), m_leftHandPos(VGet(0.0f,0.0f,0.0f))
 	m_attackCapsuleEndPoint = m_collisionInfo.attackCapsuleEndPoint;
 	m_attackRadius = m_collisionInfo.attackRadius;
 
-	m_isDie = false;
 }
 
 Boss::~Boss()
 {
+	//モデルを削除
+	MV1DeleteModel(m_handle);
+	MV1DeleteModel(m_throwingHandle);
+
 	m_pEffectManager->ClearEffect();
 	m_pEffectManager.reset();
 
@@ -99,37 +96,48 @@ Boss::~Boss()
 void Boss::Init(int handle)
 {
 	//モデルを受け取る
+ // モデルを受け取る
 	m_handle = handle;
 
-	//初期位置設定	
+	// 初期位置設定
 	m_pos = VGet(m_characterPos.posX, m_characterPos.posY, m_characterPos.posZ);
 
-	//アニメーションを読み込む
+	// アニメーションを読み込む
 	LoadCsv::GetInstance().LoadBossAnimData(m_animData);
 
-	//遠距離攻撃時に描画されるモデルをロードする
+	// 遠距離攻撃時に描画されるモデルをロードする
 	m_throwingHandle = MV1LoadModel("data/model/item/Rock.mv1");
 
-	//モデルのサイズを変更
+	// モデルのサイズを変更
 	MV1SetScale(m_handle, VGet(kBossSize, kBossSize, kBossSize));
 	MV1SetScale(m_throwingHandle, VGet(kThrowingSize, kThrowingSize, kThrowingSize));
 
-	//キャラクターの種類の設定
+	// キャラクターの種類の設定
 	m_characterKind = kBoss;
 
-	//重力
+	// 重力
 	m_gravity = kGravity;
 
-	//初期化
+	// 初期化
 	m_isLightAttack = false;
 	m_isStorongAttack = false;
 	m_isThrowing = false;
 	m_isDie = false;
 	m_isGameClear = false;
 	m_isAttack = false;
-	m_isAttack= false;
+	m_isAttackMove = false;
 
-	//ステートの作成
+	// 最初は死んでいないので動けるためtrue
+	m_isMove = true;
+
+	// 初期化
+	m_attackCapsuleStart = VGet(0.0f, kAttackPosY, 0.0f);
+	m_attackCapsuleEnd = VGet(0.0f, kAttackPosY, 0.0f);
+
+	m_capsuleStart = VGet(0.0f, 0.0f, 0.0f);
+	m_capsuleEnd = VGet(0.0f, 0.0f, 0.0f);
+
+	// ステートの作成
 	m_pEnemyState = std::make_shared<EnemyStateWalk>(shared_from_this());
 	m_pEnemyState->m_nextState = m_pEnemyState;
 
@@ -150,54 +158,54 @@ void Boss::Update(Stage& stage, Player& player, VECTOR playerPos)
 		m_pEnemyState->m_nextState = m_pEnemyState;
 	}
 
-	//カプセルの座標をエネミーと同じ位置に調整
-	m_capsuleStart = VAdd(m_pos, m_capsuleStartPoint);
-	m_capsuleEnd = VAdd(m_pos, m_capsuleEndPoint);
-
-	//ステートの更新
+	// ステートの更新
 	m_pEnemyState->Update(stage, player, m_characterKind);
-
-	//プレイヤーの攻撃が当たったかどうか
-	HitPlayerAttack(player.GetAttackCapsuleStart(), player.GetAttackCapsuleEnd(),
-		player.GetAttackRadius(), player.GetAttackPower());
-
-	//プレイヤーの魔法攻撃が当たったかどうか
-	HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(), 
-		player.GetMagicCapsuleRadius(), player.GetMagicPower());
-
-	//プレイヤーの必殺技に当たったかどうか
-	HitPlayerAttack(player.GetSpecialMoveStart(),player.GetSpecialMoveEnd(),
-		player.GetSpecialMoveRadius(),player.GetAttackPower());
-
-	//プレイヤーの攻撃が当たったかどうかを渡す
-	player.HitAttack(m_isHitAttack);
-
-	//プレイヤーと当たったかどうか
-	HitPlayer(player);
 
 	// 重力を足す
 	m_pos = VAdd(m_pos, VGet(0.0f, m_gravity, 0.0f));
 
-	//アニメーション
-	UpdateAnim();
+	// カプセルの座標をエネミーと同じ位置に調整
+	m_capsuleStart = VAdd(m_pos, m_capsuleStartPoint);
+	m_capsuleEnd = VAdd(m_pos, m_capsuleEndPoint);
 
-	//攻撃の方向
-	UpdateCol();
-
-	//向いている方向
-	UpdateAngle(player.GetPos());
-
-	//ボスの体力が0以下になったら時の処理
-	if (m_isDie)
+	if (!m_isHitAttack)
 	{
-		m_statusPoint = kStatusPoint;
-		m_isGameClear = true;
+		// プレイヤーの攻撃が当たったかどうか
+		HitPlayerAttack(player.GetAttackCapsuleStart(), player.GetAttackCapsuleEnd(),
+						player.GetAttackRadius(), player.GetAttackPower());
+		if (!m_isHitAttack)
+		{
+			// プレイヤーの魔法攻撃が当たったかどうか
+			HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
+							player.GetMagicCapsuleRadius(), player.GetMagicPower());
+			if (!m_isHitAttack)
+			{
+				// プレイヤーの必殺技に当たったかどうか
+				HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
+								player.GetSpecialMoveRadius(), player.GetAttackPower());
+			}
+		}
 	}
 
+	// プレイヤーの攻撃が当たったかどうかを渡す
+	player.HitAttack(m_isHitAttack);
 
-	//死んだ瞬間の動き
-	Die(player);
+	// プレイヤーと当たったかどうか
+	HitPlayer(player);
 
+	// アニメーション
+	UpdateAnim();
+
+	// 攻撃の方向
+	UpdateCol();
+
+	// 向いている方向
+	UpdateAngle(player.GetPos());
+
+	m_isDie = m_pEnemyState->GetIsDie();
+
+	// 死んだ瞬間の動き
+	Die();
 }
 
 //描画
@@ -220,24 +228,15 @@ void Boss::Draw()
 		MV1SetPosition(m_throwingHandle, m_attackCapsuleEnd);
 	}
 
-	//胴体の当たり判定のカプセルを表示
-	DrawCapsule3D(m_capsuleStart, m_capsuleEnd, m_radius, 40, GetColor(0, 255, 255), GetColor(255, 255, 255), false);
-
-	//弱攻撃の当たり判定カプセルを表示
-	DrawCapsule3D(m_rightShoulderPos, m_rightElbowPos, kAttackRadius, 40, GetColor(255, 255, 0), GetColor(255, 255, 255), false);
-	DrawCapsule3D(m_rightElbowPos, m_rightHandPos, kAttackRadius, 40, GetColor(255, 255, 0), GetColor(255, 255, 255), false);
-
-	//強攻撃の当たり判定のカプセルを表示
-	DrawCapsule3D(m_leftShoulderPos, m_leftElbowPos, kAttackRadius, 40, GetColor(255, 255, 0), GetColor(255, 255, 255), false);
-	DrawCapsule3D(m_leftElbowPos, m_leftHandPos, kAttackRadius, 40, GetColor(255, 255, 0), GetColor(255, 255, 255), false);
-
-	//遠距離攻撃の当たり判定のカプセルを表示
-	DrawCapsule3D(m_attackCapsuleStart, m_attackCapsuleEnd, m_attackRadius, 40, GetColor(255, 255, 0), GetColor(0, 0, 0), false);
-
 #ifdef _DEBUG
 
-	//胴体の当たり判定のカプセルを表示
-	DrawCapsule3D(m_capsuleStart, m_capsuleEnd, m_radius, 40, GetColor(0, 255, 255), GetColor(255, 255, 255), false);
+	//ボスの座標表示
+	DrawFormatString(0, 400, GetColor(0, 0, 0), "ボスの座標(%.2f,%.2f,%.2f)", m_pos.x, m_pos.y, m_pos.z);
+	DrawFormatString(0, 450, GetColor(0, 0, 0), "ボスの当たり判定の始点(%.2f,%.2f,%.2f)", m_capsuleStart.x, m_capsuleStart.y, m_capsuleStart.z);
+	DrawFormatString(0, 500, GetColor(0, 0, 0), "ボスの当たり判定の終点(%.2f,%.2f,%.2f)", m_capsuleEnd.x, m_capsuleEnd.y, m_capsuleEnd.z);
+
+	////胴体の当たり判定のカプセルを表示
+	DrawCapsule3D(m_capsuleStart, m_capsuleEnd, m_radius, 40, GetColor(255, 255, 255), GetColor(255, 255, 255), false);
 
 	//弱攻撃の当たり判定カプセルを表示
 	DrawCapsule3D(m_rightShoulderPos, m_rightElbowPos, kAttackRadius, 40, GetColor(255, 255, 0), GetColor(255, 255, 255), false);
@@ -249,6 +248,8 @@ void Boss::Draw()
 
 	//遠距離攻撃の当たり判定のカプセルを表示
 	DrawCapsule3D(m_attackCapsuleStart, m_attackCapsuleEnd, m_attackRadius, 40, GetColor(255, 255, 0), GetColor(0, 0, 0), false);
+
+	
 	
 #endif
 }
@@ -275,6 +276,7 @@ void Boss::HitPlayer(Player& player)
 
 		m_isAttack = false;
 		m_isAttackMove = false;
+		m_isThrowing = false;
 	}
 }
 
@@ -327,6 +329,8 @@ void Boss::UpdateCol()
 			m_attackCapsuleEnd = VAdd(m_attackCapsuleStart, (VTransform(m_attackCapsuleEndPoint, rotationMatrix)));
 
 			m_isAttackMove = true;
+			m_isAttack = false;
+
 		}
 		if (m_isAttackMove)
 		{
@@ -345,6 +349,12 @@ void Boss::UpdateCol()
 
 			}
 		}
+	}
+
+	if (!m_isAttack && !m_isAttackMove)
+	{
+		m_attackCapsuleStart = VGet(0.0f, kAttackPosY, 0.0f);
+		m_attackCapsuleEnd = VGet(0.0f, kAttackPosY, 0.0f);
 	}
 
 }

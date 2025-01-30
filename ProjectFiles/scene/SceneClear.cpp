@@ -1,6 +1,6 @@
 ﻿#include "SceneClear.h"
 #include "DxLib.h"
-#include "SceneTitle.h"
+#include "SceneSelect.h"
 #include "SoundManager.h"
 #include "Pad.h"
 #include "Game.h"
@@ -56,7 +56,7 @@ std::shared_ptr<SceneBase> SceneClear::Update(const Pad& pad)
 	}
 	if (m_isTitle && m_fadeAlpha >= kFadeValue)
 	{
-		return std::make_shared<SceneTitle>();
+		return std::make_shared<SceneSelect>();
 	}
 
 	return shared_from_this();

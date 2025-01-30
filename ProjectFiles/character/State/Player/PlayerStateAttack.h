@@ -36,6 +36,9 @@ private:
     //Aボタンを押した回数
     int m_aButtonCount;
 
+    //攻撃を行った回数
+    int m_attacks;
+
     //攻撃2の再生時間
     float m_attack2Time;
 

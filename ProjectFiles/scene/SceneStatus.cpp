@@ -96,12 +96,13 @@ void SceneStatus::Init()
 	//カスタムボーナスの説明をロード
 	m_customBonusHandle = LoadGraph("data/BG/custombonus.png");
 
+	//フルカスタムボーナスの説明をロード
+	m_fullCustomBonusHandle = LoadGraph("data/BG/fullCustomBonus.png");
+
 
 	m_fadeAlpha = kFadeValue;
 
 	m_isSelect = false;
-
-	m_isCustomBonus = false;
 
 	//カーソル位置の初期化
 	m_cursorPos = VGet(0.0f, 0.0f, 0.0f);
@@ -389,10 +390,15 @@ void SceneStatus::DrawPoint()
 //カスタムボーナス説明を描画する
 void SceneStatus::DrawCustomBonus()
 {
-	m_isCustomBonus = m_pPlayerStatus->GeIsCustomBonus();
-	if(m_isCustomBonus)
+	if(m_pPlayerStatus->GetIsCustomBonus())
 	{
 		DrawGraph(0, 0, m_customBonusHandle, true);
+	}
+
+
+	if (m_pPlayerStatus->GetIsFullCustomBonus())
+	{
+		DrawGraph(0, 0, m_fullCustomBonusHandle, true);
 	}
 }
 

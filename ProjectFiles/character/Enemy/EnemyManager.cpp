@@ -11,7 +11,7 @@
 namespace
 {
 	//敵が死んだときにもらえるステータスポイント
-	constexpr int kStatusPoint = 1;
+	constexpr int kStatusPoint = 5;
 
 	//最大敵数
 	constexpr int kMaxEnemy = 16;
@@ -83,21 +83,28 @@ void EnemyManager::Update(Stage& stage, Player& player)
 		{
 			//近距離型の動き
 			m_pShortDistanceEnemy[i]->Update(stage, player, player.GetPos());
-
-			//プレイヤーに攻撃が当たったかどうか
-			player.HitAttack(m_pShortDistanceEnemy[i]->GetHitCharacterAttack());
-
+			
 			//攻撃が当たったかどうか
 			m_pShortDistanceEnemy[i]->HitPlayerAttack(player.GetAttackCapsuleStart(), player.GetAttackCapsuleEnd(),
 		player.GetAttackRadius(), player.GetAttackPower());
 
-			//プレイヤーの魔法攻撃が当たったかどうか
-			m_pShortDistanceEnemy[i]->HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
-					player.GetMagicCapsuleRadius(), player.GetMagicPower());
+			if (!m_pShortDistanceEnemy[i]->GetHitCharacterAttack())
+			{
+				//プレイヤーの魔法攻撃が当たったかどうか
+				m_pShortDistanceEnemy[i]->HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
+						player.GetMagicCapsuleRadius(), player.GetMagicPower());
 
-			//必殺技が当たったかどうか
-			m_pShortDistanceEnemy[i]->HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
-		player.GetSpecialMoveRadius(), player.GetAttackPower());
+				if (!m_pShortDistanceEnemy[i]->GetHitCharacterAttack())
+				{
+					//必殺技が当たったかどうか
+					m_pShortDistanceEnemy[i]->HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
+				player.GetSpecialMoveRadius(), player.GetAttackPower());
+				}
+			}
+		
+
+			//プレイヤーに攻撃が当たったかどうか
+			player.HitAttack(m_pShortDistanceEnemy[i]->GetHitCharacterAttack());
 
 			//プレイヤーと当たったかどうか
 			m_pShortDistanceEnemy[i]->HitPlayer(player);
@@ -122,20 +129,25 @@ void EnemyManager::Update(Stage& stage, Player& player)
 		{
 			//遠距離型の動き
 			m_pLongDistanceEnemy[i]->Update(stage, player, player.GetPos());
-
-			//プレイヤーの攻撃が当たったかどうか
+			//攻撃が当たったかどうか
 			m_pLongDistanceEnemy[i]->HitPlayerAttack(player.GetAttackCapsuleStart(), player.GetAttackCapsuleEnd(),
-		player.GetAttackRadius(), player.GetAttackPower());;
+		player.GetAttackRadius(), player.GetAttackPower());
 
-			//プレイヤーの魔法攻撃が当たったかどうか
-			m_pLongDistanceEnemy[i]->HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
-					player.GetMagicCapsuleRadius(), player.GetMagicPower());
+			if (!m_pLongDistanceEnemy[i]->GetHitCharacterAttack())
+			{
+				//プレイヤーの魔法攻撃が当たったかどうか
+				m_pLongDistanceEnemy[i]->HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
+						player.GetMagicCapsuleRadius(), player.GetMagicPower());
 
-			//必殺技が当たったかどうか
-			m_pLongDistanceEnemy[i]->HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
-		player.GetSpecialMoveRadius(), player.GetAttackPower());
+				if (!m_pLongDistanceEnemy[i]->GetHitCharacterAttack())
+				{
+					//必殺技が当たったかどうか
+					m_pLongDistanceEnemy[i]->HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
+				player.GetSpecialMoveRadius(), player.GetAttackPower());
+				}
+			}
 
-			//当たったかどうかを渡す
+			//プレイヤーの攻撃が当たったかどうかを渡す
 			player.HitAttack(m_pLongDistanceEnemy[i]->GetHitCharacterAttack());
 
 			//プレイヤーと当たったかどうか

@@ -46,6 +46,11 @@ public:
 	/// </summary>
 	void StatOutput(int statasUpPoint = 0.0f);
 
+	/// <summary>
+	/// ステータスをリセットし、出力する
+	/// </summary>
+	void ResetOutPut();
+
 	//カスタムボーナスを受け取れるかどうか　
 	void CustomBonus(const Pad& Pad);
 
@@ -104,10 +109,22 @@ public:
 	int GetDefensePowerUpTimes() const { return m_defensePowerUpTimes; }
 
 	/// <summary>
+	/// 必殺技ゲージ
+	/// </summary>
+	/// <returns></returns>
+	int GetspecialMoveGauge() const { return m_specialMoveGauge; }
+
+	/// <summary>
 	/// カスタムボーナス
 	/// </summary>
 	/// <returns></returns>
-	bool GeIsCustomBonus()const { return m_isCustomBonus; }
+	bool GetIsCustomBonus()const { return m_isCustomBonus; }
+
+	/// <summary>
+	/// フルカスタムボーナス
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsFullCustomBonus() const { return m_isFullCustomBonus; }
 
 public:
 
@@ -164,6 +181,9 @@ private:
 
 	//カスタムボーナス取得できるか
 	bool m_isCustomBonus;
+
+	//フルカスタムボーナス取得できるか
+	bool m_isFullCustomBonus;
 
 
 };

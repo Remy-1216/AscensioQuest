@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "PlayerStatus.h"
 #include "Stage.h"
+#include "Font.h"
 #include <string>
 #include <map>	
 class LoadCsv
@@ -104,6 +105,13 @@ public:
 	/// </summary>
 	/// <param name="data"></param>
 	void LoadEffectData(EffectManager::EffectData& data, const char* effectName);
+
+	/// <summary>
+	/// フォントのデータを読み込む
+	/// </summary>
+	/// <param name="data">フォントデータ</param>
+	/// <param name="fontDate">読み込むデータの名前</param>
+	void LoadFontData(Font::FontId& data,const char* fontDate);
 
 private:
 	LoadCsv() = default;

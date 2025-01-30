@@ -10,6 +10,7 @@ class Boss;
 class EnemyManager;
 class Stage;
 class PlayerStatus;
+class UIBar;
 
 class SceneStage :  public SceneBase
 {
@@ -52,13 +53,6 @@ private:
 	void Stage2Update(const Pad& pad);
 
 	/// <summary>
-	/// プレイヤーのHPバー＆MPバーの表示
-	/// </summary>
-	/// <param name="hp">プレイヤーのHP</param>
-	/// <param name="mp">プレイヤーのMP</param>
-	void HpBarDraw(int hp,int mp);
-
-	/// <summary>
 	/// プレイヤーの位置によって操作説明を変更する
 	/// </summary>
 	void OperationUI();
@@ -69,6 +63,13 @@ private:
 	void Fade();
 
 private:
+
+	//UI関係
+	int m_operationHandle;				//通常時の操作方法のハンドル
+	int m_specialMoveOperationHandle;	//必殺技ができる状態の操作方法のハンドル
+	int m_warpPointOperationHandle;		//ワープポイントにいる時に表示する操作方法のハンドル
+	int m_allOperatioHandle;			//ワープ地点にいる上で必殺技も撃てる状態の操作方法のハンドル
+
 
 	std::shared_ptr<Player>m_pPlayer;
 
@@ -82,14 +83,7 @@ private:
 
 	std::shared_ptr<PlayerStatus>m_pPlayerStatus;
 
-	//UI関係
-	int m_barHandle;					//バーの灰色部分のハンドル
-	int m_hpBarHandle;					//HPバーのハンドル
-	int m_mpBarHandle;					//MPバーのハンドル
-	int m_operationHandle;				//通常時の操作方法のハンドル
-	int m_specialMoveOperationHandle;	//必殺技ができる状態の操作方法のハンドル
-	int m_warpPointOperationHandle;		//ワープポイントにいる時に表示する操作方法のハンドル
-	int m_allOperatioHandle;			//ワープ地点にいる上で必殺技も撃てる状態の操作方法のハンドル
+	std::shared_ptr<UIBar>m_pUIBar;
 
 	// シャドウマップのハンドル
 	int m_shadowMapHandle;

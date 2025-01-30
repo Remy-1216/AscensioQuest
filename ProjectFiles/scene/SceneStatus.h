@@ -115,21 +115,18 @@ private:
 	int m_customBonusHandle;
 
 	/// <summary>
+	/// フルカスタムボーナスの説明ハンドル
+	/// </summary>
+	int m_fullCustomBonusHandle;
+
+	/// <summary>
 	/// セレクト画面に戻るかどうか
 	/// </summary>
 	bool m_isSelect;
 
 	/// <summary>
-	/// カスタムボーナス
-	/// </summary>
-	bool m_isCustomBonus;
-
-	/// <summary>
 	/// カーソルの位置
 	/// </summary>
 	VECTOR m_cursorPos;
-		
-
-	
 };
 

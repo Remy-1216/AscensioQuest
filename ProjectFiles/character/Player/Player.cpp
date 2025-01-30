@@ -16,6 +16,9 @@ namespace
 {
 	const char* const kPlayerName = "player";
 
+	//魔法攻撃を行った時に消費されるMP量
+	constexpr int kMp = 20;
+
 	//アニメーションの切り替えにかかるフレーム数
 	constexpr float kAnimChangeFrame = 4.0f;
 	constexpr float kAnimChangeRateSpeed = 1.0f / kAnimChangeFrame;
@@ -54,7 +57,7 @@ namespace
 }
 
 Player::Player() :CharacterBase(m_handle),m_hpUp(0), m_attackUp(0), m_magicAttackUp(0), m_defensePowerUp(0),
-m_superMeter(0), m_sphereRadius(0.0f), m_isAttack(false), m_isAttackCollision(false),m_isMagicAttack(false),
+m_maxMp(0), m_damage(0),m_specialMoveGauge(0), m_sphereRadius(0.0f), m_isAttack(false), m_isAttackCollision(false),m_isMagicAttack(false),
 m_isMagicAttackMove(false), m_isSpecialMoveAvailable(false), m_isSpecialMove(false), m_isHitEnemy(false),
 m_isHitEnemyAttack(false), m_isWarpPoint(false),m_movementDirection(VGet(0.0f, 0.0f, 0.0f)), m_spherePos(VGet(0.0f,0.0f,0.0f)),
 m_magicDirection(VGet(0.0f,0.0f,0.0f))
@@ -131,8 +134,6 @@ void Player::Init()
 
 	m_isSpecialMoveAvailable = false;
 
-	m_superMeter = 0;
-
 	m_characterAngle = 0.0f;
 
 	m_sphereRadius = kSpherePosY;
@@ -151,7 +152,11 @@ void Player::Init()
 	m_attackPower += m_pPlayerStatus->GetAttackUp();
 	m_magicAttackPower += m_pPlayerStatus->GetMagicAttackUp();
 	m_defensePower += m_pPlayerStatus->GetDefensePowerUp();
+	m_specialMoveGauge += m_pPlayerStatus->GetspecialMoveGauge();
 
+	//最大HPと最大MPの設定
+	m_maxHp = m_hp;
+	m_maxMp = m_mp;
 
 	m_pState = std::make_shared<PlayerStateIdle>(shared_from_this());
 	m_pState->m_nextState = m_pState;
@@ -203,7 +208,8 @@ void Player::Update(Stage& stage, const Pad&pad,const Camera& camera)
 	//ワープ処理
 	stage.WarpPoint(*this, pad);
 
-	if (m_superMeter >= kSuperMeter)
+	//必殺技を使えるかどうか
+	if (m_specialMoveGauge >= kSuperMeter)
 	{
 		m_isSpecialMoveAvailable = true;
 	}
@@ -220,6 +226,9 @@ void Player::Update(Stage& stage, const Pad&pad,const Camera& camera)
 
 	//モデルの位置
 	MV1SetPosition(m_handle, m_pos);
+
+	//死んだときの処理
+	Die();
 }
 
 //描画
@@ -239,37 +248,34 @@ void Player::Draw()
 
 	
 
-//#ifdef _DEBUG
-//
-//	//現在の状態
-//	m_pState->Draw();
-//
-//	//プレイヤーの座標表示
-//	DrawFormatString(0, 400, GetColor(0, 0, 0), "playerの座標(%.2f,%.2f,%.2f)", m_pos.x, m_pos.y, m_pos.z);
-//
-//	//足元のカプセルを表示
-//	DrawSphere3D(m_spherePos, m_sphereRadius, 5,0x000000, 0x000000, false);
-//
-//	//胴体のカプセルの表示
-//	DrawCapsule3D(m_capsuleStart, m_capsuleEnd, m_radius, 40, GetColor(0, 255, 0), GetColor(0,0,0), false);
-//	
-//	//攻撃のカプセルの表示
-//	DrawCapsule3D(m_attackCapsuleStart, m_attackCapsuleEnd, m_attackRadius, 40, GetColor(255, 255, 0), GetColor(0,0,0), false);
-//
-//	//魔法攻撃のカプセルの表示
-//	DrawCapsule3D(m_magicCapsuleStart, m_magicCapsuleEnd, m_magicRadius, 40, GetColor(255, 0, 0), GetColor(0,0,0), false);
-//
-//	//必殺技時のカプセルの表示
-//	DrawCapsule3D(m_specialMoveStart, m_specialMoveEnd, m_specialMoveRadius, 40, GetColor(255, 0, 0), GetColor(0,0,0), false);
-//
-//
-//	
-//
-//	DrawFormatString(0,450, GetColor(0,0,0), "playerのHP:%4d", m_hp);
-//
-//	DrawFormatString(0, 500, GetColor(0,0,0), "playerの必殺技ゲージ:%4d", m_superMeter);
-//
-//#endif
+#ifdef _DEBUG
+
+	//現在の状態
+	m_pState->Draw();
+
+	//プレイヤーの座標表示
+	DrawFormatString(0, 400, GetColor(0, 0, 0), "playerの座標(%.2f,%.2f,%.2f)", m_pos.x, m_pos.y, m_pos.z);
+
+	//足元のカプセルを表示
+	DrawSphere3D(m_spherePos, m_sphereRadius, 5,0x000000, 0x000000, false);
+
+	//胴体のカプセルの表示
+	DrawCapsule3D(m_capsuleStart, m_capsuleEnd, m_radius, 40, GetColor(0, 255, 0), GetColor(0,0,0), false);
+	
+	//攻撃のカプセルの表示
+	DrawCapsule3D(m_attackCapsuleStart, m_attackCapsuleEnd, m_attackRadius, 40, GetColor(255, 255, 0), GetColor(0,0,0), false);
+
+	//魔法攻撃のカプセルの表示
+	DrawCapsule3D(m_magicCapsuleStart, m_magicCapsuleEnd, m_magicRadius, 40, GetColor(255, 0, 0), GetColor(0,0,0), false);
+
+	//必殺技時のカプセルの表示
+	DrawCapsule3D(m_specialMoveStart, m_specialMoveEnd, m_specialMoveRadius, 40, GetColor(255, 0, 0), GetColor(0,0,0), false);
+
+	DrawFormatString(0,450, GetColor(0,0,0), "playerのHP:%4d", m_hp);
+
+	DrawFormatString(0, 500, GetColor(0,0,0), "playerの必殺技ゲージ:%4d", m_specialMoveGauge);
+
+#endif
 }
 
 //動いた時の処理
@@ -326,18 +332,19 @@ void Player::Attack(int buttonCount,float animTime)
 //魔法攻撃をした時の処理
 void Player::MagicAttack()
 {
-	m_mp -= 5.0f;
+	m_mp -= kMp;
+	m_pSoundManager->MagicAttackSE();
 	m_isMagicAttack = true;
 }
 
 //必殺技を行った時の処理
 void Player::SpecialMove(const Pad& pad,bool isSpecialMove)
 {
-	if (m_superMeter > kSuperMeter && pad.IsTrigger("Y"))
+	if (m_specialMoveGauge == kSuperMeter && pad.IsTrigger("Y"))
 	{
 		m_isSpecialMove = true;
 
-		m_superMeter = 0;
+		m_specialMoveGauge = 0;
 	}
 
 	if (isSpecialMove)
@@ -371,16 +378,20 @@ void Player::Damage(float damage,int enemyType)
 	if (m_isHitEnemyAttack && !m_isPlayerGuard && enemyType == kShortDistanceEnemy)
 	{
 		m_pSoundManager->HitShortDistanceAttackSE();
+		m_damage = damage;
 		m_hp -= damage;
 		m_pEffectManager->DrawPlayerDamageEffect(m_pos);
+		m_isMove = false;
 		KnockBack(m_subVector);
 	}
 	//ガード中に近距離攻撃が当たった時の処理
 	else if (m_isHitEnemyAttack && m_isPlayerGuard && enemyType == kShortDistanceEnemy)
 	{
 		m_pSoundManager->HitShortDistanceAttackSE();
+		m_damage = damage * 0.5;
 		m_hp -= damage * 0.5;
 		m_pEffectManager->DrawPlayerGuardEffect(m_pos);
+		m_pSoundManager->GuardSE();
 		KnockBack(m_subVector);
 	}
 	
@@ -388,17 +399,19 @@ void Player::Damage(float damage,int enemyType)
 	if (m_isHitEnemyAttack && !m_isPlayerGuard &&enemyType == kLongDistanceEnemy)
 	{
 		m_pSoundManager->HitLongDistanceAttackSE();
+		m_damage = damage;
 		m_hp -= damage;
 		m_pEffectManager->DrawPlayerDamageEffect(m_pos);
+		m_isMove = false;
 		KnockBack(m_subVector);
 	}
-
 	//ガード中に遠距離攻撃に当たった時の処理
 	else if (m_isHitEnemyAttack && m_isPlayerGuard && enemyType == kLongDistanceEnemy)
 	{
 		m_pSoundManager->HitLongDistanceAttackSE();
 		m_hp -= damage*0.5f;
 		m_pEffectManager->DrawPlayerGuardEffect(m_pos);
+		m_pSoundManager->GuardSE();
 		KnockBack(m_subVector);
 	}
 
@@ -407,15 +420,24 @@ void Player::Damage(float damage,int enemyType)
 	{
 		m_pSoundManager->HitShortDistanceAttackSE();
 		m_hp -= damage;
+		m_isMove = false;
 
 		KnockBack(m_subVector);
 	}
+
+	//ガード中に敵に当たった時の処理
 	else if (m_isHitEnemy && m_isPlayerGuard)
 	{
 		m_pSoundManager->HitShortDistanceAttackSE();
+		m_damage = damage * 0.5f;
 		m_hp -= damage*0.5f;
-
 		KnockBack(m_subVector);
+	}
+
+	if (!m_isHitEnemy && !m_isHitEnemyAttack && m_hp > 0)
+	{
+		m_damage = 0;
+		m_isMove = true;
 	}
 }
 
@@ -423,6 +445,11 @@ void Player::Damage(float damage,int enemyType)
 void Player::RecoverHp(int recoveryQuantity)
 {
 	m_hp += recoveryQuantity;
+
+	if (m_hp >= m_maxHp)
+	{
+		m_hp = m_maxHp;
+	}
 }
 
 
@@ -434,7 +461,7 @@ bool Player::HitEnemy(VECTOR enemyPos,VECTOR HitEnemyCollisionStart, VECTOR HitE
 	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyCollisionStart, HitEnemyCollisionEnd, HitEnemyRadius))
 	{
 		m_isHitEnemy = true;
-
+		m_isMove = false;
 	}
 	else
 	{
@@ -452,7 +479,6 @@ bool Player::HitEnemyAttack(VECTOR enemyPos, VECTOR HitEnemyAttackCollisionStart
 	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyAttackCollisionStart, HitEnemyAttackCollisionEnd, HitAttackEnemyRadius))
 	{
 		m_isHitEnemyAttack = true;
-
 	}
 	else
 	{
@@ -468,7 +494,13 @@ void Player::HitAttack(bool hitAttack)
 	//当たった時の処理
 	if (hitAttack&& m_isAttack)
 	{
-		m_superMeter += 5;
+		m_specialMoveGauge += 5;
+
+		if (m_specialMoveGauge >= kSuperMeter)
+		{
+			m_specialMoveGauge = kSuperMeter;
+		}
+
 		m_pSoundManager->SwordSE();
 
 		return;
@@ -556,5 +588,17 @@ void Player::UpdateCol()
 	{
 		m_specialMoveStart = VGet(0.0f, kAttackPosY, 0.0f);
 		m_specialMoveEnd = VGet(0.0f, kAttackPosY, 0.0f);
+	}
+
+	
+	if (!m_isHitEnemy && !m_isHitEnemyAttack && m_hp > 0)
+	{
+		m_isMove = true;
+	}
+
+	//プレイヤーが死んだときの処理
+	if (m_hp <= 0 && !m_isDie)
+	{
+		m_isMove = false;
 	}
 }

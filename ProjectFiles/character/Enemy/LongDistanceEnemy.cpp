@@ -2,6 +2,7 @@
 #include "EnemyStateWalk.h"
 #include "LoadCsv.h"
 #include "Player.h"
+#include "UIBar.h"
 #include <memory>
 
 namespace
@@ -74,6 +75,7 @@ LongDistanceEnemy::~LongDistanceEnemy()
 {
 	//モデルを削除
 	MV1DeleteModel(m_handle);
+	MV1DeleteModel(m_throwingHandle);
 	
 	m_pEffectManager->ClearEffect();
 	m_pEffectManager.reset();
@@ -98,8 +100,11 @@ void LongDistanceEnemy::Init(int handle, VECTOR enemyPos)
 	m_isHitAttack = false;
 	m_isDie = false;
 	m_isAttackMove = false;
+
 	//最初は死んでいないので動けるためtrue
 	m_isMove = true;
+
+	m_maxHp = m_hp;
 
 	//当たり判定の初期化
 	m_attackCapsuleStart = VGet(0.0f, kAttackPosY, 0.0f);
@@ -123,6 +128,7 @@ void LongDistanceEnemy::Init(int handle, VECTOR enemyPos)
 
 void LongDistanceEnemy::Update(Stage&stage,const Player& player,VECTOR playerPos)
 {
+
 	// 前のフレームと違うstateの場合
 	if (m_pEnemyState->GetKind() != m_pEnemyState->m_nextState->GetKind())
 	{
@@ -130,31 +136,34 @@ void LongDistanceEnemy::Update(Stage&stage,const Player& player,VECTOR playerPos
 		m_pEnemyState = m_pEnemyState->m_nextState;
 		m_pEnemyState->m_nextState = m_pEnemyState;
 	}
-	
-	//カプセルの座標をエネミーと同じ位置に調整
+
+	// カプセルの座標をエネミーと同じ位置に調整
 	m_capsuleStart = VAdd(m_pos, m_capsuleStartPoint);
 	m_capsuleEnd = VAdd(m_pos, m_capsuleEndPoint);
-	
-	//ステートの更新
-	m_pEnemyState->Update(stage,player, m_characterKind);
+
+	// ステートの更新
+	m_pEnemyState->Update(stage, player, m_characterKind);
 
 	// 重力を足す
 	m_pos = VAdd(m_pos, VGet(0.0f, m_gravity, 0.0f));
 
-	//アニメーション
+	// アニメーション
 	UpdateAnim();
 
-	//当たり判定の更新
+	// 当たり判定の更新
 	UpdateCol();
 
-	//向いている方向
-	UpdateAngle(playerPos);
-
-	//死んでいるかを受け取る
+	// 死んでいるかを受け取る
 	m_isDie = m_pEnemyState->GetIsDie();
 
-	//死んだ瞬間の動き
-	Die(player);
+	// 死んだ瞬間の動き
+	Die();
+
+	// 向いている方向
+	if (m_isMove)
+	{
+		UpdateAngle(playerPos);
+	}
 
 }
 
@@ -162,6 +171,9 @@ void LongDistanceEnemy::Draw()
 {
 	//モデルの位置
 	MV1SetPosition(m_handle, m_pos);
+
+	//HPバーの描画
+	//m_pUIBar->DrawEnemyGaugeBar(*this);
 
 	//死んでいないときは表示し、死んだ後には表示しない(EnemyManagerが完成次第なくなる)
 	if (!m_isDie)
@@ -177,10 +189,6 @@ void LongDistanceEnemy::Draw()
 
 		MV1SetPosition(m_throwingHandle, m_attackCapsuleEnd);
 	}
-
-	//本体の当たり判定の描画
-	DrawCapsule3D(m_capsuleStart, m_capsuleEnd, m_radius, 40, GetColor(0, 255, 255), GetColor(255, 255, 255), false);
-
 
 #ifdef _DEBUG
 

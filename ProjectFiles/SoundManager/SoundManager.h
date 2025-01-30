@@ -41,9 +41,19 @@ public:
 	void GameOverBGM();
 
 	/// <summary>
+	/// カーソル移動SEを流す
+	/// </summary>
+	void MoveCursorSE();
+
+	/// <summary>
 	/// 決定SEを流す
 	/// </summary>
 	void DeterminationSE();
+
+	/// <summary>
+	/// 失敗SEを流す
+	/// </summary>
+	void FailureSE();
 
 	/// <summary>
 	/// 剣を振った時のSEを流す
@@ -54,6 +64,16 @@ public:
 	/// 剣で斬った時のSEを流す
 	/// </summary>
 	void SwordSE();
+
+	/// <summary>
+	/// 魔法攻撃を行った時のSEを流す
+	/// </summary>
+	void MagicAttackSE();
+
+	/// <summary>
+	/// ガードが成功した時のSEを流す
+	/// </summary>
+	void GuardSE();
 
 	/// <summary>
 	/// 必殺技を発動した時のSEを流す
@@ -95,14 +115,26 @@ private:
 	//ゲームオーバー画面BGM
 	int m_gameOverBGM;
 
+	//カーソル移動時のSE
+	int m_moveCursorSE;
+
 	//決定音SE
 	int m_determinationSE;
+
+	//失敗時のSE
+	int m_failureSE;
 
 	//剣を振った時のSE
 	int m_rollSwordSE;
 
 	//剣で切った時のSE
 	int m_swordSE;
+
+	//魔法攻撃した時のSE
+	int m_magicAttackSE;
+
+	//ガード成功時のSE
+	int m_guardSE;
 
 	//必殺技を発動した時のSE
 	int m_specialMoveSE;

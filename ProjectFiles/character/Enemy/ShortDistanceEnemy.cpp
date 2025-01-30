@@ -2,6 +2,7 @@
 #include "EnemyStateWalk.h"
 #include "LoadCsv.h"
 #include "Player.h"
+#include "UIBar.h"
 #include <memory>
 
 namespace
@@ -92,6 +93,8 @@ void ShortDistanceEnemy::Init(int handle, VECTOR enemyPos)
 	//最初は死んでいないので動けるためtrue
 	m_isMove = true;
 
+	m_maxHp = m_hp;
+
 	//当たり判定の初期化
 	m_attackCapsuleStart = VGet(0.0f, kAttackPosY, 0.0f);
 	m_attackCapsuleEnd = VGet(0.0f, kAttackPosY, 0.0f);
@@ -142,13 +145,17 @@ void ShortDistanceEnemy::Update(Stage& stage, const Player& player,VECTOR player
 	//当たり判定の更新
 	UpdateCol();
 
-	//向いている方向の更新
-	UpdateAngle(playerPos);
-
 	m_isDie = m_pEnemyState->GetIsDie();
 
 	//死んだ瞬間の動き
-	Die(player);
+	Die();
+
+	//向いている方向
+	if (m_isMove)
+	{
+		UpdateAngle(playerPos);
+	}
+
 }
 
 void ShortDistanceEnemy::Draw()
@@ -156,15 +163,15 @@ void ShortDistanceEnemy::Draw()
 	//モデルの位置
 	MV1SetPosition(m_handle, m_pos);
 
+	//HPバーの描画
+	//m_pUIBar->DrawEnemyGaugeBar(*this);
+
 	//死んでいないときは表示し、死んだ後には表示しない(EnemyManagerが完成次第なくなる)
 	if (!m_isDie)
 	{
 		//モデルの表示
 		MV1DrawModel(m_handle);
 	}
-
-	//本体のカプセルの表示
-	DrawCapsule3D(m_capsuleStart, m_capsuleEnd, m_radius, 40, GetColor(0, 255, 255), GetColor(255, 255, 255), false);
 
 #ifdef _DEBUG
 

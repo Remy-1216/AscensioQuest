@@ -44,6 +44,7 @@
     <ClCompile Include="character\State\Player\PlayerStateRun.cpp" />
     <ClCompile Include="character\State\Player\PlayerStateSpecialMove.cpp" />
     <ClCompile Include="character\State\Player\PlayerStateWalk.cpp" />
+    <ClCompile Include="character\State\Player\TitlePlayer.cpp" />
     <ClCompile Include="Effect\EffectManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="object\Apple.cpp" />
@@ -57,6 +58,7 @@
     <ClCompile Include="scene\SceneStatus.cpp" />
     <ClCompile Include="scene\SceneTitle.cpp" />
     <ClCompile Include="SoundManager\SoundManager.cpp" />
+    <ClCompile Include="UI\UIBar.cpp" />
     <ClCompile Include="util\Font.cpp" />
     <ClCompile Include="util\LoadCsv.cpp" />
     <ClCompile Include="util\Pad.cpp" />
@@ -89,6 +91,7 @@
     <ClInclude Include="character\State\Player\PlayerStateRun.h" />
     <ClInclude Include="character\State\Player\PlayerStateSpecialMove.h" />
     <ClInclude Include="character\State\Player\PlayerStateWalk.h" />
+    <ClInclude Include="character\State\Player\TitlePlayer.h" />
     <ClInclude Include="Effect\EffectManager.h" />
     <ClInclude Include="object\Apple.h" />
     <ClInclude Include="object\Stage.h" />
@@ -101,6 +104,7 @@
     <ClInclude Include="scene\SceneStatus.h" />
     <ClInclude Include="scene\SceneTitle.h" />
     <ClInclude Include="SoundManager\SoundManager.h" />
+    <ClInclude Include="UI\UIBar.h" />
     <ClInclude Include="util\Font.h" />
     <ClInclude Include="util\Game.h" />
     <ClInclude Include="util\LoadCsv.h" />
@@ -165,7 +169,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -182,7 +186,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Full</Optimization>
     </ClCompile>
@@ -200,7 +204,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -217,7 +221,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Full</Optimization>
     </ClCompile>

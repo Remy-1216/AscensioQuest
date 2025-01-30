@@ -8,6 +8,7 @@
 #include "Boss.h"
 #include "PlayerStatus.h"
 #include "SoundManager.h"
+#include "UIBar.h"
 #include "Pad.h"
 #include "Game.h"
 
@@ -27,14 +28,15 @@ namespace
 
 	//ライトの方向
 	constexpr float kLight = 0.5f;
+
+	//必殺技ゲージの右下のX座標
+	constexpr float kSpecialMoveGaugePosX =250.0f;
 }
 
 
 
-SceneStage::SceneStage(const int StageNumber):m_barHandle(-1), m_hpBarHandle(-1), m_mpBarHandle(-1), m_operationHandle(-1),
-m_specialMoveOperationHandle(-1), m_warpPointOperationHandle(-1), m_allOperatioHandle(-1), m_shadowMapHandle(-1), m_stageKinds(0),m_bossHandle(-1),
+SceneStage::SceneStage(const int StageNumber): m_operationHandle(-1),m_specialMoveOperationHandle(-1), m_warpPointOperationHandle(-1), m_allOperatioHandle(-1), m_shadowMapHandle(-1), m_stageKinds(0),m_bossHandle(-1),
 m_isPlayerDie(false),m_isWarpPoint(false),m_isSpecialMoveAvailable(false),m_isGameClear(false), m_cameraAngle(VGet(0.0f, 0.0f, 0.0f))
-
 {
 	m_stageKinds = StageNumber;
 }
@@ -66,9 +68,6 @@ SceneStage::~SceneStage()
 	m_pPlayerStatus = nullptr;
 
 	//UI画像の削除
-	DeleteGraph(m_barHandle);
-	DeleteGraph(m_hpBarHandle);
-	DeleteGraph(m_mpBarHandle);
 	DeleteGraph(m_operationHandle);
 	DeleteGraph(m_specialMoveOperationHandle);
 	DeleteGraph(m_warpPointOperationHandle);
@@ -79,6 +78,7 @@ SceneStage::~SceneStage()
 	DeleteShadowMap(m_shadowMapHandle);
 }
 
+//初期化
 void SceneStage::Init()
 {
 	if (m_stageKinds == Stage1)
@@ -106,6 +106,8 @@ void SceneStage::Init()
 	m_pPlayerStatus = std::make_shared<PlayerStatus>();
 	m_pPlayerStatus->Init();
 
+	m_pUIBar = std::make_shared<UIBar>();
+	m_pUIBar->Init();
 
 	//フェード値の初期設定
 	m_fadeAlpha = kFadeValue;
@@ -115,9 +117,6 @@ void SceneStage::Init()
 	m_isGameClear = false;
 
 	//UI関連画像のロード
-	m_barHandle = LoadGraph("data/Ui/Bar.png");
-	m_hpBarHandle = LoadGraph("data/UI/HpBar.png");
-	m_mpBarHandle = LoadGraph("data/UI/MpBar.png");
 	m_operationHandle = LoadGraph("data/UI/operation.png");
 	m_specialMoveOperationHandle = LoadGraph("data/UI/specialmoveoperation.png");
 	m_warpPointOperationHandle = LoadGraph("data/UI/warpOperation.png");
@@ -131,7 +130,6 @@ void SceneStage::Init()
 
 	// シャドウマップに描画する範囲を設定
 	SetShadowMapDrawArea(m_shadowMapHandle, VGet(-kShadowMapRange, -1.0f, -kShadowMapRange), VGet(kShadowMapRange, kShadowMapRange, kShadowMapRange));
-	 
 	
 	//ゲームプレイ中のBGMを再生する
 	m_pSoundManager->GamePlayBGM();
@@ -140,10 +138,12 @@ void SceneStage::Init()
 std::shared_ptr<SceneBase> SceneStage::Update(const Pad& pad)
 {
 
+	//ステージ1の動き
 	if (m_stageKinds == Stage1)
 	{
 		Stage1Update(pad);
 	}
+	//ステージ2の動き
 	if (m_stageKinds == Stage2)
 	{
 		Stage2Update(pad);
@@ -183,6 +183,7 @@ std::shared_ptr<SceneBase> SceneStage::Update(const Pad& pad)
 
 }
 
+//描画
 void SceneStage::Draw()
 {
 	// シャドウマップへの描画の準備
@@ -207,14 +208,12 @@ void SceneStage::Draw()
 	{
 		m_pBoss->Draw();
 	}
-	
-	//UIの描画
-	DrawGraph(0, 0, m_barHandle, true);
-	DrawGraph(0, 0, m_hpBarHandle, true);
-	DrawGraph(0, 0, m_mpBarHandle, true);
 
-
+	//操作説明を表示
 	OperationUI();
+
+	//HPバーなどを表示する
+	m_pUIBar->DrawPlayerGaugeBar(*m_pPlayer);
 
 	if (!m_isPlayerDie)
 	{
@@ -262,13 +261,14 @@ void SceneStage::Stage1Update(const Pad& pad)
 	//プレイヤーが必殺技を撃てる状態かを受け取る
 	m_isSpecialMoveAvailable = m_pPlayer->GetIsSpecialMoveAvailable();
 
-	m_pPlayer->Update(*m_pStage, pad, *m_pCamera);
-
 	m_pEnemyManager->Update(*m_pStage, *m_pPlayer);
+
+	m_pPlayer->Update(*m_pStage, pad, *m_pCamera);
 
 	m_pCamera->Update(m_pPlayer->GetPos());
 }
 
+//ステージ2での処理
 void SceneStage::Stage2Update(const Pad& pad)
 {
 	//プレイヤーが死んだかどうかを受け取る
@@ -277,24 +277,18 @@ void SceneStage::Stage2Update(const Pad& pad)
 	//ゲームをクリアしたかどうかを受け取る
 	m_isGameClear = m_pBoss->GetGameClear();
 
-	//プレイヤーの動き
-	m_pPlayer->Update(*m_pStage, pad, *m_pCamera);
-
 	//ボスの動き
 	m_pBoss->Update(*m_pStage, *m_pPlayer, m_pPlayer->GetPos());
+
+	//プレイヤーの動き
+	m_pPlayer->Update(*m_pStage, pad, *m_pCamera);
 
 	//カメラの動き
 	m_pCamera->Update(m_pPlayer->GetPos());
 }
 
-void SceneStage::HpBarDraw(int hp, int mp)
-{
-	//UIの描画
-	DrawGraph(0, 0, m_barHandle, true);
-	DrawGraph(0, 0, m_hpBarHandle, true);
-	DrawGraph(0, 0, m_mpBarHandle, true);
-}
 
+//操作説明
 void SceneStage::OperationUI()
 {
 	if (!m_isWarpPoint && !m_isSpecialMoveAvailable)
@@ -316,6 +310,7 @@ void SceneStage::OperationUI()
 	}
 }
 
+//フェードイン、フェードアウト
 void SceneStage::Fade()
 {
 	//フェードイン、フェードアウト

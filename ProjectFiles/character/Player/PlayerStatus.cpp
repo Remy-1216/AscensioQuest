@@ -73,10 +73,14 @@ namespace
 	//カスタムボーナス
 	constexpr int kSpecialMoveGauge = 50;
 
+	//フルカスタムボーナス
+	constexpr int kAttackBonus = 20;
+	constexpr int kMagicAttackBonus = 10;
+
 }
 
 PlayerStatus::PlayerStatus(): m_statusPoint(0), m_hpUp(0), m_attackUp(0), m_attackUpTimes(0), m_magicAttackUp(0),
-m_magicAttackUpTimes(0), m_defensePowerUp(0), m_defensePowerUpTimes(0), m_specialMoveGauge(0),m_customBonus(0), m_isCustomBonus(false)
+m_magicAttackUpTimes(0), m_defensePowerUp(0), m_defensePowerUpTimes(0), m_specialMoveGauge(0),m_customBonus(0), m_isCustomBonus(false), m_isFullCustomBonus(false)
 {
 }
 
@@ -125,10 +129,10 @@ void PlayerStatus::StatOutput(int statasUpPoint)
 	//出力したいファイル名を指定する
 	std::ofstream outputfile("data/csv/StatusUP.csv");
 
-	std::vector<std::tuple<const char*, const char*, const char*, const char*, const  char*,const char*, const char*, const char*, const char*>>nameData;
+	std::vector<std::tuple<const char*, const char*, const char*, const char*, const  char*,const char*, const char*, const char*, const char*, const char*, const char*>>nameData;
 	std::vector<std::tuple<int, int,int,int,int, int, int, int, int,int,int>>data;
 	//出力したいデータを作る
-	nameData.push_back(std::make_tuple("ステータスポイント", "HPUP","HPUP段階数", "攻撃力UP","攻撃力UP段階数 ","魔法攻撃力UP", "魔法攻撃力UP段階数", "防御力UP","防御力UP段階数"));
+	nameData.push_back(std::make_tuple("ステータスポイント", "HPUP","HPUP段階数", "攻撃力UP","攻撃力UP段階数 ","魔法攻撃力UP", "魔法攻撃力UP段階数", "防御力UP","防御力UP段階数","必殺技ゲージ","カスタムボーナスの説明回数"));
 	data.push_back(std::make_tuple(m_statusPoint, m_hpUp,m_attackUpTimes, m_attackUp,m_attackUpTimes, m_magicAttackUp,m_magicAttackUpTimes, m_defensePowerUp,m_defensePowerUpTimes, m_specialMoveGauge, m_customBonus));
 	//データの出力
 
@@ -180,6 +184,79 @@ void PlayerStatus::StatOutput(int statasUpPoint)
 	outputfile.close();
 }
 
+void PlayerStatus::ResetOutPut()
+{
+	m_statusPoint = 0;
+	m_hpUp = 0;
+	m_hpUpTimes = 0;
+	m_attackUp = 0;
+	m_attackUpTimes = 0;
+	m_magicAttackUp = 0;
+	m_magicAttackUpTimes = 0;
+	m_defensePowerUp = 0;
+	m_defensePowerUpTimes = 0;
+	m_specialMoveGauge = 0;
+	m_customBonus = 0;
+
+	//出力したいファイル名を指定する
+	std::ofstream outputfile("data/csv/StatusUP.csv");
+
+	std::vector<std::tuple<const char*, const char*, const char*, const char*, const  char*, const char*, const char*, const char*, const char*, const char*, const char*>>nameData;
+	std::vector<std::tuple<int, int, int, int, int, int, int, int, int, int, int>>data;
+	//出力したいデータを作る
+	nameData.push_back(std::make_tuple("ステータスポイント", "HPUP", "HPUP段階数", "攻撃力UP", "攻撃力UP段階数 ", "魔法攻撃力UP", "魔法攻撃力UP段階数", "防御力UP", "防御力UP段階数", "必殺技ゲージ", "カスタムボーナスの説明回数"));
+	data.push_back(std::make_tuple(m_statusPoint, m_hpUp, m_attackUpTimes, m_attackUp, m_attackUpTimes, m_magicAttackUp, m_magicAttackUpTimes, m_defensePowerUp, m_defensePowerUpTimes, m_specialMoveGauge, m_customBonus));
+	//データの出力
+
+	for (auto&& a : nameData) {
+		outputfile << std::get<0>(a);
+		outputfile << ',';
+		outputfile << std::get<1>(a);
+		outputfile << ',';
+		outputfile << std::get<2>(a);
+		outputfile << ',';
+		outputfile << std::get<3>(a);
+		outputfile << ',';
+		outputfile << std::get<4>(a);
+		outputfile << ',';
+		outputfile << std::get<5>(a);
+		outputfile << ',';
+		outputfile << std::get<6>(a);
+		outputfile << ',';
+		outputfile << std::get<7>(a);
+		outputfile << ',';
+		outputfile << std::get<8>(a);
+		outputfile << '\n';
+	}
+	for (auto&& b : data) {
+		outputfile << std::get<0>(b);
+		outputfile << ',';
+		outputfile << std::get<1>(b);
+		outputfile << ',';
+		outputfile << std::get<2>(b);
+		outputfile << ',';
+		outputfile << std::get<3>(b);
+		outputfile << ',';
+		outputfile << std::get<4>(b);
+		outputfile << ',';
+		outputfile << std::get<5>(b);
+		outputfile << ',';
+		outputfile << std::get<6>(b);
+		outputfile << ',';
+		outputfile << std::get<7>(b);
+		outputfile << ',';
+		outputfile << std::get<8>(b);
+		outputfile << ',';
+		outputfile << std::get<9>(b);
+		outputfile << ',';
+		outputfile << std::get<10>(b);
+		outputfile << '\n';
+	}
+	//ファイルの出力
+	outputfile.close();
+}
+
+//カスタムボーナス
 void PlayerStatus::CustomBonus(const Pad&pad)
 {
 	if (m_hpUpTimes >= kStatusUpTimes6 && m_attackUpTimes >= kStatusUpTimes6 && m_defensePowerUpTimes >= kStatusUpTimes6 &&
@@ -197,7 +274,23 @@ void PlayerStatus::CustomBonus(const Pad&pad)
 		}
 	}
 
-	
+	if (m_hpUpTimes >= kStatusUpTimes10 && m_attackUpTimes >= kStatusUpTimes10 && m_defensePowerUpTimes >= kStatusUpTimes10 &&
+		m_magicAttackUpTimes >= kStatusUpTimes10 && m_defensePowerUpTimes >= kStatusUpTimes10 && m_customBonus == 1)
+	{
+		m_isFullCustomBonus = true;
+
+		m_attackUp += kAttackBonus;
+
+		m_magicAttackUp += kMagicAttackBonus;
+
+
+		if (pad.IsTrigger("A"))
+		{
+			m_isFullCustomBonus = false;
+
+			m_customBonus++;
+		}
+	}
 }
 
 //HPの上限を上げる処理

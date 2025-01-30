@@ -21,7 +21,7 @@ namespace
 	const char* const kWarpPointPosFileName = "data/csv/WarpPoint.csv";
 	const char* const kStatusUpFileName = "data/csv/StatusUP.csv";
 	const char* const kEffectDataFileName = "data/csv/EffectData.csv";
-
+	const char* const kFontDataFileName = "data/csv/FontData.csv";
 
 	/// <summary>
 	/// 文字列を分割する
@@ -131,7 +131,6 @@ void LoadCsv::LoadCollisionInfo(CharacterBase::CollisionInfo& collisionInfo, con
 	collisionInfo.specialMoveEndPoint.y = std::stof(strvec[26]);
 	collisionInfo.specialMoveEndPoint.z = std::stof(strvec[27]);
 	collisionInfo.specialMoveRadius = std::stof(strvec[28]);
-
 }
 
 //プレイヤーのアニメーション情報を読み込む
@@ -158,6 +157,7 @@ void LoadCsv::LoadPlayerAnimData(std::map<std::string, CharacterBase::AnimInfo>&
 		}
 		catch (const std::invalid_argument& e)
 		{
+			
 		}
 	}
 }
@@ -463,5 +463,31 @@ void LoadCsv::LoadEffectData(EffectManager::EffectData& data, const char* effect
 	data.EffectAdjPosY = std::stof(strvec[3]);
 }
 
+void LoadCsv::LoadFontData(Font::FontId& data, const char* fontDate)
+{
+	std::ifstream ifs(kFontDataFileName);
+	std::string line;
+	std::vector<std::string> strvec;
+	m_data.clear();
+
+	while (std::getline(ifs, line))
+	{
+		strvec = split(line, ',');
+		const char* str = strvec[0].c_str();
+
+		// 参照したいキャラが見つかっていたら処理をやめる
+		// MEMO:strcmp 文字列を比較する 第1引数 = 第2引数の場合0
+		if (strcmp(str, fontDate) == 0)
+		{
+			break;
+		}
+		else
+		{
+			strvec.erase(strvec.begin(), strvec.end());
+		}
+	}
+
+	// ステータス情報を代入する
+}
 
 

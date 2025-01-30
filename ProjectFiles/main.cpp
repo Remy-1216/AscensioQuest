@@ -2,6 +2,7 @@
 #include "EffekseerForDXLib.h"
 #include "Pad.h"
 #include "Game.h"
+#include "Font.h"
 #include "SceneManager.h"
 
 
@@ -45,6 +46,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	Pad* m_pPad = new Pad;
 
+	Font::Load();
+
 	// ゲームループ
 	while (ProcessMessage() != -1)
 	{
@@ -76,6 +79,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			// 16.66ミリ秒(16667マイクロ秒)経過するまで待つ
 		}
 	}
+	Font::UnLoad();
 
 	// Effekseerを終了する。
 	Effkseer_End();

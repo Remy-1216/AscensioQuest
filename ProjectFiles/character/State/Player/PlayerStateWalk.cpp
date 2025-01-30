@@ -6,6 +6,7 @@
 #include "PlayerStateGuard.h"
 #include "PlayerStateDamage.h"
 #include "PlayerStateSpecialMove.h"
+#include "PlayerStateDie.h"
 #include "DxLib.h"
 #include "Player.h"
 #include "Camera.h"
@@ -99,12 +100,21 @@ void PlayerStateWalk::Update(Stage& stage,const Pad& pad, const Camera& camera)
 		return;
 	}
 
+	//歩いている状態から必殺技を打つ状態
 	if (pad.IsPress("Y") && m_isSpecialMove)
 	{
 		m_nextState = std::make_shared<PlayerStateSpecialMove>(m_pPlayer);
 		auto state = std::dynamic_pointer_cast<PlayerStateSpecialMove>(m_nextState);
 		state->Init();
 		return;
+	}
+
+	//ダメージを受けた状態から死亡状態
+	if (m_pPlayer->GetHp() <= 0)
+	{
+		m_nextState = std::make_shared<PlayerStateDie>(m_pPlayer);
+		auto state = std::dynamic_pointer_cast<PlayerStateDie>(m_nextState);
+		state->Init();
 	}
 
 	

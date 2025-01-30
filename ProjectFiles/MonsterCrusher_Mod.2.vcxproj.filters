@@ -85,6 +85,12 @@
     <Filter Include="ヘッダー ファイル\Effect">
       <UniqueIdentifier>{0e3b9691-3a47-4d6b-8e1f-846cbb37520d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\UI">
+      <UniqueIdentifier>{a8949cbd-5d05-4465-8903-120f4a3ee998}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\UI">
+      <UniqueIdentifier>{3f807ed3-2b3e-4d37-9d50-7dd7000943a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -180,9 +186,6 @@
     <ClCompile Include="SoundManager\SoundManager.cpp">
       <Filter>ソース ファイル\Sound</Filter>
     </ClCompile>
-    <ClCompile Include="character\CharacterBase.cpp">
-      <Filter>ソース ファイル\character</Filter>
-    </ClCompile>
     <ClCompile Include="character\State\Player\PlayerStateSpecialMove.cpp">
       <Filter>ソース ファイル\State\Player</Filter>
     </ClCompile>
@@ -212,6 +215,15 @@
     </ClCompile>
     <ClCompile Include="util\Font.cpp">
       <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIBar.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="character\State\Player\TitlePlayer.cpp">
+      <Filter>ソース ファイル\character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="character\CharacterBase.cpp">
+      <Filter>ソース ファイル\character</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -343,6 +355,12 @@
     </ClInclude>
     <ClInclude Include="util\Font.h">
       <Filter>ヘッダー ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIBar.h">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="character\State\Player\TitlePlayer.h">
+      <Filter>ヘッダー ファイル\Character\Player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

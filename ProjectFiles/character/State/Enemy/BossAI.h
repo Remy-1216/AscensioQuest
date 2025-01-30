@@ -22,9 +22,6 @@ private:
 	/// <summary>
 	/// ボスの残りHPが高く、プレイヤーが近い場合の行動
 	/// </summary>
-	/// <param name="boss"></param>
-	/// <param name="bossStatebase"></param>
-	/// <returns></returns>
 	int HpHighlyRangeNear();
 
 	/// <summary>

@@ -97,6 +97,24 @@ public:
 	void HitAttack(bool hitAttack);
 
 	/// <summary>
+	/// 最大MPを渡す
+	/// </summary>
+	/// <returns></returns>
+	int GetMaxMp() const { return m_maxMp; }
+
+	/// <summary>
+	/// 必殺技ゲージを渡す
+	/// </summary>
+	/// <returns></returns>
+	int GetSpecialMoveGauge() const { return m_specialMoveGauge; }
+
+	/// <summary>
+	/// 受けたダメージを渡す
+	/// </summary>
+	/// <returns></returns>
+	int GetDamage()const { return m_damage; }
+
+	/// <summary>
 	/// 足元にある球体の半径を渡す
 	/// </summary>
 	/// <returns></returns>
@@ -153,8 +171,14 @@ private:
 	int m_magicAttackUp;	//魔法攻撃力UP
 	int m_defensePowerUp;	//防御力UP
 
+	//最大ステータス
+	int m_maxMp;
+
+	//受けたダメージ
+	int m_damage;
+
 	//必殺技ゲージ
-	int m_superMeter;
+	int m_specialMoveGauge;
 
 	//足元にある球体の半径
 	float m_sphereRadius;

@@ -11,3 +11,6 @@ GuardDamage,8,0.0f,26.0f,0.5f
 Guard,9,0.0f,15.0f,0.5f
 Death,10,0.0f,78.0f,0.5f
 SpecialMove,11,0.0f,107.0f,0.5f
+WaveHand,0,0.0f,95.0f,0.5f
+FistPump,1,0.0f,114.0f,0.5f
+RaiseYourHand,2,0.0f,122.0f,0.5f

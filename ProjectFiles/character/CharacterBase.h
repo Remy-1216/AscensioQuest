@@ -12,6 +12,7 @@ class Stage;
 class Player;
 class SoundManager;
 class EffectManager;
+class UIBar;
 
 class CharacterBase
 {
@@ -21,13 +22,13 @@ public:
 	/// </summary>
 	struct Status
 	{
-		float maxHp;				// 最大HP
-		float maxMp;				// 最大MP
-		float attackPower;			// 攻撃力
-		float magicAttackPower;		// 魔法攻撃力
-		float defensePower;			// 防御力
-		float walkSpeed;			// 歩き速度
-		float runSpeed;				// 走り速度
+		float maxHp = 0.0f;				// 最大HP
+		float maxMp = 0.0f;				// 最大MP
+		float attackPower = 0.0f;			// 攻撃力
+		float magicAttackPower = 0.0f;		// 魔法攻撃力
+		float defensePower = 0.0f;			// 防御力
+		float walkSpeed = 0.0f;			// 歩き速度
+		float runSpeed = 0.0f;				// 走り速度
 	};
 
 	/// <summary>
@@ -46,18 +47,18 @@ public:
 	/// </summary>
 	struct CollisionInfo
 	{
-		VECTOR capsuleStartPoint;			//胴体の当たり判定用のカプセルを形成する二点中の一点の座標
-		VECTOR capsuleEndPoint;				//胴体の当たり判定用のカプセルを形成する二点中の一点の座標
-		VECTOR attackCapsuleStartPoint;		//攻撃時に使うカプセルを形成する二点中の一点の座標
-		VECTOR attackCapsuleEndPoint;		//攻撃時に使うカプセルを形成する二点中の一点の座標
-		VECTOR magicCapsuleStartPoint;		//魔法攻撃に使うカプセルを形成する二点中の一点の座標
-		VECTOR magicCapsuleEndPoint;		//魔法攻撃に使うカプセルを形成する二点中の一点の座標
-		VECTOR specialMoveStartPoint;		//必殺技に使うカプセルを形成する二点中の一点の座標
-		VECTOR specialMoveEndPoint;			//必殺技に使うカプセルを形成する二点中の一点の座標
-		float radius;						//胴体の当たり判定用のカプセルの半径
-		float attackRadius;					//攻撃時に使うカプセルの半径
-		float magicRadius;					//魔法攻撃に使うカプセルの半径
-		float specialMoveRadius;			//必殺技に使うカプセルの半径
+		VECTOR capsuleStartPoint = VGet(0.0f,0.0f,0.0f);				//胴体の当たり判定用のカプセルを形成する二点中の一点の座標
+		VECTOR capsuleEndPoint = VGet(0.0f, 0.0f, 0.0f);				//胴体の当たり判定用のカプセルを形成する二点中の一点の座標
+		VECTOR attackCapsuleStartPoint = VGet(0.0f, 0.0f, 0.0f);		//攻撃時に使うカプセルを形成する二点中の一点の座標
+		VECTOR attackCapsuleEndPoint = VGet(0.0f, 0.0f, 0.0f);			//攻撃時に使うカプセルを形成する二点中の一点の座標
+		VECTOR magicCapsuleStartPoint = VGet(0.0f, 0.0f, 0.0f);			//魔法攻撃に使うカプセルを形成する二点中の一点の座標
+		VECTOR magicCapsuleEndPoint = VGet(0.0f, 0.0f, 0.0f);			//魔法攻撃に使うカプセルを形成する二点中の一点の座標
+		VECTOR specialMoveStartPoint = VGet(0.0f, 0.0f, 0.0f);			//必殺技に使うカプセルを形成する二点中の一点の座標
+		VECTOR specialMoveEndPoint = VGet(0.0f, 0.0f, 0.0f);			//必殺技に使うカプセルを形成する二点中の一点の座標
+		float radius = 0.0f;											//胴体の当たり判定用のカプセルの半径
+		float attackRadius = 0.0f;										//攻撃時に使うカプセルの半径
+		float magicRadius = 0.0f;										//魔法攻撃に使うカプセルの半径
+		float specialMoveRadius = 0.0f;									//必殺技に使うカプセルの半径
 	};
 
 	/// <summary>
@@ -113,7 +114,12 @@ public:
 	/// <summary>
 	/// アニメーションを更新
 	/// </summary>
-	void UpdateAnim();									
+	void UpdateAnim();			
+
+	/// <summary>
+	/// アニメーションの総再生時間を取得する
+	/// </summary>
+	float GetAnimTotalTime(std::string animName);
 
 	/// <summary>
 	/// 指定のキャラクターに向かって歩く
@@ -163,7 +169,7 @@ public:
 	/// <summary>
 	/// 死んだときの動き
 	/// </summary>
-	void Die(const Player& player);
+	void Die();
 
 	//シーンを抜けるときの処理
 	void End();		
@@ -173,6 +179,18 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	int GetHp() const { return m_hp; }
+
+	/// <summary>
+	/// MPを渡す
+	/// </summary>
+	/// <returns></returns>
+	int GetMp() const { return m_mp; }
+
+	/// <summary>
+	/// 最大HPを渡す
+	/// </summary>
+	/// <returns></returns>
+	int GetMaxHp() const { return m_maxHp; }
 
 	/// <summary>
 	/// 攻撃が当たった時に入るダメージ数を渡す
@@ -316,10 +334,14 @@ protected:
 
 	CharacterPos m_characterPos;
 
+	//サウンドマネージャー
 	std::shared_ptr<SoundManager> m_pSoundManager;
 
 	//エフェクトマネージャー
 	std::shared_ptr<EffectManager> m_pEffectManager;
+
+	//UIバー
+	std::shared_ptr<UIBar> m_pUIBar;
 
 	//アニメーション情報
 	std::map<std::string, AnimInfo> m_animData;		// アニメーションのデータ
@@ -380,6 +402,9 @@ protected:
 
 	//重力
 	float m_gravity;
+
+	//最大ステータス
+	int m_maxHp;
 
 	//キャラクター向いている方向
 	float m_characterAngle;

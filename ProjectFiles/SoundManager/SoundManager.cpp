@@ -2,8 +2,8 @@
 #include "DxLib.h"
 
 SoundManager::SoundManager():m_titleBGM(-1), m_selectBGM(-1), m_statusBGM(-1),m_gamePlayBGM(-1), m_clearBGM(-1), m_gameOverBGM(-1),
-m_determinationSE(-1), m_rollSwordSE(-1), m_swordSE(-1), m_specialMoveSE(-1), m_hitShortDistanceAttackSE(-1),
-m_hitLongDistanceAttackSE(-1), m_statusUpSE(-1)
+m_moveCursorSE(-1),m_determinationSE(-1), m_failureSE(-1), m_rollSwordSE(-1), m_swordSE(-1), m_magicAttackSE(-1), m_guardSE(-1),
+m_specialMoveSE(-1), m_hitShortDistanceAttackSE(-1),m_hitLongDistanceAttackSE(-1), m_statusUpSE(-1)
 {
 }
 
@@ -16,9 +16,13 @@ SoundManager::~SoundManager()
 	DeleteSoundMem(m_gamePlayBGM);
 	DeleteSoundMem(m_clearBGM);
 	DeleteSoundMem(m_gameOverBGM);
+	DeleteSoundMem(m_moveCursorSE);
 	DeleteSoundMem(m_determinationSE);
+	DeleteSoundMem(m_failureSE);
 	DeleteSoundMem(m_rollSwordSE);
 	DeleteSoundMem(m_swordSE);
+	DeleteSoundMem(m_magicAttackSE);
+	DeleteSoundMem(m_guardSE);
 	DeleteSoundMem(m_specialMoveSE);
 	DeleteSoundMem(m_hitShortDistanceAttackSE);
 	DeleteSoundMem(m_hitLongDistanceAttackSE);
@@ -61,7 +65,6 @@ void SoundManager::StatusBGM()
 	if (m_statusBGM <= -1)
 	{
 		m_statusBGM = LoadSoundMem("data/BGM/GameStatus.mp3");
-
 	}
 	
 	//BGMの設定
@@ -109,6 +112,19 @@ void SoundManager::GameOverBGM()
 	PlaySoundMem(m_gameOverBGM, DX_PLAYTYPE_LOOP, true);
 }
 
+void SoundManager::MoveCursorSE()
+{
+	//ロード
+	if (m_moveCursorSE <= -1)
+	{
+		m_moveCursorSE = LoadSoundMem("data/SE/cursor.mp3");
+	}
+
+	//SEの設定
+	PlaySoundMem(m_moveCursorSE, DX_PLAYTYPE_BACK, true);
+
+}
+
 void SoundManager::DeterminationSE()
 {
 	//ロード
@@ -120,6 +136,17 @@ void SoundManager::DeterminationSE()
 
 	//SEの設定
 	PlaySoundMem(m_determinationSE, DX_PLAYTYPE_BACK, true);
+}
+
+void SoundManager::FailureSE()
+{
+	if (m_failureSE <= -1)
+	{
+		m_failureSE = LoadSoundMem("data/SE/cancel.mp3");
+	}
+
+	//SEの設定
+	PlaySoundMem(m_failureSE, DX_PLAYTYPE_BACK, true);
 }
 
 void SoundManager::RollSwordSE()
@@ -143,6 +170,27 @@ void SoundManager::SwordSE()
 
 	//SEの設定
 	PlaySoundMem(m_swordSE, DX_PLAYTYPE_BACK, true);
+}
+
+void SoundManager::MagicAttackSE()
+{
+	//ロード
+	if (m_magicAttackSE <= -1)
+	{
+		m_magicAttackSE = LoadSoundMem("data/SE/MagicAttack.mp3");
+	}
+
+	PlaySoundMem(m_magicAttackSE, DX_PLAYTYPE_BACK, true);
+}
+
+void SoundManager::GuardSE()
+{
+	if (m_guardSE <= -1)
+	{
+		m_guardSE = LoadSoundMem("data/SE/Guard.mp3");
+	}
+
+	PlaySoundMem(m_guardSE, DX_PLAYTYPE_BACK, true);
 }
 
 void SoundManager::SpecialMoveSE()

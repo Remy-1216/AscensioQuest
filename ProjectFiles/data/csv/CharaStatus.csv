@@ -1,7 +1,5 @@
 ﻿ID,HP,MP,攻撃力,魔法攻撃力,防御力,歩く時の速さ,走るときの速さ
 player,100,100,15,30,0,6.0f,12.0f
-shortdistanceenemy,200,0,10,0,0,2.0ｆ,0.0ｆ
-shortdistanceenemy_2,250,0,15,0,0,2.0ｆ,0.0ｆ
-longdistanceenemy,200,0,10,0,0,2.0ｆ,0.0ｆ
-longdistanceenemy_2,250,0,15,0,0,2.0ｆ,0.0ｆ
-boss,600,0,20,0,0,2.0f,0.0f
+shortdistanceenemy,250,0,10,0,0,2.0ｆ,0.0ｆ
+longdistanceenemy,250,0,10,0,0,2.0ｆ,0.0ｆ
+boss,700,0,20,0,0,2.0f,0.0f

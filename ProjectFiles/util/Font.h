@@ -7,6 +7,11 @@ namespace Font
 	// フォントの種類
 	enum class FontId
 	{
+		// フォントサイズ、太さ
+		kSize96_4,
+		kSize64_4,
+		kSize55_4,
+		kNum,		// フォントの種類数
 	};
 
 	// フォントのロード、アンロード

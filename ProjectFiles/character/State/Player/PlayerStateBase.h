@@ -5,6 +5,7 @@
 #include "CharacterBase.h"
 
 class Player;
+class TitlePlayer;
 class Camera;
 class Stage;
 class Pad;
@@ -24,11 +25,14 @@ public:
 		kSpecialMove,	//必殺技を打っている状態
 		kGuard,			//ガードをしている状態
 		kDamage,		//敵からダメージを受けている状態
-		kDie			//死んでしまった状態
+		kDie,			//死んでしまった状態
+		kFistPump,		//ガッツポーズ状態
+		kWaveHand,		//手を振っている状態
 	};
 
-	PlayerStateBase(std::shared_ptr<Player> pPlayer) { m_pPlayer = pPlayer, m_isDie = false; }
-	
+	PlayerStateBase(std::shared_ptr<Player> pPlayer) { m_pPlayer = pPlayer, m_characterKind = 0, m_hp = 0, m_cameraAngle = 0.0f, m_playerAngle = 0.0f,m_analogX = 0.0f,
+		m_analogZ = 0.0f, m_isDie = false, m_isSpecialMove = false, m_isSpecialMoveTime = false, m_move = VGet(0.0f,0.0f,0.0f), m_playerPos = VGet(0.0f,0.0f,0.0f), m_movementDirection = VGet(0.0f,0.0f,0.0f); }
+
 	virtual void Update(Stage& stage,const Pad& pad, const Camera& camera) = 0;
 
 	virtual void Draw() = 0;

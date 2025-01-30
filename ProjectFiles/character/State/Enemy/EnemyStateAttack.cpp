@@ -102,13 +102,17 @@ void EnemyStateAttack::LongDistanveEnemyAttack(Stage& stage, const Player& playe
 		m_attackNum++;
 	}
 
+	m_pEnemy->LongDistanceEnemyAttack();
+
 	//状態遷移
 	//攻撃から待機状態に変更
 	if (m_pEnemy->GetAnimLoopEndTime() <= m_pEnemy->GetCurrentAnimTime())
 	{
 		m_nextState = std::make_shared<EnemyStateWalk>(m_pEnemy);
 		auto state = std::dynamic_pointer_cast<EnemyStateWalk>(m_nextState);
-		state->Init(characterKinds);
+		state->Init(kLongDistanceEnemy);
+
+		return;
 	}
 
 	if (m_pEnemy->GetHitCharacterAttack())

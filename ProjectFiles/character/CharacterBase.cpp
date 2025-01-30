@@ -4,16 +4,20 @@
 #include "Camera.h"
 #include "Stage.h"
 #include "EffectManager.h"
+#include "UIBar.h"
 #include <windows.h>	
 #include <algorithm>
 // 定数
 namespace
 {
 	// アニメーション情報
-	constexpr float kAnimBlendMax = 1.5f;	 // アニメーションブレンドの最大値
+	constexpr float kAnimBlendMax = 1.0f;	 // アニメーションブレンドの最大値
+	constexpr float kAnimBlendSpeed = 0.1f;	 // アニメーションブレンドの変化速度
 
 	//ノックバック
 	constexpr float kKnockBack = 0.5f;
+
+	
 }
 
 CharacterBase::CharacterBase(int handle):m_status(),m_animData(),m_currentPlayAnim(0),m_prevPlayAnim(0.0f),m_animBlendRate(0.0f), m_currentAnimTime(0), m_prevAnimTime(0.0f), m_totalAnimTime(0.0f),
@@ -23,6 +27,9 @@ m_modelPolygon(0),m_pos(VGet(0.0f,0.0f,0.0f)),m_moveDir(VGet(0.0f, 0.0f, 0.0f)),
 	//エフェクト
 	m_pEffectManager = std::make_shared<EffectManager>();
 	m_pEffectManager->Init();
+
+    m_pUIBar = std::make_shared<UIBar>();
+    m_pUIBar->Init();
 }
 
 CharacterBase::~CharacterBase()
@@ -38,93 +45,121 @@ CharacterBase::~CharacterBase()
 //アニメーションの更新
 void CharacterBase::UpdateAnim()
 {
-	// ブレンド率が1以下の場合
-	if (m_animBlendRate < kAnimBlendMax)
-	{
-		m_animBlendRate += m_animPlaySpeed;
-		m_animBlendRate = std::min(m_animBlendRate, kAnimBlendMax);
-	}
+    // ブレンド率が1以下の場合
+    if (m_animBlendRate < kAnimBlendMax)
+    {
+        m_animBlendRate += kAnimBlendSpeed;
+        m_animBlendRate = std::min(m_animBlendRate, kAnimBlendMax);
+    }
 
-	// アニメーションの再生時間を進める
-	m_currentAnimTime += m_animPlaySpeed;
+    // アニメーションの再生時間を進める
+    m_currentAnimTime += m_animPlaySpeed;
 
-	// アニメーションが繰り返し行われる場合
-	if (m_isLoopAnim)
-	{
-		if (m_currentAnimTime > m_animLoopEndTime)
-		{
-			m_currentAnimTime = m_animLoopStartTime;
-		}
-	}
+    // アニメーションが繰り返し行われる場合
+    if (m_isLoopAnim && !m_isPlayerGuard)
+    {
+        if (m_currentAnimTime > m_animLoopEndTime)
+        {
+            m_currentAnimTime = m_animLoopStartTime;
+        }
+    }
 
-	// アニメーションの総再生時間を超え,ガード以外のアニメーションを行っている場合
-	if (m_currentAnimTime > m_totalAnimTime && !m_isPlayerGuard)
-	{
-		m_currentAnimTime = 0.0f;
-		m_animPlaySpeed = 0.0f;
-	}
-	// アニメーションの総再生時間を超え,ガードのアニメーションを行っている場合
-	else if (m_currentAnimTime >= m_totalAnimTime && m_isPlayerGuard)
-	{
-		m_currentAnimTime = m_totalAnimTime;
-		m_animPlaySpeed = 0.0f;
-	}
+    if (m_isLoopAnim && m_isPlayerGuard)
+    {
+        if (m_currentAnimTime > m_animLoopEndTime)
+        {
+            m_currentAnimTime = m_animLoopEndTime;
+        }
+    }
 
-	// 再生時間を更新
-	MV1SetAttachAnimTime(m_handle, m_currentPlayAnim, m_currentAnimTime);
+    // アニメーションの総再生時間を超えた場合
+    if (m_currentAnimTime > m_totalAnimTime)
+    {
+        m_currentAnimTime = 0.0f;
+    }
+
+    // 再生時間を更新
+    MV1SetAttachAnimTime(m_handle, m_currentPlayAnim, m_currentAnimTime);
+
+    // アニメーションのブレンド率を設定する
+
+    // m_prevPlayAnimが有効なインデックスか確認
+    if (m_prevPlayAnim != -1) 
+    {
+        MV1SetAttachAnimBlendRate(m_handle, m_prevPlayAnim, kAnimBlendMax - m_animBlendRate);
+    }
+    MV1SetAttachAnimBlendRate(m_handle, m_currentPlayAnim, m_animBlendRate);
 }
+
+
 
 //アニメーションの変更
 void CharacterBase::ChangeAnim(std::string animName)
 {
-		// 前のアニメーションをデタッチする
-		if (m_prevAnimTime != -1)
-		{
-			MV1DetachAnim(m_handle, static_cast<int>(m_prevPlayAnim));
-			m_prevPlayAnim = -1;
-		}
+    // 前のアニメーションをデタッチする
+    if (m_prevPlayAnim != -1)
+    {
+        MV1DetachAnim(m_handle, m_prevPlayAnim);
+        m_prevPlayAnim = -1;
+    }
 
-		// 再生中のアニメーションを1つ前に移動する
-		m_prevPlayAnim = m_currentPlayAnim;
-		m_prevAnimTime = m_currentAnimTime;
+    // 再生中のアニメーションを1つ前に移動する
+    m_prevPlayAnim = m_currentPlayAnim;
+    m_prevAnimTime = m_currentAnimTime;
 
-		// アニメーションを設定
-		m_animPlaySpeed = m_animData[animName].playSpeed;
-		m_animLoopStartTime = m_animData[animName].loopFrame;
-		m_animLoopEndTime = m_animData[animName].endFrame;
+    // アニメーションを設定
+    m_animPlaySpeed = m_animData[animName].playSpeed;
+    m_animLoopStartTime = m_animData[animName].loopFrame;
+    m_animLoopEndTime = m_animData[animName].endFrame;
 
-		// ループ終了フレームが0でない場合、ループフラグを立てる
-		if (m_animLoopEndTime > 0)
-		{
-			m_isLoopAnim = true;
-		}
+    // ループ終了フレームが0でない場合、ループフラグを立てる
+    if (m_animLoopEndTime > 0)
+    {
+        m_isLoopAnim = true;
+    }
+    else
+    {
+        m_isLoopAnim = false;
+    }
 
-		// 新たにアニメーションをアタッチする
-		m_currentPlayAnim = MV1AttachAnim(m_handle, m_animData[animName].number);
-		//アニメーションの総再生時間を設定
-		m_totalAnimTime = MV1GetAnimTotalTime(m_handle, m_animData[animName].number);
+    // 新たにアニメーションをアタッチする
+    m_currentPlayAnim = MV1AttachAnim(m_handle, m_animData[animName].number);
+    m_currentAnimTime = 0.0f;
 
-		// ブレンド率はprevが有効でない場合、1.0にする
-		if (m_prevPlayAnim == -1)
-		{
-			m_animBlendRate = kAnimBlendMax;
-		}
-		else
-		{
-			m_animBlendRate = 0.0f;
-		}
+    //アニメーションの総再生時間を設定
+    m_totalAnimTime = MV1GetAnimTotalTime(m_handle, m_animData[animName].number);
 
-		//ガードのアニメーション時の処理
-		if (animName == "Guard" || animName == "Die" || animName == "Death")
-		{
-			//ガードを行っているのでtrue
-			m_isPlayerGuard = true;
-		}
-		else
-		{
-			//ガードを行っていないのでfalse
-			m_isPlayerGuard = false;
-		}
+    // ブレンド率はprevが有効でない場合、1.0にする
+    if (m_prevPlayAnim == -1)
+    {
+        m_animBlendRate = kAnimBlendMax;
+    }
+    else
+    {
+        m_animBlendRate = 0.0f;
+    }
+
+    //ガードのアニメーション時の処理
+    if (animName == "Guard" || animName == "Die" || animName == "Death")
+    {
+        //ガードを行っているのでtrue
+        m_isPlayerGuard = true;
+    }
+    else
+    {
+        //ガードを行っていないのでfalse
+        m_isPlayerGuard = false;
+    }
+}
+
+
+float CharacterBase::GetAnimTotalTime(std::string animName)
+{
+
+	int animIndex = m_animData[animName].number;
+	float totalTime = MV1GetAnimTotalTime(m_handle, animIndex);
+
+	return totalTime;
 }
 
 //プレイヤーに向かう処理
@@ -221,7 +256,7 @@ void CharacterBase::HitPlayerAttack(VECTOR attackStart, VECTOR attackEnd, float 
 }
 
 //死んだときの処理
-void CharacterBase::Die(const Player& player)
+void CharacterBase::Die()
 {
 	if (!m_isMove)
 	{

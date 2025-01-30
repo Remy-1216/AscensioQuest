@@ -3,7 +3,7 @@
 #include "SoundManager.h"
 #include "DxLib.h"
 #include "Pad.h"
-#include "SceneTitle.h"
+#include "SceneSelect.h"
 #include "Game.h"
 
 namespace
@@ -58,7 +58,7 @@ std::shared_ptr<SceneBase> SceneResult::Update(const Pad& pad)
 	}
 	if (m_isTitle && m_fadeAlpha >= kFadeValue)
 	{
-		return std::make_shared<SceneTitle>();
+		return std::make_shared<SceneSelect>();
 	}
 
 	return shared_from_this();
