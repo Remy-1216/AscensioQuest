@@ -284,12 +284,9 @@ void PlayerStatus::CustomBonus(const Pad&pad)
 		m_magicAttackUp += kMagicAttackBonus;
 
 
-		if (pad.IsTrigger("A"))
-		{
-			m_isFullCustomBonus = false;
-
-			m_customBonus++;
-		}
+		
+		m_customBonus++;
+		
 	}
 }
 

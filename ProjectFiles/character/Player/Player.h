@@ -41,7 +41,7 @@ public:
 	/// <summary>
 	/// 攻撃をしているときの処理
 	/// </summary>
-	void Attack(int buttonCount,float animTime);
+	void Attack(int attackNum,float animTime);
 
 	/// <summary>
 	/// 魔法攻撃をしているときの処理

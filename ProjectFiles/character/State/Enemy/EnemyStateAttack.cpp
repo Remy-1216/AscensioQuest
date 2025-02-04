@@ -102,7 +102,6 @@ void EnemyStateAttack::LongDistanveEnemyAttack(Stage& stage, const Player& playe
 		m_attackNum++;
 	}
 
-	m_pEnemy->LongDistanceEnemyAttack();
 
 	//状態遷移
 	//攻撃から待機状態に変更

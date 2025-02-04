@@ -17,13 +17,15 @@ void PlayerStateSpecialMove::Init()
 void PlayerStateSpecialMove::Update(Stage& stage, const Pad& pad, const Camera& camera)
 {
 	m_pPlayer->Move(stage, VGet(0.0f, 0.0f, 0.0f));
-	m_pPlayer->SpecialMove(pad, m_isSpecialMoveTime);
+
+	
 
 	//状態遷移
 	//攻撃から待機状態に変更
 	if (m_pPlayer->GetAnimLoopEndTime() <= m_pPlayer->GetCurrentAnimTime())
 	{
 		m_isSpecialMoveTime = true;
+		m_pPlayer->SpecialMove(pad, m_isSpecialMoveTime);
 
 		m_nextState = std::make_shared<PlayerStateIdle>(m_pPlayer);
 		auto state = std::dynamic_pointer_cast<PlayerStateIdle>(m_nextState);

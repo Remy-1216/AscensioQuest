@@ -56,6 +56,10 @@ std::shared_ptr<SceneBase> SceneResult::Update(const Pad& pad)
 
 		m_isTitle = true;
 	}
+	if (pad.IsTrigger("B"))
+	{
+		DxLib_End();
+	}
 	if (m_isTitle && m_fadeAlpha >= kFadeValue)
 	{
 		return std::make_shared<SceneSelect>();

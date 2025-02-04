@@ -8,6 +8,7 @@ namespace Font
 	enum class FontId
 	{
 		// フォントサイズ、太さ
+		kSize100_4,
 		kSize96_4,
 		kSize64_4,
 		kSize55_4,

@@ -42,6 +42,14 @@ CharacterBase::~CharacterBase()
 	m_pEffectManager = nullptr;
 }
 
+void CharacterBase::DrawShadowModel()
+{
+    //シャドウマップにモデルを描画する
+    MV1DrawModel(m_handle);
+
+  
+}
+
 //アニメーションの更新
 void CharacterBase::UpdateAnim()
 {

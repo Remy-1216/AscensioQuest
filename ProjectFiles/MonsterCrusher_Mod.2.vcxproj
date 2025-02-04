@@ -167,7 +167,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -184,7 +184,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -202,7 +202,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -219,7 +219,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

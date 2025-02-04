@@ -103,6 +103,11 @@ public:
 	CharacterBase(int handle);
 	virtual ~CharacterBase();
 
+	/// <summary>
+	/// シャドウマップへの描画の準備
+	/// </summary>
+	void DrawShadowModel();
+
 	//アニメーションの進行
 	//ループしたかどうかを返す
 	/// <summary>

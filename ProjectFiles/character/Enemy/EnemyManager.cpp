@@ -212,6 +212,24 @@ void EnemyManager::Draw()
 	}
 }
 
+void EnemyManager::DrawShadowModel()
+{
+	//存在している敵を描画
+	for (int i = 0; i < kEnemyNum; i++)
+	{
+		if (m_pShortDistanceEnemy[i])
+		{
+			m_pShortDistanceEnemy[i]->DrawShadowModel();
+		}
+
+		if (m_pLongDistanceEnemy[i])
+		{
+			m_pLongDistanceEnemy[i]->DrawShadowModel();
+		}
+	}
+
+}
+
 //近距離型の敵の生成
 void EnemyManager::CreateShortDistanceEnemy()
 {

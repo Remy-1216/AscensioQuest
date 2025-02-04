@@ -19,10 +19,6 @@ public:
 	//敵のHPバーの描画
 	void DrawEnemyGaugeBar(const CharacterBase& characterBase);
 
-	//プレイヤーが受けたダメージを受け取る
-	void PlayerDamage(int damage);
-
-
 private:
 	//プレイヤーUI関係
 	int m_playerBarHandle;					//プレイヤーHPバーの灰色部分のハンドル
@@ -44,7 +40,6 @@ private:
 	float m_specialMoveGaugeBarX;
 	
 	//受けたダメージを受け取る
-	int m_damage;
 	int m_enemyDamage;
 };
 

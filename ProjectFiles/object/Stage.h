@@ -6,6 +6,7 @@ class CharacterBase;
 class Player;
 class Pad;
 class EffectManager;
+class SoundManager;
 
 class Stage
 {
@@ -52,6 +53,10 @@ public:
 
 	void Draw();
 
+	/// <summary>
+	/// シャドウマップへの描画の準備
+	/// </summary>
+	void DrawShadowModel();
 
 	/// <summary>
 	/// ワープポイントの情報を読み取る
@@ -109,6 +114,7 @@ private:
 private:
 
 	std::shared_ptr<EffectManager> m_pEffectManager;
+
 
 	//ステージのハンドル
 	int m_stageHandle;

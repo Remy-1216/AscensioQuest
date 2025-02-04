@@ -94,6 +94,9 @@ private:
 	//ボスのモデルハンドル
 	int m_bossHandle;
 
+	//敵の人数
+	int m_enemyNum;
+
 	//プレイヤーが死んだかどうか
 	bool m_isPlayerDie;
 

@@ -95,6 +95,11 @@ public:
 	/// </summary>
 	void StatusUpSE();
 
+	/// <summary>
+	/// ワープした時のSEを流す
+	/// </summary>
+	void WarpSE();
+
 private:
 
 	//タイトル画面BGM　
@@ -147,6 +152,9 @@ private:
 
 	//能力を上げた時のSE
 	int m_statusUpSE;
+
+	//ワープ音
+	int m_warpSE;
 
 
 };

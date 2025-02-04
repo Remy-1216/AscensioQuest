@@ -80,16 +80,10 @@ Stage::~Stage()
 
 void Stage::Draw()
 {
-    //シャドウマップへステージを描画
-    MV1DrawModel(m_stageHandle);
-
-    // シャドウマップへの描画を終了
-    ShadowMap_DrawEnd();
-
     //背景の描画
     DrawGraph(0, 0, m_bgHandle, false);
 
-    //モデルの表示
+    //ステージを描画する
     MV1DrawModel(m_stageHandle);
 
     if (m_stageKinds == Stage1)
@@ -103,29 +97,12 @@ void Stage::Draw()
             m_pEffectManager->DrawWarpPointEffect(m_warpTarger[i], i + kWarpPointNum);
         }
     }
-   
-    
+}
 
-#ifdef _DEBUG
-
-   // //ステージの座標位置を表示する
-   // DrawFormatString(0, 800, GetColor(0, 0, 0), "stageの座標(%.2f,%.2f,%.2f)", m_stagePos.x, m_stagePos.y, m_stagePos.z);
-
-   // if (m_stageKinds == Stage1)
-   //{
-   //     //足元のカプセルを表示
-   //     DrawSphere3D(m_oldPos, kWarpPointSphereRadius, 5, 0x000000, 0x000000, false);
-
-
-   //     for (int i = 0; i < kWarpPointNum; i++)
-   //     {
-   //         //ワープのカプセルを表示
-   //         DrawSphere3D(m_warpSource[i], kWarpPointSphereRadius, 5, 0x000000, 0x000000, false);
-   //         //ワープ先のカプセルを表示
-   //         DrawSphere3D(m_warpTarger[i], kWarpPointSphereRadius, 5, 0x000000, 0x000000, false);
-   //     }
-   // }
-#endif
+void Stage::DrawShadowModel()
+{
+    //シャドウマップへステージを描画
+    MV1DrawModel(m_stageHandle);
 
 }
 

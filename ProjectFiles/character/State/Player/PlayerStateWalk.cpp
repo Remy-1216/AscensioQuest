@@ -151,8 +151,8 @@ void PlayerStateWalk::WalkingProcess(Stage& stage)
 
 	//アナログスティック無効な範囲を除外する
 	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-	rate = min(rate, 1.0f);
-	rate = max(rate, 0.0f);
+	rate = std::min(rate, 1.0f);
+	rate = std::max(rate, 0.0f);
 	//速度が決定できるので移動ベクトルに反映する
 	m_move = VNorm(m_move);
 	float speed = m_walkSpeed * rate;

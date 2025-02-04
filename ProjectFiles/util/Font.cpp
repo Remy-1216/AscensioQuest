@@ -28,6 +28,8 @@ namespace Font
 
 	FontData data[] =
 	{
+		//kSize100_4
+		{kFontName,100,4, DX_FONTTYPE_ANTIALIASING_8X8},
 		// Size96_4
 		{kFontName, 96, 4, DX_FONTTYPE_ANTIALIASING_8X8},
 		// Size64_4

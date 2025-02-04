@@ -3,7 +3,7 @@
 
 SoundManager::SoundManager():m_titleBGM(-1), m_selectBGM(-1), m_statusBGM(-1),m_gamePlayBGM(-1), m_clearBGM(-1), m_gameOverBGM(-1),
 m_moveCursorSE(-1),m_determinationSE(-1), m_failureSE(-1), m_rollSwordSE(-1), m_swordSE(-1), m_magicAttackSE(-1), m_guardSE(-1),
-m_specialMoveSE(-1), m_hitShortDistanceAttackSE(-1),m_hitLongDistanceAttackSE(-1), m_statusUpSE(-1)
+m_specialMoveSE(-1), m_hitShortDistanceAttackSE(-1),m_hitLongDistanceAttackSE(-1), m_statusUpSE(-1),m_warpSE(-1)
 {
 }
 
@@ -27,6 +27,7 @@ SoundManager::~SoundManager()
 	DeleteSoundMem(m_hitShortDistanceAttackSE);
 	DeleteSoundMem(m_hitLongDistanceAttackSE);
 	DeleteSoundMem(m_statusUpSE);
+	DeleteSoundMem(m_warpSE);
 }
 
 void SoundManager::Init()
@@ -235,4 +236,15 @@ void SoundManager::StatusUpSE()
 	//SEの設定
 	PlaySoundMem(m_statusUpSE, DX_PLAYTYPE_BACK, true);
 
+}
+
+void SoundManager::WarpSE()
+{
+	if (m_warpSE <= -1)
+	{
+		m_warpSE = LoadSoundMem("data/SE/warp.mp3");
+	}
+
+	//SEの設定
+	PlaySoundMem(m_warpSE, DX_PLAYTYPE_BACK, true);
 }

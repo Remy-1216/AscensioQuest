@@ -52,10 +52,21 @@ public:
 
 
 	/// <summary>
+	/// シャドウマップへの描画の準備
+	/// </summary>
+	void DrawShadowModel();
+
+	/// <summary>
 	/// ステータスポイントを渡す
 	/// </summary>
 	/// <returns></returns>
 	int GetStatusPoint()const { return m_statusPoint; }
+
+	/// <summary>
+	/// 敵の数を渡す
+	/// </summary>
+	/// <returns></returns>
+	int GetEnemyNum()const { return m_enemyNum; }
 
 	/// <summary>
 	/// ゲームをクリアしたかを渡す

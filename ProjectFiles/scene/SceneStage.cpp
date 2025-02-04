@@ -11,6 +11,7 @@
 #include "UIBar.h"
 #include "Pad.h"
 #include "Game.h"
+#include "Font.h"
 
 namespace
 {
@@ -21,16 +22,19 @@ namespace
 	constexpr int kFadeUpDown =5;
 
 	//シャドウマップを制作するときに使用する値
-	constexpr int kShadowMap = 1024;
-
+	constexpr int kShadowMap = 2048;
 	//シャドウマップの描画範囲
-	constexpr float kShadowMapRange = 7500.0f;
+	constexpr float kShadowMapRange =7500.0f;
 
 	//ライトの方向
 	constexpr float kLight = 0.5f;
 
 	//必殺技ゲージの右下のX座標
 	constexpr float kSpecialMoveGaugePosX =250.0f;
+
+	//残りの敵数を表示する位置
+	constexpr float kPosX = 1350.0f;
+	constexpr float kPosY = 50.0f;
 }
 
 
@@ -73,7 +77,6 @@ SceneStage::~SceneStage()
 	DeleteGraph(m_warpPointOperationHandle);
 	DeleteGraph(m_allOperatioHandle);
 	
-
 	// シャドウマップの削除
 	DeleteShadowMap(m_shadowMapHandle);
 }
@@ -137,7 +140,6 @@ void SceneStage::Init()
 
 std::shared_ptr<SceneBase> SceneStage::Update(const Pad& pad)
 {
-
 	//ステージ1の動き
 	if (m_stageKinds == Stage1)
 	{
@@ -189,6 +191,29 @@ void SceneStage::Draw()
 	// シャドウマップへの描画の準備
 	ShadowMap_DrawSetup(m_shadowMapHandle);
 
+	m_pStage->DrawShadowModel();
+
+	m_pPlayer->DrawShadowModel();
+
+	//ステージの種類によって描画するものを変更する
+	if (m_stageKinds == Stage1)
+	{
+		//エネミーの描画
+		m_pEnemyManager->DrawShadowModel();
+
+		//残り敵数を描画
+		DrawFormatStringFToHandle(kPosX, kPosY, GetColor(0, 0, 0), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize100_4)], "残り%4d\n", m_enemyNum);
+
+
+	}
+	if (m_stageKinds == Stage2)
+	{
+		m_pBoss->DrawShadowModel();
+	}
+
+	//シャドウマップへの描画を終了
+	ShadowMap_DrawEnd();
+
 	// 描画に使用するシャドウマップを設定
 	SetUseShadowMap(0, m_shadowMapHandle);
 
@@ -198,16 +223,24 @@ void SceneStage::Draw()
 	//プレイヤーの描画
 	m_pPlayer->Draw();
 
+
 	//ステージの種類によって描画するものを変更する
 	if (m_stageKinds == Stage1)
 	{
 		//エネミーの描画
 		m_pEnemyManager->Draw();
+
+		//残り敵数を描画
+		DrawFormatStringFToHandle(kPosX,kPosY, GetColor(0, 0, 0), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize100_4)], "残り%4d\n",m_enemyNum);
 	}
 	if (m_stageKinds == Stage2)
 	{
+		//ボスの描画
 		m_pBoss->Draw();
 	}
+
+	// 描画に使用するシャドウマップの設定を解除
+	SetUseShadowMap(0, -1);
 
 	//操作説明を表示
 	OperationUI();
@@ -260,6 +293,9 @@ void SceneStage::Stage1Update(const Pad& pad)
 
 	//プレイヤーが必殺技を撃てる状態かを受け取る
 	m_isSpecialMoveAvailable = m_pPlayer->GetIsSpecialMoveAvailable();
+
+	//敵の残り人数を受け取る
+	m_enemyNum = m_pEnemyManager->GetEnemyNum();
 
 	m_pEnemyManager->Update(*m_pStage, *m_pPlayer);
 

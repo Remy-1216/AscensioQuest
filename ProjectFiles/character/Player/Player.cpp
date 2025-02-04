@@ -202,7 +202,7 @@ void Player::Update(Stage& stage, const Pad&pad,const Camera& camera)
 
 	// stateの更新
 	m_pState->Update(stage,pad,camera); 	
-
+	
 	m_pEffectManager->Update();
 
 	//ワープ処理
@@ -234,12 +234,6 @@ void Player::Update(Stage& stage, const Pad&pad,const Camera& camera)
 //描画
 void Player::Draw()
 {
-	//シャドウマップでプレイヤーモデルを描画する
-	MV1DrawModel(m_handle);
-
-	// シャドウマップへの描画を終了
-	ShadowMap_DrawEnd();
-
 	//モデルの表示
 	MV1DrawModel(m_handle);
 
@@ -300,29 +294,29 @@ void Player::Move( Stage& stage,const VECTOR& moveVec)
 }
 
 //攻撃をした時の処理
-void Player::Attack(int buttonCount,float animTime)
+void Player::Attack(int attackNum,float animTime)
 {
 	m_isAttack = true; 
 
-	if (animTime >= kAttack1Time&& buttonCount == 0)
+	if (animTime >= kAttack1Time&& attackNum == 0)
 	{
 		m_isAttackCollision = true;
 	}
 
-	if (animTime >= kAttack2StartTime && buttonCount == 1)
+	if (animTime >= kAttack2StartTime && attackNum == 1)
 	{
 		m_isAttackCollision = true;
 	}
-	else if (animTime >= kAttack2EndTime && buttonCount == 1)
+	else if (animTime >= kAttack2EndTime && attackNum == 1)
 	{
 		m_isAttackCollision = false;
 	}
 
-	if (animTime >= kAttack3StartTime && buttonCount == 2)
+	if (animTime >= kAttack3StartTime && attackNum == 2)
 	{
 		m_isAttackCollision = true;
 	}
-	else if (animTime >= kAttack3EndTime && buttonCount == 2)
+	else if (animTime >= kAttack3EndTime && attackNum == 2)
 	{
 		m_isAttackCollision = false;
 	}
@@ -361,6 +355,8 @@ void Player::Warp(const Pad& pad,VECTOR warpTarget)
 	if (pad.IsTrigger("X"))
 	{
 		m_pos = warpTarget;
+
+		m_pSoundManager->WarpSE();
 	}
 
 #ifdef _DEBUG
@@ -599,6 +595,7 @@ void Player::UpdateCol()
 	//プレイヤーが死んだときの処理
 	if (m_hp <= 0 && !m_isDie)
 	{
+		m_hp = 0;
 		m_isMove = false;
 	}
 }

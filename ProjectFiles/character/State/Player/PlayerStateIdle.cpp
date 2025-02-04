@@ -41,7 +41,7 @@ void PlayerStateIdle::PlayerIdle(const Pad& pad, const Camera& camera)
 	m_isHitCharacter = m_pPlayer->GetIsHitEnemy();
 	m_isSpecialMove = m_pPlayer->GetIsSpecialMove();
 
-	m_pPlayer->SpecialMove(pad, m_isSpecialMoveTime);
+	m_pPlayer->SpecialMove(pad,false);
 
 	//待機状態から走る状態に変更
 	if (pad.IsPress("RB") && (pad.IsPress("left") || pad.IsPress("right") || pad.IsPress("up") || pad.IsPress("down")))

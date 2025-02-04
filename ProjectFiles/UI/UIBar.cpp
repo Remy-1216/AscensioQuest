@@ -3,14 +3,15 @@
 #include "Game.h"
 #include "DxLib.h"
 #include "CharacterBase.h"
+#include <vector>
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include<cmath>
 
 namespace
 {
 	//プレイヤーのHPバー
-	constexpr float kUIBar = 1980.0f;
+	constexpr float kUIBar = 1920.0f;
 
 	//敵のHPバー
 	constexpr float kEnemyBarX = 10.0f;
@@ -62,35 +63,38 @@ void UIBar::Update()
 
 void UIBar::DrawPlayerGaugeBar(const Player& player)
 {
-	//バーの下地部分の描画
-	DrawGraph(0,0, m_playerBarHandle,true);
-
-
+	DrawExtendGraphF(0.0f, 0.0f, Game::kScreenWindidth, Game::kScreenHeight, m_playerBarHandle, true);
+	
 	float damageBar = static_cast<float>(player.GetHp()) / static_cast<float>(player.GetMaxHp());
-	float hpBar = kUIBar * damageBar;
+	damageBar = std::max(0.0f, damageBar);
+	float hpBar = Game::kScreenWindidth * damageBar; // HPバーの長さを計算
 
-	//ダメージバーの描画
-	DrawExtendGraphF(0.0f, 0.0f, hpBar, Game::kScreenHeight, m_playerDamageBarHandle, true);
-
-	//HPバーの描画
+	// ダメージバーの描画
 	DrawExtendGraphF(0.0f, 0.0f, hpBar, Game::kScreenHeight, m_playerHpBarHandle, true);
 
+	// HPバーを左端固定で描画（左端を 0.0f にする）
+	DrawExtendGraphF(0.0f, 0.0f, hpBar, Game::kScreenHeight, m_playerHpBarHandle, true);
+
+	// MPバーの計算
 	float mpBar = static_cast<float>(player.GetMp()) / static_cast<float>(player.GetMaxMp());
-	float Bar = kUIBar * mpBar;
+	mpBar = std::min(1.0f, std::max(0.0f, mpBar));
+	float mpBarWidth = kUIBar * mpBar;
 
-	//MPバーの描画
-	DrawExtendGraphF(0.0f, 0.0f, Bar, Game::kScreenHeight, m_playerMpBarHandle, true);
+	// MPバーの描画
+	DrawExtendGraphF(0.0f, 0.0f, mpBarWidth, Game::kScreenHeight, m_playerMpBarHandle, true);
 
-	float specialMoveGaugeBar = static_cast<float>(player.GetSpecialMoveGauge()) /100.0f;
-	float specialMoveGauge = kUIBar * specialMoveGaugeBar;
+	// 必殺技ゲージの計算
+	float specialMoveGaugeBar = static_cast<float>(player.GetSpecialMoveGauge()) / 100.0f;
+	specialMoveGaugeBar = std::min(1.0f, std::max(0.0f, specialMoveGaugeBar));
+	float specialMoveGaugeWidth = kUIBar * specialMoveGaugeBar;
 
-	//必殺技ゲージの描画
+	// 必殺技ゲージの描画
 	if (specialMoveGaugeBar > 0.0f)
 	{
-		DrawExtendGraphF(0.0f, 0.0f, specialMoveGauge, Game::kScreenHeight, m_playerSpecialMoveGaugeHandle, true);
+		DrawExtendGraphF(0.0f, 0.0f, specialMoveGaugeWidth, Game::kScreenHeight, m_playerSpecialMoveGaugeHandle, true);
 	}
-	
 }
+
 
 void UIBar::DrawEnemyGaugeBar(const CharacterBase& characterBase)
 {
@@ -103,44 +107,33 @@ void UIBar::DrawEnemyGaugeBar(const CharacterBase& characterBase)
 		// ワールド座標をスクリーン座標に変換する
 		VECTOR screenPos = ConvWorldPosToScreenPos(headPos);
 
-		
-			// HPバーの背景を描画
-			DrawExtendGraphF(screenPos.x - kEnemyBarX, screenPos.y - kEnemyBarY,
-							 screenPos.x + kEnemyBarX, screenPos.y + kEnemyBarY, m_enemyBarHandle, true);
 
-			// 敵のHPが0以下になる場合、ダメージ部分を表示しない
-			if (characterBase.GetHp() <= 0.0f)
-			{
-				m_enemyDamage = 0.0f;
-			}
+		// HPバーの背景を描画
+		DrawExtendGraphF(screenPos.x - kEnemyBarX, screenPos.y - kEnemyBarY,
+						 screenPos.x + kEnemyBarX, screenPos.y + kEnemyBarY, m_enemyBarHandle, true);
 
-			// ダメージバーの長さを計算
-			float hp = characterBase.GetHp() + m_enemyDamage;
-			float damageHpRatio = hp / characterBase.GetMaxHp();
-			float damageHpLength = kEnemyBarX * damageHpRatio;
+		// 敵のHPが0以下になる場合、ダメージ部分を表示しない
+		if (characterBase.GetHp() <= 0.0f)
+		{
+			m_enemyDamage = 0.0f;
+		}
 
-			// ダメージバーを描画
-			DrawExtendGraphF(screenPos.x - kEnemyBarX , screenPos.y - kEnemyBarY ,
-							 (screenPos.x - kEnemyBarX ) + damageHpLength, screenPos.y + kEnemyBarY , m_enemyDamageBarHandle, true);
+		// ダメージバーの長さを計算
+		float hp = characterBase.GetHp() + m_enemyDamage;
+		float damageHpRatio = hp / characterBase.GetMaxHp();
+		float damageHpLength = kEnemyBarX * damageHpRatio;
 
-			// HPバーの長さを計算
-			float hpRatio = static_cast<float>(characterBase.GetHp()) / static_cast<float>(characterBase.GetMaxHp());
-			float hpLength = kEnemyBarX * hpRatio;
+		// ダメージバーを描画
+		DrawExtendGraphF(screenPos.x - kEnemyBarX, screenPos.y - kEnemyBarY,
+						 (screenPos.x - kEnemyBarX) + damageHpLength, screenPos.y + kEnemyBarY, m_enemyDamageBarHandle, true);
 
-			// HPバーを描画
-			DrawExtendGraphF(screenPos.x - kEnemyBarX , screenPos.y - kEnemyBarY ,
-							 (screenPos.x - kEnemyBarX) + hpLength, screenPos.y + kEnemyBarY , m_enemyHpBarHandle, true);
-		
+		// HPバーの長さを計算
+		float hpRatio = static_cast<float>(characterBase.GetHp()) / static_cast<float>(characterBase.GetMaxHp());
+		float hpLength = kEnemyBarX * hpRatio;
+
+		// HPバーを描画
+		DrawExtendGraphF(screenPos.x - kEnemyBarX, screenPos.y - kEnemyBarY,
+						 (screenPos.x - kEnemyBarX) + hpLength, screenPos.y + kEnemyBarY, m_enemyHpBarHandle, true);
+
 	}
-}
-
-
-
-
-
-
-
-void UIBar::PlayerDamage(int damage)
-{
-	m_damage = damage;
 }

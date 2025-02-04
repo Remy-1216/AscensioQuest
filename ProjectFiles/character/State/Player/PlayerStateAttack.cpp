@@ -1,12 +1,14 @@
 ﻿#include "PlayerStateIdle.h"
 #include "PlayerStateAttack.h"
+#include "PlayerStateWalk.h"
+#include "PlayerStateRun.h"
 #include "Player.h"
 #include "Pad.h"
 
 void PlayerStateAttack::Init()
 {
 	m_pPlayer->ChangeAnim("Attack1");
-	m_isAttack = true;
+	m_isAttacking = false;
 
 	m_attack2Time = 0.0f;
 
@@ -21,44 +23,42 @@ void PlayerStateAttack::Update(Stage& stage, const Pad& pad, const Camera& camer
 {
     m_pPlayer->Move(stage, VGet(0.0f, 0.0f, 0.0f));
 
-    // 攻撃状態時の処理
+    // 攻撃処理
     if (pad.IsTrigger("A"))
     {
-        m_aButtonCount++;
+        m_aButtonCount++;  // Aボタンを押した回数を記録
     }
 
-    if (m_aButtonCount == 0)
+    // 初回攻撃の開始
+    if (!m_isAttacking)
     {
         m_pPlayer->Attack(m_aButtonCount, m_pPlayer->GetCurrentAnimTime());
+        m_isAttacking = true;  // 攻撃中フラグを立てる
     }
-    else if (m_aButtonCount == 1)
+    else
     {
-        m_pPlayer->Attack(m_aButtonCount, m_pPlayer->GetCurrentAnimTime());
-    }
-    else if(m_aButtonCount == 2)
-    {
-        m_pPlayer->Attack(m_aButtonCount, m_pPlayer->GetCurrentAnimTime());
+        m_pPlayer->Attack(m_attacks, m_pPlayer->GetCurrentAnimTime());
     }
 
-    // 現在のアニメーションが終了したかどうかを確認
+    // アニメーションが終了したかチェック
     if (m_pPlayer->GetAnimLoopEndTime() <= m_pPlayer->GetCurrentAnimTime())
-    {  
-        if (m_aButtonCount == 1 && m_attacks == 0)
+    {
+        if (m_aButtonCount >= 1 && m_attacks == 0)
         {
             m_pPlayer->ChangeAnim("Attack2");
-
             m_attacks++;
         }
-        else if (m_aButtonCount == 2 && m_attacks == 1)
+        else if (m_aButtonCount >= 2 && m_attacks == 1)
         {
             m_pPlayer->ChangeAnim("Attack3");
             m_attacks++;
         }
-
-        else if(m_aButtonCount >= 3)
-        { 
+        else if (m_aButtonCount >= 3 && m_attacks == 2)
+        {
+            // 攻撃終了
             m_attacks = 0;
             m_aButtonCount = 0;
+            m_isAttacking = false;  // 攻撃終了
         }
     }
 
@@ -71,10 +71,6 @@ void PlayerStateAttack::Update(Stage& stage, const Pad& pad, const Camera& camer
         state->Init();
     }
 }
-
-
-
-
 void PlayerStateAttack::Draw()
 {
 	DrawFormatString(0, 50, GetColor(0,0,0), "プレイヤーが攻撃中");
