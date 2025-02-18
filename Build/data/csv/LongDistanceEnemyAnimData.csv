@@ -1,5 +1,0 @@
-﻿AnimName,No,loopFrame,loopEndFrame,animSpeed
-Walk,0,0,42.0f,0.5f
-Attack,1,0,60.0f,1.0f
-Damage,2,0,38.0f,1.0f
-Die,3,0,109.0f,1.0f

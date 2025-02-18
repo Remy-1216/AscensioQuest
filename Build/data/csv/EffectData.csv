@@ -1,7 +1,0 @@
-﻿,エフェクトの時間,エフェクトのサイズ,エフェクトの位置補正
-playerdamage,20,3.5f,100.0f
-magicattack,73,5.0f,0.0f
-warppoint,232,20.0f,20.0f
-item,101,20.0f,0.0f
-playerguard,1,20.0f,100.0f
-enemydamage,1,20.0f,100.0f
