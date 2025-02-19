@@ -4,6 +4,7 @@
 #include "SoundManager.h"
 #include "Pad.h"
 #include "Game.h"
+#include "Font.h"
 
 namespace
 {
@@ -23,6 +24,11 @@ namespace
 
 	//フェード値の増減
 	constexpr int kFadeUpDown = 8;
+
+	//描画する文字の位置
+	constexpr float kPosX =600.0f;
+	constexpr float kPosY = 100.0f;
+
 
 	//強化回数
 	constexpr int kReinforcementTimes1 = 1;
@@ -62,6 +68,8 @@ SceneStatus::~SceneStatus()
 	DeleteGraph(m_releasedGaugeHandle9);
 	DeleteGraph(m_releasedGaugeHandle10);
 	DeleteGraph(m_customBonusHandle);
+
+
 
 }
 
@@ -177,10 +185,16 @@ void SceneStatus::CursorMotion(const Pad& pad)
 	if (pad.IsTrigger("up"))
 	{
 		m_cursorPos.y -= kCarsorMove;
+		
+		//SEの再生
+		m_pSoundManager->MoveCursorSE();
 	}
 	if (pad.IsTrigger("down"))
 	{
 		m_cursorPos.y += kCarsorMove;
+
+		//SEの再生
+		m_pSoundManager->MoveCursorSE();
 	}
 
 	//上限を超える一番下の項目に飛ぶ
@@ -384,7 +398,7 @@ void SceneStatus::BackgroundChange()
 //ポイントの数値や、上限UPできるかを描画する
 void SceneStatus::DrawPoint()
 {
-	DrawFormatString(1000, 200, GetColor(0, 0, 0), "スキルポイント数:%4d", m_pPlayerStatus->GetStatusPoint());
+	DrawFormatStringFToHandle(kPosX, kPosY, GetColor(0, 0, 0), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize64_4)], "ステータスポイント数:%4d", m_pPlayerStatus->GetStatusPoint());
 }
 
 //カスタムボーナス説明を描画する

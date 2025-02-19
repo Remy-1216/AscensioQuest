@@ -19,6 +19,23 @@ namespace
 
     //ワープ関係
     constexpr float kWarpPointSphereRadius = 100.0f;
+
+    //マップを描画する位置
+    constexpr float kMapPosX = 1600.0f;
+    constexpr float kMapPosY =  50.0f;
+
+    //プレイヤーの位置表示を描画する位置
+    constexpr float kSafeAreaPosX = 1675.0f;
+    constexpr float kSafeAreaPosY = 120.0f;
+    constexpr float kMap1PosX = 1580.0f;
+    constexpr float kMap1PosY = 25.0f;
+    constexpr float kMap2PosX = 1775.0f;
+    constexpr float kMap2PosY = 25.0f;
+    constexpr float kMap3PosX = 1580.0f;
+    constexpr float kMap3PosY = 215.0f;
+    constexpr float kMap4PosX = 1775.0f;
+    constexpr float kMap4PosY = 215.0f;
+
 }
 
 Stage::Stage(int stageKinds)
@@ -32,6 +49,10 @@ Stage::Stage(int stageKinds)
     if (m_stageKinds == Stage1)
     {
         m_stageHandle = MV1LoadModel("data/model/stage/stage.mv1");
+
+        m_mapHandle = LoadGraph("data/UI/Map.png");
+
+        m_playerPosHandle = LoadGraph("data/UI/playerPosition.png");
     }
     if (m_stageKinds == Stage2)
     {
@@ -55,6 +76,9 @@ Stage::Stage(int stageKinds)
     m_posZ = m_stage.posZ;
     m_size = m_stage.size;
 
+    //マップの端の位置を読み込む
+    LoadCsv::GetInstance().LoadMapPosData(m_upperLeft, "upperLeft");
+    LoadCsv::GetInstance().LoadMapPosData(m_lowerRight, "lowerRight");
 
     m_stagePos = VGet(m_posX, -m_posY, m_posZ);
 
@@ -74,6 +98,9 @@ Stage::~Stage()
     //画像の削除
     DeleteGraph(m_bgHandle);
 
+    //マップ画像の削除
+    DeleteGraph(m_mapHandle);
+
     //モデルの削除
     MV1DeleteModel(m_stageHandle);   
 }
@@ -91,6 +118,8 @@ void Stage::Draw()
         for (int i = 0; i < kWarpPointNum; i++)
         {
             m_pEffectManager->DrawWarpPointEffect(m_warpSource[i], i);
+
+            DrawGraph(kMapPosX, kMapPosY, m_mapHandle, true);
         }
         for (int i = 0; i < kWarpPointNum; i++)
         {
@@ -104,6 +133,34 @@ void Stage::DrawShadowModel()
     //シャドウマップへステージを描画
     MV1DrawModel(m_stageHandle);
 
+}
+
+void Stage::DrawMap(Player& player)
+{
+    m_playerPos = player.GetPos();
+
+    if (m_playerPos.x >= m_upperLeft.map1PosX && m_playerPos.z <= m_upperLeft.map1PosZ && m_playerPos.x <= m_lowerRight.map1PosX && m_playerPos.z >= m_lowerRight.map1PosZ)
+    {
+        DrawGraph(kSafeAreaPosX, kSafeAreaPosY, m_playerPosHandle,true);
+    }
+
+    else if (m_playerPos.x >= m_upperLeft.map2PosX && m_playerPos.z <= m_upperLeft.map2PosZ && m_playerPos.x <= m_lowerRight.map2PosX && m_playerPos.z >= m_lowerRight.map2PosZ)
+    {
+        DrawGraph(kMap1PosX, kMap1PosY, m_playerPosHandle, true);
+    }
+
+    else if (m_playerPos.x >= m_upperLeft.map3PosX && m_playerPos.z <= m_upperLeft.map3PosZ && m_playerPos.x <= m_lowerRight.map3PosX && m_playerPos.z >= m_lowerRight.map3PosZ)
+    {
+        DrawGraph(kMap2PosX, kMap2PosY, m_playerPosHandle, true);
+    }
+    else if (m_playerPos.x >= m_upperLeft.map4PosX && m_playerPos.z <= m_upperLeft.map4PosZ && m_playerPos.x <= m_lowerRight.map4PosX && m_playerPos.z >= m_lowerRight.map4PosZ)
+    {
+        DrawGraph(kMap3PosX, kMap3PosY, m_playerPosHandle, true);
+    }
+    else if (m_playerPos.x >= m_upperLeft.map5PosX && m_playerPos.z <= m_upperLeft.map5PosZ && m_playerPos.x <= m_lowerRight.map5PosX && m_playerPos.z >= m_lowerRight.map5PosZ)
+    {
+        DrawGraph(kMap4PosX, kMap4PosY, m_playerPosHandle, true);
+    }
 }
 
 void Stage::LoadWarpPointPos()

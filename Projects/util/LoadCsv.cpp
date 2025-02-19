@@ -22,6 +22,7 @@ namespace
 	const char* const kStatusUpFileName = "data/csv/StatusUP.csv";
 	const char* const kEffectDataFileName = "data/csv/EffectData.csv";
 	const char* const kFontDataFileName = "data/csv/FontData.csv";
+	const char* const kMapPosFileName = "data/csv/MapPos.csv";
 
 	/// <summary>
 	/// 文字列を分割する
@@ -217,6 +218,8 @@ void LoadCsv::LoadShortDistanceEnemyAnimData(std::map<std::string, CharacterBase
 		catch (const std::invalid_argument& e)
 		{
 		}
+
+	
 	}
 }
 
@@ -463,6 +466,7 @@ void LoadCsv::LoadEffectData(EffectManager::EffectData& data, const char* effect
 	data.EffectAdjPosY = std::stof(strvec[3]);
 }
 
+//フォントデータを読み込む
 void LoadCsv::LoadFontData(Font::FontId& data, const char* fontDate)
 {
 	std::ifstream ifs(kFontDataFileName);
@@ -485,9 +489,46 @@ void LoadCsv::LoadFontData(Font::FontId& data, const char* fontDate)
 		{
 			strvec.erase(strvec.begin(), strvec.end());
 		}
+
 	}
 
 	// ステータス情報を代入する
+}
+
+//マップの端の位置を読み込む
+void LoadCsv::LoadMapPosData(Stage::MapPos& data, const char* direction)
+{
+	std::ifstream ifs(kMapPosFileName);
+	std::string line;
+	std::vector<std::string> strvec;
+	m_data.clear();
+
+	while (std::getline(ifs, line))
+	{
+		strvec = split(line, ',');
+		const char* str = strvec[0].c_str();
+
+		// 参照したいキャラが見つかっていたら処理をやめる
+		// MEMO:strcmp 文字列を比較する 第1引数 = 第2引数の場合0
+		if (strcmp(str, direction) == 0)
+		{
+			break;
+		}
+		else
+		{
+			strvec.erase(strvec.begin(), strvec.end());
+		}
+	}
+	data.map1PosX = std::stoi(strvec[1]);
+	data.map1PosZ = std::stoi(strvec[2]);
+	data.map2PosX = std::stoi(strvec[3]);
+	data.map2PosZ = std::stoi(strvec[4]);
+	data.map3PosX = std::stoi(strvec[5]);
+	data.map3PosZ = std::stoi(strvec[6]);
+	data.map4PosX = std::stoi(strvec[7]);
+	data.map4PosZ = std::stoi(strvec[8]);
+	data.map5PosX = std::stoi(strvec[9]);
+	data.map5PosZ = std::stoi(strvec[10]);
 }
 
 

@@ -364,7 +364,7 @@ protected:
 	//ステータス関連
 	Status m_status;		// ステータス
 	int m_hp;				// HP
-	int m_mp;				// MP
+	float m_mp;				// MP
 	int m_attackPower;		// 攻撃力
 	int m_magicAttackPower;	// 魔法攻撃力
 	int m_defensePower;		// 防御力

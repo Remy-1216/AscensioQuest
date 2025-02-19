@@ -33,7 +33,7 @@ namespace
 	constexpr float kSpecialMoveGaugePosX =250.0f;
 
 	//残りの敵数を表示する位置
-	constexpr float kPosX = 1350.0f;
+	constexpr float kPosX = 1000.0f;
 	constexpr float kPosY = 50.0f;
 }
 
@@ -220,9 +220,8 @@ void SceneStage::Draw()
 	//ステージの描画
 	m_pStage->Draw();
 
-	//プレイヤーの描画
-	m_pPlayer->Draw();
-
+	//マップの描画
+	m_pStage->DrawMap(*m_pPlayer);
 
 	//ステージの種類によって描画するものを変更する
 	if (m_stageKinds == Stage1)
@@ -238,6 +237,9 @@ void SceneStage::Draw()
 		//ボスの描画
 		m_pBoss->Draw();
 	}
+
+	//プレイヤーの描画
+	m_pPlayer->Draw();
 
 	// 描画に使用するシャドウマップの設定を解除
 	SetUseShadowMap(0, -1);

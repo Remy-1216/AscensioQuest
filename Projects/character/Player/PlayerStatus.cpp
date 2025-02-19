@@ -129,11 +129,14 @@ void PlayerStatus::StatOutput(int statasUpPoint)
 	//出力したいファイル名を指定する
 	std::ofstream outputfile("data/csv/StatusUP.csv");
 
-	std::vector<std::tuple<const char*, const char*, const char*, const char*, const  char*,const char*, const char*, const char*, const char*, const char*, const char*>>nameData;
+	std::vector<std::tuple<const char*, const char*, const char*, const char*, const  char*,const char*, 
+		const char*, const char*, const char*, const char*, const char*>>nameData;
 	std::vector<std::tuple<int, int,int,int,int, int, int, int, int,int,int>>data;
 	//出力したいデータを作る
-	nameData.push_back(std::make_tuple("ステータスポイント", "HPUP","HPUP段階数", "攻撃力UP","攻撃力UP段階数 ","魔法攻撃力UP", "魔法攻撃力UP段階数", "防御力UP","防御力UP段階数","必殺技ゲージ","カスタムボーナスの説明回数"));
-	data.push_back(std::make_tuple(m_statusPoint, m_hpUp,m_attackUpTimes, m_attackUp,m_attackUpTimes, m_magicAttackUp,m_magicAttackUpTimes, m_defensePowerUp,m_defensePowerUpTimes, m_specialMoveGauge, m_customBonus));
+	nameData.push_back(std::make_tuple("ステータスポイント", "HPUP","HPUP段階数", "攻撃力UP","攻撃力UP段階数 ","魔法攻撃力UP", 
+		"魔法攻撃力UP段階数", "防御力UP","防御力UP段階数","必殺技ゲージ","カスタムボーナスの説明回数"));
+	data.push_back(std::make_tuple(m_statusPoint, m_hpUp,m_attackUpTimes, m_attackUp,m_attackUpTimes, m_magicAttackUp,
+		m_magicAttackUpTimes, m_defensePowerUp,m_defensePowerUpTimes, m_specialMoveGauge, m_customBonus));
 	//データの出力
 
 	for (auto&& a : nameData) {
@@ -184,6 +187,7 @@ void PlayerStatus::StatOutput(int statasUpPoint)
 	outputfile.close();
 }
 
+//ゲームを初期から始めた時に行うCSVの出力
 void PlayerStatus::ResetOutPut()
 {
 	m_statusPoint = 0;

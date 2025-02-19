@@ -8,4 +8,6 @@ SceneBase::SceneBase()
 
 SceneBase::~SceneBase()
 {
+	m_pSoundManager.reset();
+	m_pSoundManager = nullptr;
 }

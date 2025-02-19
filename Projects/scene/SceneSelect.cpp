@@ -41,7 +41,7 @@ namespace
 }
 
 SceneSelect::SceneSelect() :m_stage1Handle(-1), m_stage2Handle(-1), m_statusHandle(-1), m_operationHandle(-1), m_gameEndHandle(-1),
-m_stage1DescriptionHandle(-1), m_stage2DescriptionHandle(-1),m_operationInstructionsHandle(-1), m_statusDescriptionHandle(-1), m_count(0), m_cursorCount(0), m_isDebug(false),
+m_stage1DescriptionHandle(-1), m_stage2DescriptionHandle(-1),m_operationInstructionsHandle(-1), m_statusDescriptionHandle(-1), m_count(0), m_cursorCount(0),
 m_isStage1(false), m_isStage2(false),m_isStatus(false), m_isExplanation(false), m_isCautionaryNote(false), m_isPishAButton(false), m_isPressPad(false), m_cursorPos(VGet(0.0f,0.0f,0.0f)), m_stage1DescriptionPos(VGet(0.0f,0.0f,0.0f)),
 m_stage2DescriptionPos(VGet(0.0f,0.0f,0.0f)), m_statusDescriptionPos(VGet(0.0f,0.0f,0.0f)), m_operationDescriptionPos(VGet(0.0f,0.0f,0.0f)),m_stage1Pos(VGet(0.0f, 0.0f, 0.0f)), m_stage2Pos(VGet(0.0f, 0.0f, 0.0f)),
 m_statusPos(VGet(0.0f, 0.0f, 0.0f)),m_explanationPos(VGet(0.0f, 0.0f, 0.0f)), m_gameEndPos(VGet(0.0f, 0.0f, 0.0f))
@@ -86,10 +86,10 @@ void SceneSelect::Init()
 	m_operationDescriptionHandle = LoadGraph("data/BG/Operation.png");
 	m_operationInstructionsHandle = LoadGraph("data/BG/OperationInstructions.png");
 
-	if (!m_isDebug)
+	/*if (!m_isDebug)
 	{
 		m_cautionaryNoteHandle = LoadGraph("data/BG/CautionaryNote.png");
-	}
+	}*/
 
 	//カーソルの位置初期化
 	m_cursorPos = VGet(0.0f, 0.0f, 0.0f);
@@ -455,6 +455,18 @@ std::shared_ptr<SceneBase> SceneSelect::SceneChange(const Pad& pad)
 		return std::make_shared<SceneStage>(Stage1);
 	}
 	
+	//ステージ2に遷移する
+	//if (m_cursorPos.y == kStage2Pos && pad.IsTrigger("A"))
+	//{
+	//	//SEの再生
+	//		m_pSoundManager->DeterminationSE();
+	//	m_isStage2 = true;
+	//}
+	//if (m_isStage2 && m_fadeAlpha >= kFadeValue)
+	//{
+	//	return std::make_shared<SceneStage>(Stage2);
+	//}
+
 	//buildのバージョンによって動作を変更している
 	//Debug版の場合
 	if (m_isDebug)

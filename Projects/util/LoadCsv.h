@@ -113,6 +113,13 @@ public:
 	/// <param name="fontDate">読み込むデータの名前</param>
 	void LoadFontData(Font::FontId& data,const char* fontDate);
 
+	/// <summary>
+	/// マップの左上,右下の座標位置を読み込む
+	/// </summary>
+	/// <param name="data">マップの座標位置</param>
+	/// <param name="map">方向</param>
+	void LoadMapPosData(Stage::MapPos& data, const char* direction);
+
 private:
 	LoadCsv() = default;
 	virtual ~LoadCsv() = default;

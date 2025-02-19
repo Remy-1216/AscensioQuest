@@ -72,6 +72,12 @@ public:
 	void RecoverHp(int recoveryQuantity);
 
 	/// <summary>
+	/// 無敵時間
+	/// </summary>
+	void InvincibleTime();
+
+
+	/// <summary>
 	/// プレイヤーと敵が当たったかどうか
 	/// </summary>
 	/// <param name="HitCollisionStart">当たり判定時に使うカプセルの二点中の一点の座標</param>
@@ -180,6 +186,9 @@ private:
 	//必殺技ゲージ
 	int m_specialMoveGauge;
 
+	//無敵時間
+	int m_invincibleTime;
+
 	//足元にある球体の半径
 	float m_sphereRadius;
 
@@ -209,6 +218,9 @@ private:
 
 	//ワープできる地点にいるかどうか
 	bool m_isWarpPoint;
+
+	//プレイヤーが無敵かどうか
+	bool m_isInvincible;
 
 	//カメラの方向を変換した値
 	VECTOR m_movementDirection;

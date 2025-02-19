@@ -118,7 +118,7 @@ void LongDistanceEnemy::Init(int handle, VECTOR enemyPos)
 
 	m_subVector = VGet(0.0f, 0.0f, 0.0f);
 
-	//ステートの作成
+	//ステート
 	m_pEnemyState = std::make_shared<EnemyStateWalk>(shared_from_this());
 	m_pEnemyState->m_nextState = m_pEnemyState;
 

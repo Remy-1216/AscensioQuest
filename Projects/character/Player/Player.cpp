@@ -54,6 +54,12 @@ namespace
 
 	//攻撃当たり判定の初期位置
 	constexpr float kAttackPosY = -200.0f;
+
+	//時間経過で回復するMPの量
+	constexpr float kMpRecovery = 0.01f;
+
+	//無敵時間
+	constexpr int  kInvincibleTime = 120;
 }
 
 Player::Player() :CharacterBase(m_handle),m_hpUp(0), m_attackUp(0), m_magicAttackUp(0), m_defensePowerUp(0),
@@ -134,9 +140,14 @@ void Player::Init()
 
 	m_isSpecialMoveAvailable = false;
 
+	m_isInvincible = false;
+
 	m_characterAngle = 0.0f;
 
 	m_sphereRadius = kSpherePosY;
+
+	//無敵時間の初期化
+	m_invincibleTime = kInvincibleTime;
 
 	//座標の初期化
 	m_pos = VGet(m_characterPos.posX, m_characterPos.posY, m_characterPos.posZ);
@@ -208,6 +219,13 @@ void Player::Update(Stage& stage, const Pad&pad,const Camera& camera)
 	//ワープ処理
 	stage.WarpPoint(*this, pad);
 
+	m_mp += kMpRecovery;
+
+	if (m_mp >= m_maxMp)
+	{
+		m_mp = m_maxMp;
+	}
+
 	//必殺技を使えるかどうか
 	if (m_specialMoveGauge >= kSuperMeter)
 	{
@@ -226,6 +244,9 @@ void Player::Update(Stage& stage, const Pad&pad,const Camera& camera)
 
 	//モデルの位置
 	MV1SetPosition(m_handle, m_pos);
+
+	//無敵時間関係
+	InvincibleTime();
 
 	//死んだときの処理
 	Die();
@@ -448,21 +469,48 @@ void Player::RecoverHp(int recoveryQuantity)
 	}
 }
 
+//無敵時間
+void Player::InvincibleTime()
+{
+	if (m_isHitEnemyAttack && !m_isInvincible)
+	{
+		m_isInvincible = true;
+	}
+
+	if(m_isHitEnemy && !m_isInvincible)
+	{
+		m_isInvincible = true;
+	}
+
+	if (m_isInvincible)
+	{
+		m_invincibleTime--;
+	}
+
+	if (m_invincibleTime <= 0)
+	{
+		m_isInvincible = false;
+		m_invincibleTime = kInvincibleTime;
+	}
+}
+
 
 //敵の胴体と当たったかどうか
 bool Player::HitEnemy(VECTOR enemyPos,VECTOR HitEnemyCollisionStart, VECTOR HitEnemyCollisionEnd, float HitEnemyRadius)
 {
 	m_subVector = VSub(enemyPos, m_pos);
 
-	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyCollisionStart, HitEnemyCollisionEnd, HitEnemyRadius))
+	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyCollisionStart, HitEnemyCollisionEnd, HitEnemyRadius) && !m_isInvincible)
 	{
 		m_isHitEnemy = true;
 		m_isMove = false;
 	}
-	else
+	else if(!HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyCollisionStart, HitEnemyCollisionEnd, HitEnemyRadius))
 	{
 		m_isHitEnemy = false;
 	}
+
+	
 
 	return m_isHitEnemy;
 }
@@ -472,11 +520,11 @@ bool Player::HitEnemyAttack(VECTOR enemyPos, VECTOR HitEnemyAttackCollisionStart
 {
 	m_subVector = VSub(enemyPos, m_pos);
 
-	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyAttackCollisionStart, HitEnemyAttackCollisionEnd, HitAttackEnemyRadius))
+	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyAttackCollisionStart, HitEnemyAttackCollisionEnd, HitAttackEnemyRadius) && !m_isInvincible)
 	{
 		m_isHitEnemyAttack = true;
 	}
-	else
+	else if(!HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyAttackCollisionStart, HitEnemyAttackCollisionEnd, HitAttackEnemyRadius))
 	{
 		m_isHitEnemyAttack = false;
 	}
@@ -586,7 +634,7 @@ void Player::UpdateCol()
 		m_specialMoveEnd = VGet(0.0f, kAttackPosY, 0.0f);
 	}
 
-	
+	//
 	if (!m_isHitEnemy && !m_isHitEnemyAttack && m_hp > 0)
 	{
 		m_isMove = true;
