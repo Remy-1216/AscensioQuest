@@ -32,7 +32,13 @@ public:
 	virtual void Draw();
 
 	/// <summary>
-	/// プレイヤーと当たったかどうか
+	/// プレイヤーのどの攻撃を受けたのか
+	/// </summary>
+	/// <param name="player"></param>
+	void HitAnyPlayerAttack(Player& player);
+
+	/// <summary>
+	/// プレイヤーに胴体や攻撃が当たったかどうか
 	/// </summary>
 	/// <param name="playar"></param>
 	void HitPlayer(Player& player);

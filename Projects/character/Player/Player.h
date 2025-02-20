@@ -76,7 +76,6 @@ public:
 	/// </summary>
 	void InvincibleTime();
 
-
 	/// <summary>
 	/// プレイヤーと敵が当たったかどうか
 	/// </summary>
@@ -130,7 +129,7 @@ public:
 	/// 死んだかどうかを渡す
 	/// </summary>
 	/// <returns></returns>
-	bool GetIsPlayerDie() const { return m_isDie; }
+	bool GetIsPlayerDie() const { return m_isKnockedDown; }
 
 	/// <summary>
 	/// エネミーの攻撃や胴体に当たったかどうかを渡す
@@ -164,6 +163,24 @@ private:
 	/// </summary>
 	void UpdateCol();
 
+	/// <summary>
+	///  通常攻撃の当たり判定の更新
+	/// </summary>
+	/// <param name="rotationMatrix">プレイヤーの向き</param>
+	void AttackCol(MATRIX rotationMatrixY);
+
+	/// <summary>
+	/// 魔法攻撃の当たり判定の更新
+	/// </summary>
+	/// <param name="rotationMatrix">プレイヤーの向き</param>
+	void MagicAttackCol(MATRIX rotationMatrixY);
+
+	/// <summary>
+	/// 必殺技の当たり判定の更新
+	/// </summary>
+	/// <param name="rotationMatrix">プレイヤーの向き</param>
+	void SpecialMoveCol(MATRIX rotationMatrixY);
+
 private:
 	//プレイヤーの状態
 	std::shared_ptr<PlayerStateBase> m_pState;
@@ -191,6 +208,9 @@ private:
 
 	//足元にある球体の半径
 	float m_sphereRadius;
+
+	//プレイヤーがガードを行っているか
+	bool m_isPlayerGuard;
 
 	//攻撃しているかどうか
 	bool m_isAttack;

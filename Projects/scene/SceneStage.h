@@ -46,7 +46,6 @@ private:
 	/// <param name="pad"></param>
 	void Stage1Update(const Pad& pad);
 
-
 	/// <summary>
 	/// ステージ2の動き
 	/// </summary>

@@ -60,6 +60,16 @@ namespace
 
 	//無敵時間
 	constexpr int  kInvincibleTime = 120;
+
+	//スペシャルゲージの増加
+	constexpr int kSpecialMoveGauge = 5;
+
+	//攻撃回数
+	constexpr int kAttack1 = 1;
+	constexpr int kAttack2 = 2;
+
+	//落ちてしまうと死んでしまう位置
+	constexpr float kMinimumAltitude = 1000.0f;
 }
 
 Player::Player() :CharacterBase(m_handle),m_hpUp(0), m_attackUp(0), m_magicAttackUp(0), m_defensePowerUp(0),
@@ -126,7 +136,7 @@ Player::~Player()
 void Player::Init()
 {
 	//初期化
-	m_isDie = false;
+	m_isKnockedDown = false;
 
 	m_isHitEnemy = false;
 
@@ -193,28 +203,23 @@ void Player::Update(Stage& stage, const Pad&pad,const Camera& camera)
 		m_pState->m_nextState = m_pState;
 	}
 
+	// stateの更新
+	m_pState->Update(stage, pad, camera);
+
+	m_pEffectManager->Update();
+
 	// 重力を足す
 	m_pos = VAdd(m_pos, VGet(0.0f, m_gravity, 0.0f));
 
 	//ステージから落ちると、ゲームオーバー
-	if (m_pos.y <= -1000.0f)
+	if (m_pos.y <= -kMinimumAltitude)
 	{
-		m_isDie = true;
+		m_isKnockedDown = true;
 	}
 	else
 	{
-		m_isDie = m_pState->GetIsDie();
+		m_isKnockedDown = m_pState->GetIsDie();
 	}
-
-	//カプセルの座標をプレイヤーと同じ位置に調整
-	m_capsuleStart = VAdd(m_pos, m_capsuleStartPoint);
-	m_capsuleEnd = VAdd(m_pos, m_capsuleEndPoint);
-	m_spherePos = VAdd(m_pos, VGet(0.0f, kSpherePosY, 0.0f));
-
-	// stateの更新
-	m_pState->Update(stage,pad,camera); 	
-	
-	m_pEffectManager->Update();
 
 	//ワープ処理
 	stage.WarpPoint(*this, pad);
@@ -306,12 +311,16 @@ void Player::Move( Stage& stage,const VECTOR& moveVec)
 
 	m_pos = stage.CheckObjectCol(*this, moveVec);
 
+	//カプセルの座標をプレイヤーと同じ位置に調整
+	m_capsuleStart = VAdd(m_pos, m_capsuleStartPoint);
+	m_capsuleEnd = VAdd(m_pos, m_capsuleEndPoint);
+	m_spherePos = VAdd(m_pos, VGet(0.0f, kSpherePosY, 0.0f));
+
 	//モデルの位置
 	MV1SetPosition(m_handle, m_pos);
 
 	//モデルの回転更新
 	MV1SetRotationXYZ(m_handle, VGet(0.0f, m_characterAngle, 0.0f));
-
 }
 
 //攻撃をした時の処理
@@ -319,25 +328,27 @@ void Player::Attack(int attackNum,float animTime)
 {
 	m_isAttack = true; 
 
+
+	//アニメーションの時間によって、当たり判定を出す。
 	if (animTime >= kAttack1Time&& attackNum == 0)
 	{
 		m_isAttackCollision = true;
 	}
 
-	if (animTime >= kAttack2StartTime && attackNum == 1)
+	if (animTime >= kAttack2StartTime && attackNum == kAttack1)
 	{
 		m_isAttackCollision = true;
 	}
-	else if (animTime >= kAttack2EndTime && attackNum == 1)
+	else if (animTime >= kAttack2EndTime && attackNum == kAttack1)
 	{
 		m_isAttackCollision = false;
 	}
 
-	if (animTime >= kAttack3StartTime && attackNum == 2)
+	if (animTime >= kAttack3StartTime && attackNum == kAttack2)
 	{
 		m_isAttackCollision = true;
 	}
-	else if (animTime >= kAttack3EndTime && attackNum == 2)
+	else if (animTime >= kAttack3EndTime && attackNum == kAttack2)
 	{
 		m_isAttackCollision = false;
 	}
@@ -472,21 +483,26 @@ void Player::RecoverHp(int recoveryQuantity)
 //無敵時間
 void Player::InvincibleTime()
 {
+	//敵の攻撃を受けた時に無敵状態ではなかった時
 	if (m_isHitEnemyAttack && !m_isInvincible)
 	{
 		m_isInvincible = true;
 	}
 
+	//敵の胴体に当たった時に無敵状態ではなかった時の処理
 	if(m_isHitEnemy && !m_isInvincible)
 	{
 		m_isInvincible = true;
 	}
 
+	//無敵状態の場合
 	if (m_isInvincible)
 	{
+		//無敵時間を減らす
 		m_invincibleTime--;
 	}
 
+	//無敵時間が0になった場合
 	if (m_invincibleTime <= 0)
 	{
 		m_isInvincible = false;
@@ -509,8 +525,6 @@ bool Player::HitEnemy(VECTOR enemyPos,VECTOR HitEnemyCollisionStart, VECTOR HitE
 	{
 		m_isHitEnemy = false;
 	}
-
-	
 
 	return m_isHitEnemy;
 }
@@ -538,8 +552,10 @@ void Player::HitAttack(bool hitAttack)
 	//当たった時の処理
 	if (hitAttack&& m_isAttack)
 	{
-		m_specialMoveGauge += 5;
+		//攻撃が当たったのでスペシャルゲージがたまる
+		m_specialMoveGauge += kSpecialMoveGauge;
 
+		//スペシャルゲージが一定値を超えた時の処理
 		if (m_specialMoveGauge >= kSuperMeter)
 		{
 			m_specialMoveGauge = kSuperMeter;
@@ -550,7 +566,7 @@ void Player::HitAttack(bool hitAttack)
 		return;
 	}
 
-	//当たっていない時の処理
+	//攻撃が当たっていない時の処理
 	else if(!hitAttack && m_isAttack)
 	{
 		m_pSoundManager->RollSwordSE();
@@ -565,6 +581,29 @@ void Player::UpdateCol()
 	// プレイヤーの向きをもとに当たり判定の位置を調整する
 	MATRIX rotationMatrixY = MGetRotY(m_attackAngle);
 
+	AttackCol(rotationMatrixY);
+	
+	MagicAttackCol(rotationMatrixY);
+
+	SpecialMoveCol(rotationMatrixY);
+
+	//敵の胴体にも攻撃にも当たっていないときの処理
+	if (!m_isHitEnemy && !m_isHitEnemyAttack && m_hp > 0)
+	{
+		m_isMove = true;
+	}
+
+	//プレイヤーが死んだときの処理
+	if (m_hp <= 0 && !m_isKnockedDown)
+	{
+		m_hp = 0;
+		m_isMove = false;
+	}
+}
+
+//攻撃の当たり判定の更新
+void Player::AttackCol(MATRIX rotationMatrixY)
+{
 	// カプセルの移動方向を計算
 	if (m_isAttackCollision)
 	{
@@ -580,8 +619,11 @@ void Player::UpdateCol()
 		m_attackCapsuleStart = VGet(0.0f, kAttackPosY, 0.0f);
 		m_attackCapsuleEnd = VGet(0.0f, kAttackPosY, 0.0f);
 	}
+}
 
-
+//魔法攻撃の当たり判定の更新
+void Player::MagicAttackCol(MATRIX rotationMatrixY)
+{
 	//魔法攻撃の当たり判定を更新
 	//魔法攻撃を行っているが、魔法攻撃がまだ動いていない場合
 	if (m_isMagicAttack && !m_isMagicAttackMove)
@@ -591,7 +633,7 @@ void Player::UpdateCol()
 
 		//カプセルの二点の残り一つを設定
 		m_magicCapsuleEnd = VAdd(m_magicCapsuleStart, (VTransform(m_magicCapsuleEndPoint, rotationMatrixY)));
-	
+
 		//カプセルの進行方向を計算で出す
 		m_magicDirection = VTransform({ 0.0f, 0.0f, 1.0f }, rotationMatrixY);
 
@@ -617,11 +659,14 @@ void Player::UpdateCol()
 			m_isMagicAttack = false;
 
 			m_magicCapsuleStart = VGet(0.0f, kAttackPosY, 0.0f);
-			m_magicCapsuleEnd =  VGet(0.0f, kAttackPosY, 0.0f);
+			m_magicCapsuleEnd = VGet(0.0f, kAttackPosY, 0.0f);
 		}
 	}
+}
 
-
+//必殺技の当たり判定の更新
+void Player::SpecialMoveCol(MATRIX rotationMatrixY)
+{
 	//必殺技の当たり判定を更新
 	if (m_isSpecialMove)
 	{
@@ -632,18 +677,5 @@ void Player::UpdateCol()
 	{
 		m_specialMoveStart = VGet(0.0f, kAttackPosY, 0.0f);
 		m_specialMoveEnd = VGet(0.0f, kAttackPosY, 0.0f);
-	}
-
-	//
-	if (!m_isHitEnemy && !m_isHitEnemyAttack && m_hp > 0)
-	{
-		m_isMove = true;
-	}
-
-	//プレイヤーが死んだときの処理
-	if (m_hp <= 0 && !m_isDie)
-	{
-		m_hp = 0;
-		m_isMove = false;
 	}
 }

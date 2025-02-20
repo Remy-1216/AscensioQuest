@@ -5,7 +5,7 @@ class EnemyStateStatusUp : public EnemyStateBase
 {
 public:
 
-	EnemyStateStatusUp(std::shared_ptr<CharacterBase>enemy) :EnemyStateBase(enemy) {}
+	EnemyStateStatusUp(std::shared_ptr<CharacterBase>enemy) :EnemyStateBase(enemy) { m_animSpeed = 0.0f; m_time = 0.0f; }
 
 	/// <summary>
 	/// 初期化
@@ -31,6 +31,12 @@ public:
 	virtual StateKind GetKind() override { return StateKind::kStatusUp; }
 
 private:
+
+	//アニメーションが進むスピード
+	float m_animSpeed;
+
+	//アニメーションがどれだけ進んだか
+	float m_time;
 
 };
 

@@ -36,15 +36,19 @@ void EnemyStateWalk::Init(const int characterKinds)
 
 void EnemyStateWalk::Update(Stage& stage, const Player& player, const int characterKinds)
 {
+	//近距離攻撃を行う敵の処理
 	if (characterKinds == kShortDistanceEnemy)
 	{
 		ShortDistanceEnemyWalk(stage, player, kShortDistanceEnemy);
 	}
 
+	//遠距離攻撃を行う敵の処理
 	if (characterKinds == kLongDistanceEnemy)
 	{
 		LongDistanceEnemyWalk(stage, player, kLongDistanceEnemy);
 	}
+
+	//ボスの処理
 	if (characterKinds == kBoss)
 	{
 		BossWalk(stage, player, kBoss);
@@ -59,23 +63,14 @@ void EnemyStateWalk::Draw(const int characterKinds)
 
 void EnemyStateWalk::ShortDistanceEnemyWalk(Stage& stage, const Player& player, const int characterKinds)
 {
+	//攻撃のクールタイム
 	m_coolTime++;
 
 	//プレイヤーとの距離を計算する
 	m_distance = VSize(VSub(m_pEnemy->GetPos(), player.GetPos()));
 
 	//敵の初期位置からターゲット位置に向かうベクトルを生成する
-	//始点から終点に向かうベクトルを求める場合、終点の座標-始点の座標で求める
-	VECTOR toTarget = VSub(player.GetPos(), m_pEnemy->GetPos());
-
-	//ベクトルの長さをkSpeedにしてやる
-	//ベクトルの正規化　長さを１にする
-	toTarget = VNorm(toTarget);
-
-	//speedでかける
-	m_move.x = toTarget.x * m_pEnemy->GetWalkSpeed();
-	m_move.y = toTarget.y;
-	m_move.z = toTarget.z * m_pEnemy->GetWalkSpeed();
+	m_move = GoToPlayer(player.GetPos());
 
 	//一定距離まで来ると動き始める
 	if (m_distance <= kDistancePlayer)
@@ -118,23 +113,13 @@ void EnemyStateWalk::ShortDistanceEnemyWalk(Stage& stage, const Player& player, 
 
 void EnemyStateWalk::LongDistanceEnemyWalk(Stage& stage, const Player& player, const int characterKinds)
 {
+	//攻撃のクールタイム
 	m_coolTime++;
 
 	//エネミーとプレイヤーの距離を出します
 	m_distance = VSize(VSub(m_pEnemy->GetPos(), player.GetPos()));
 
-	//敵の初期位置からターゲット位置に向かうベクトルを生成する
-	//始点から終点に向かうベクトルを求める場合、終点の座標-始点の座標で求める
-	VECTOR toTarget = VSub(player.GetPos(), m_pEnemy->GetPos());
-
-	//ベクトルの長さをkSpeedにしてやる
-	//ベクトルの正規化　長さを１にする
-	toTarget = VNorm(toTarget);
-
-	//歩く速さをかける
-	m_move.x = toTarget.x * m_pEnemy->GetWalkSpeed();
-	m_move.y = toTarget.y;
-	m_move.z = toTarget.z * m_pEnemy->GetWalkSpeed();
+	m_move = GoToPlayer(player.GetPos());
 
 	//一定距離まで来ると動き始める
 	if (m_distance <= kDistancePlayer)
@@ -175,23 +160,14 @@ void EnemyStateWalk::LongDistanceEnemyWalk(Stage& stage, const Player& player, c
 
 void EnemyStateWalk::BossWalk(Stage& stage, const Player& player, const int characterKinds)
 {
+	//攻撃のクールタイム
 	m_coolTime++;
 	
 	//エネミーとプレイヤーの距離を出します
 	m_distance = VSize(VSub(m_pEnemy->GetPos(), player.GetPos()));
 
 	//敵の初期位置からターゲット位置に向かうベクトルを生成する
-	//始点から終点に向かうベクトルを求める場合、終点の座標-始点の座標で求める
-	VECTOR toTarget = VSub(player.GetPos(), m_pEnemy->GetPos());
-
-	//ベクトルの長さをkSpeedにしてやる
-	//ベクトルの正規化　長さを１にする
-	toTarget = VNorm(toTarget);
-
-	//歩く速さをかける
-	m_move.x = toTarget.x * m_pEnemy->GetWalkSpeed();
-	m_move.y = toTarget.y;
-	m_move.z = toTarget.z * m_pEnemy->GetWalkSpeed();
+	m_move = GoToPlayer(player.GetPos());
 
 	//プレイヤーに向かって歩く
 	m_pEnemy->ComingCharacter(stage, m_move);
@@ -245,4 +221,22 @@ void EnemyStateWalk::BossWalk(Stage& stage, const Player& player, const int char
 		return;
 	}
 
+}
+
+//敵の初期位置からターゲット位置に向かうベクトルを生成する
+VECTOR EnemyStateWalk::GoToPlayer(VECTOR playerPos)
+{
+	//始点から終点に向かうベクトルを求める場合、終点の座標-始点の座標で求める
+	VECTOR toTarget = VSub(playerPos, m_pEnemy->GetPos());
+
+	//ベクトルの長さをkSpeedにしてやる
+	//ベクトルの正規化　長さを１にする
+	toTarget = VNorm(toTarget);
+
+	//歩く速さをかける
+	m_move.x = toTarget.x * m_pEnemy->GetWalkSpeed();
+	m_move.y = toTarget.y;
+	m_move.z = toTarget.z * m_pEnemy->GetWalkSpeed();
+
+	return m_move;
 }

@@ -84,30 +84,14 @@ void EnemyManager::Update(Stage& stage, Player& player)
 			//近距離型の動き
 			m_pShortDistanceEnemy[i]->Update(stage, player, player.GetPos());
 			
-			//攻撃が当たったかどうか
-			m_pShortDistanceEnemy[i]->HitPlayerAttack(player.GetAttackCapsuleStart(), player.GetAttackCapsuleEnd(),
-		player.GetAttackRadius(), player.GetAttackPower());
-
-			if (!m_pShortDistanceEnemy[i]->GetHitCharacterAttack())
-			{
-				//プレイヤーの魔法攻撃が当たったかどうか
-				m_pShortDistanceEnemy[i]->HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
-						player.GetMagicCapsuleRadius(), player.GetMagicPower());
-
-				if (!m_pShortDistanceEnemy[i]->GetHitCharacterAttack())
-				{
-					//必殺技が当たったかどうか
-					m_pShortDistanceEnemy[i]->HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
-				player.GetSpecialMoveRadius(), player.GetAttackPower());
-				}
-			}
-		
+			//プレイヤーに胴体や攻撃が当たったかどうか
+			m_pShortDistanceEnemy[i]->HitPlayer(player);
 
 			//プレイヤーに攻撃が当たったかどうか
 			player.HitAttack(m_pShortDistanceEnemy[i]->GetHitCharacterAttack());
 
-			//プレイヤーと当たったかどうか
-			m_pShortDistanceEnemy[i]->HitPlayer(player);
+			//プレイヤーの攻撃に当たったかどうか
+			m_pShortDistanceEnemy[i]->HitAnyPlayerAttack(player);
 
 			//もし死んでいたら削除する
 			if (m_pShortDistanceEnemy[i]->GetIsDie())
@@ -129,28 +113,11 @@ void EnemyManager::Update(Stage& stage, Player& player)
 		{
 			//遠距離型の動き
 			m_pLongDistanceEnemy[i]->Update(stage, player, player.GetPos());
-			//攻撃が当たったかどうか
-			m_pLongDistanceEnemy[i]->HitPlayerAttack(player.GetAttackCapsuleStart(), player.GetAttackCapsuleEnd(),
-		player.GetAttackRadius(), player.GetAttackPower());
+		
+			//プレイヤーの攻撃に当たったかどうか
+			m_pLongDistanceEnemy[i]->HitAnyPlayerAttack(player);
 
-			if (!m_pLongDistanceEnemy[i]->GetHitCharacterAttack())
-			{
-				//プレイヤーの魔法攻撃が当たったかどうか
-				m_pLongDistanceEnemy[i]->HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
-						player.GetMagicCapsuleRadius(), player.GetMagicPower());
-
-				if (!m_pLongDistanceEnemy[i]->GetHitCharacterAttack())
-				{
-					//必殺技が当たったかどうか
-					m_pLongDistanceEnemy[i]->HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
-				player.GetSpecialMoveRadius(), player.GetAttackPower());
-				}
-			}
-
-			//プレイヤーの攻撃が当たったかどうかを渡す
-			player.HitAttack(m_pLongDistanceEnemy[i]->GetHitCharacterAttack());
-
-			//プレイヤーと当たったかどうか
+			//プレイヤー胴体や攻撃が当たったかどうか
 			m_pLongDistanceEnemy[i]->HitPlayer(player);
 
 			//死んでいた場合削除する

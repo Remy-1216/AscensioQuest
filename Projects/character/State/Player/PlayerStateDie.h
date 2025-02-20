@@ -30,8 +30,6 @@ public:
 	/// <param name="characterKinds"></param>
 	virtual void Draw();
 
-
-
 #ifdef _DEBUG
 	// 現在の状態名を取得
 	virtual std::string GetStateName() override { return "死亡"; }

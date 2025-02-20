@@ -4,6 +4,7 @@
 #include "EnemyManager.h"
 #include "EffectManager.h"
 #include "Player.h"
+#include "BossAI.h"
 #include "PlayerStatus.h"
 #include "Stage.h"
 #include "Font.h"
@@ -119,6 +120,14 @@ public:
 	/// <param name="data">マップの座標位置</param>
 	/// <param name="map">方向</param>
 	void LoadMapPosData(Stage::MapPos& data, const char* direction);
+
+
+	/// <summary>
+	/// ボスの状態によって変わる、行動確率を読み込む
+	/// </summary>
+	/// <param name="data">行動確率データ</param>
+	/// <param name="status">どのような状態なのか</param>
+	void LoadBossAIData(BossAI::AI& data, const char* status);
 
 private:
 	LoadCsv() = default;

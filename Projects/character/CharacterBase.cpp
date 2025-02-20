@@ -15,7 +15,7 @@ namespace
 	constexpr float kAnimBlendSpeed = 0.1f;	 // アニメーションブレンドの変化速度
 
 	//ノックバック
-	constexpr float kKnockBack = 0.5f;
+	constexpr float kKnockBack = 0.5f; 
 
 	
 }
@@ -28,6 +28,7 @@ m_modelPolygon(0),m_pos(VGet(0.0f,0.0f,0.0f)),m_moveDir(VGet(0.0f, 0.0f, 0.0f)),
 	m_pEffectManager = std::make_shared<EffectManager>();
 	m_pEffectManager->Init();
 
+    //UI
     m_pUIBar = std::make_shared<UIBar>();
     m_pUIBar->Init();
 }
@@ -64,7 +65,7 @@ void CharacterBase::UpdateAnim()
     m_currentAnimTime += m_animPlaySpeed;
 
     // アニメーションが繰り返し行われる場合
-    if (m_isLoopAnim && !m_isPlayerGuard)
+    if (m_isLoopAnim && !m_isStopAnimation)
     {
         if (m_currentAnimTime > m_animLoopEndTime)
         {
@@ -72,7 +73,8 @@ void CharacterBase::UpdateAnim()
         }
     }
 
-    if (m_isLoopAnim && m_isPlayerGuard)
+    //ガードを行っている場合や死んでいる場合は最初に戻らないようにする
+    if (m_isLoopAnim &&m_isStopAnimation)
     {
         if (m_currentAnimTime > m_animLoopEndTime)
         {
@@ -88,8 +90,6 @@ void CharacterBase::UpdateAnim()
 
     // 再生時間を更新
     MV1SetAttachAnimTime(m_handle, m_currentPlayAnim, m_currentAnimTime);
-
-    // アニメーションのブレンド率を設定する
 
     // m_prevPlayAnimが有効なインデックスか確認
     if (m_prevPlayAnim != -1) 
@@ -147,16 +147,16 @@ void CharacterBase::ChangeAnim(std::string animName)
         m_animBlendRate = 0.0f;
     }
 
-    //ガードのアニメーション時の処理
+    //ガードや、死んでいる時のアニメーション時の処理
     if (animName == "Guard" || animName == "Die" || animName == "Death")
     {
         //ガードを行っているのでtrue
-        m_isPlayerGuard = true;
+       m_isStopAnimation = true;
     }
     else
     {
         //ガードを行っていないのでfalse
-        m_isPlayerGuard = false;
+       m_isStopAnimation = false;
     }
 }
 

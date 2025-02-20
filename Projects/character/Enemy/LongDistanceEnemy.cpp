@@ -68,7 +68,7 @@ LongDistanceEnemy::LongDistanceEnemy() :CharacterBase(m_handle),m_throwingHandle
 	m_attackCapsuleEndPoint = m_collisionInfo.attackCapsuleEndPoint;
 	m_attackRadius = m_collisionInfo.attackRadius;
 
-	m_isDie = false;
+	m_isKnockedDown = false;
 }
 
 LongDistanceEnemy::~LongDistanceEnemy()
@@ -98,7 +98,7 @@ void LongDistanceEnemy::Init(int handle, VECTOR enemyPos)
 
 	//初期化
 	m_isHitAttack = false;
-	m_isDie = false;
+	m_isKnockedDown = false;
 	m_isAttackMove = false;
 
 	//最初は死んでいないので動けるためtrue
@@ -154,7 +154,7 @@ void LongDistanceEnemy::Update(Stage&stage,const Player& player,VECTOR playerPos
 	UpdateCol();
 
 	// 死んでいるかを受け取る
-	m_isDie = m_pEnemyState->GetIsDie();
+	m_isKnockedDown = m_pEnemyState->GetIsDie();
 
 	// 死んだ瞬間の動き
 	Die();
@@ -175,8 +175,8 @@ void LongDistanceEnemy::Draw()
 	//HPバーの描画
 	//m_pUIBar->DrawEnemyGaugeBar(*this);
 
-	//死んでいないときは表示し、死んだ後には表示しない(EnemyManagerが完成次第なくなる)
-	if (!m_isDie)
+
+	if (!m_isKnockedDown)
 	{
 		//モデルの表示
 		MV1DrawModel(m_handle);
@@ -206,7 +206,7 @@ void LongDistanceEnemy::Draw()
 
 void LongDistanceEnemy::HitPlayer(Player& player)
 {
-	//プレイヤーと自分の胴体と当たったかどうか
+	//プレイヤーと自分の胴体が当たったかどうか
 	if (player.HitEnemy(m_pos,m_capsuleStart, m_capsuleEnd, m_radius))
 	{
 		player.Damage(kDamage,kLongDistanceEnemy);
@@ -220,6 +220,24 @@ void LongDistanceEnemy::HitPlayer(Player& player)
 		m_isAttack = false;
 		m_isAttackMove = false;
 	}
+}
+
+//どの攻撃に当たったのか
+void LongDistanceEnemy::HitAnyPlayerAttack(Player& player)
+{
+	//プレイヤーの攻撃が当たったかどうか
+	HitPlayerAttack(player.GetAttackCapsuleStart(), player.GetAttackCapsuleEnd(),
+		player.GetAttackRadius(), player.GetAttackPower());
+
+
+	//プレイヤーの魔法攻撃が当たったかどうか
+	HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
+			player.GetMagicCapsuleRadius(), player.GetMagicPower());
+
+		
+	//プレイヤー必殺技が当たったかどうか
+	HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
+				player.GetSpecialMoveRadius(), player.GetAttackPower());
 }
 
 void LongDistanceEnemy::UpdateCol()

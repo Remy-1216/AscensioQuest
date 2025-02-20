@@ -21,20 +21,26 @@ namespace
     constexpr float kWarpPointSphereRadius = 100.0f;
 
     //マップを描画する位置
-    constexpr float kMapPosX = 1600.0f;
+    constexpr float kMapPosX = 1550.0f;
     constexpr float kMapPosY =  50.0f;
 
     //プレイヤーの位置表示を描画する位置
+
+    //敵のいないステージの位置
     constexpr float kSafeAreaPosX = 1675.0f;
-    constexpr float kSafeAreaPosY = 120.0f;
-    constexpr float kMap1PosX = 1580.0f;
-    constexpr float kMap1PosY = 25.0f;
-    constexpr float kMap2PosX = 1775.0f;
-    constexpr float kMap2PosY = 25.0f;
-    constexpr float kMap3PosX = 1580.0f;
-    constexpr float kMap3PosY = 215.0f;
-    constexpr float kMap4PosX = 1775.0f;
-    constexpr float kMap4PosY = 215.0f;
+    constexpr float kSafeAreaPosY = 125.0f;
+
+    //ステージ1と3のX座標
+    constexpr float kMap1_3PosX = 1580.0f;
+
+    //ステージ1と2のY座標
+    constexpr float kMap1_2PosY = 35.0f;
+
+    //ステージ2と4のX座標
+    constexpr float kMap2_4PosX = 1775.0f;
+
+    //ステージ3と4のX座標
+    constexpr float kMap3_4PosY = 225.0f;
 
 }
 
@@ -146,20 +152,20 @@ void Stage::DrawMap(Player& player)
 
     else if (m_playerPos.x >= m_upperLeft.map2PosX && m_playerPos.z <= m_upperLeft.map2PosZ && m_playerPos.x <= m_lowerRight.map2PosX && m_playerPos.z >= m_lowerRight.map2PosZ)
     {
-        DrawGraph(kMap1PosX, kMap1PosY, m_playerPosHandle, true);
+        DrawGraph(kMap1_3PosX, kMap1_2PosY, m_playerPosHandle, true);
     }
 
     else if (m_playerPos.x >= m_upperLeft.map3PosX && m_playerPos.z <= m_upperLeft.map3PosZ && m_playerPos.x <= m_lowerRight.map3PosX && m_playerPos.z >= m_lowerRight.map3PosZ)
     {
-        DrawGraph(kMap2PosX, kMap2PosY, m_playerPosHandle, true);
+        DrawGraph(kMap2_4PosX, kMap1_2PosY, m_playerPosHandle, true);
     }
     else if (m_playerPos.x >= m_upperLeft.map4PosX && m_playerPos.z <= m_upperLeft.map4PosZ && m_playerPos.x <= m_lowerRight.map4PosX && m_playerPos.z >= m_lowerRight.map4PosZ)
     {
-        DrawGraph(kMap3PosX, kMap3PosY, m_playerPosHandle, true);
+        DrawGraph(kMap1_3PosX, kMap3_4PosY, m_playerPosHandle, true);
     }
     else if (m_playerPos.x >= m_upperLeft.map5PosX && m_playerPos.z <= m_upperLeft.map5PosZ && m_playerPos.x <= m_lowerRight.map5PosX && m_playerPos.z >= m_lowerRight.map5PosZ)
     {
-        DrawGraph(kMap4PosX, kMap4PosY, m_playerPosHandle, true);
+        DrawGraph(kMap2_4PosX, kMap3_4PosY, m_playerPosHandle, true);
     }
 }
 

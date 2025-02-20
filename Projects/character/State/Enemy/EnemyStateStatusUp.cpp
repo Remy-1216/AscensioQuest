@@ -9,9 +9,11 @@ void EnemyStateStatusUp::Init()
 void EnemyStateStatusUp::Update(Stage& stage, const Player& playerconst,const int  characterKinds)
 {
 	//エネミーの動き
-	m_pEnemy->ComingCharacter(stage, VGet(0.0f, 0.0f, 0.0f));
+	m_pEnemy->ComingCharacter(stage, VGet(0.0f, 0.0f, 0.0f)); 
 
-	if (m_pEnemy->GetAnimLoopEndTime() <= m_pEnemy->GetCurrentAnimTime())
+	m_time += m_pEnemy->GetAnimSpeed();
+
+	if (m_pEnemy->GetAnimLoopEndTime() <= m_time)
 	{
 		m_nextState = std::make_shared<EnemyStateWalk>(m_pEnemy);
 		auto state = std::dynamic_pointer_cast<EnemyStateWalk>(m_nextState);

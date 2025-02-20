@@ -18,22 +18,17 @@ void PlayerStateMagicAttack::Init()
 
 void PlayerStateMagicAttack::Update(Stage& stage, const Pad&pad,const Camera& camera)
 {
-	//アニメーションの終わる時間を受け取る
-	m_animLoopEndTime = m_pPlayer->GetAnimLoopEndTime();
-
 	//アニメーションのスピードを受け取る
 	m_animTime = m_pPlayer->GetAnimSpeed();
 
 	//ステージとの当たり判定
 	m_pPlayer->Move(stage, VGet(0.0f, 0.0f, 0.0f));
 
-	
-
 	//アニメーションがそれだけ進んでいるか
 	m_time += m_animTime;
 
 	//魔法攻撃状態から待機状態に変更
-	if (m_animLoopEndTime <= m_time)
+	if (m_pPlayer->GetAnimLoopEndTime() <= m_time)
 	{
 		m_time = 0.0f;
 

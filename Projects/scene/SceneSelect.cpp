@@ -456,44 +456,44 @@ std::shared_ptr<SceneBase> SceneSelect::SceneChange(const Pad& pad)
 	}
 	
 	//ステージ2に遷移する
-	//if (m_cursorPos.y == kStage2Pos && pad.IsTrigger("A"))
-	//{
-	//	//SEの再生
-	//		m_pSoundManager->DeterminationSE();
-	//	m_isStage2 = true;
-	//}
-	//if (m_isStage2 && m_fadeAlpha >= kFadeValue)
-	//{
-	//	return std::make_shared<SceneStage>(Stage2);
-	//}
-
-	//buildのバージョンによって動作を変更している
-	//Debug版の場合
-	if (m_isDebug)
+	if (m_cursorPos.y == kStage2Pos && pad.IsTrigger("A"))
 	{
-		//ステージ2に遷移する
-		if (m_cursorPos.y == kStage2Pos && pad.IsTrigger("A"))
-		{
-			//SEの再生
+		//SEの再生
 			m_pSoundManager->DeterminationSE();
-			m_isStage2 = true;
-		}
-		if (m_isStage2 && m_fadeAlpha >= kFadeValue)
-		{
-			return std::make_shared<SceneStage>(Stage2);
-		}
+		m_isStage2 = true;
 	}
-	//Release版の場合
-	else
+	if (m_isStage2 && m_fadeAlpha >= kFadeValue)
 	{
-		//ステージ2に遷移する
-		if (!m_isPishAButton && m_cursorPos.y == kStage2Pos && pad.IsTrigger("A"))
-		{
-			//SEの再生
-			m_pSoundManager->FailureSE();
-			m_isCautionaryNote = true;
-		}
+		return std::make_shared<SceneStage>(Stage2);
 	}
+
+	////buildのバージョンによって動作を変更している
+	////Debug版の場合
+	//if (m_isDebug)
+	//{
+	//	//ステージ2に遷移する
+	//	if (m_cursorPos.y == kStage2Pos && pad.IsTrigger("A"))
+	//	{
+	//		//SEの再生
+	//		m_pSoundManager->DeterminationSE();
+	//		m_isStage2 = true;
+	//	}
+	//	if (m_isStage2 && m_fadeAlpha >= kFadeValue)
+	//	{
+	//		return std::make_shared<SceneStage>(Stage2);
+	//	}
+	//}
+	////Release版の場合
+	//else
+	//{
+	//	//ステージ2に遷移する
+	//	if (!m_isPishAButton && m_cursorPos.y == kStage2Pos && pad.IsTrigger("A"))
+	//	{
+	//		//SEの再生
+	//		m_pSoundManager->FailureSE();
+	//		m_isCautionaryNote = true;
+	//	}
+	//}
 
 
 	//ステータスに遷移する

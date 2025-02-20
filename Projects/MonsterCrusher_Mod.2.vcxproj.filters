@@ -91,6 +91,12 @@
     <Filter Include="ソース ファイル\UI">
       <UniqueIdentifier>{3f807ed3-2b3e-4d37-9d50-7dd7000943a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Game">
+      <UniqueIdentifier>{8c9d21b4-3512-49a2-be1e-b7f30ab9040a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game">
+      <UniqueIdentifier>{2639b527-6912-40c8-89c0-1f97eb7a19d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -224,6 +230,9 @@
     </ClCompile>
     <ClCompile Include="character\CharacterBase.cpp">
       <Filter>ソース ファイル\character</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneTutorial.cpp">
+      <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -361,6 +370,9 @@
     </ClInclude>
     <ClInclude Include="character\State\Player\TitlePlayer.h">
       <Filter>ヘッダー ファイル\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneTutorial.h">
+      <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

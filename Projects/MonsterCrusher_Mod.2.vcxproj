@@ -57,6 +57,7 @@
     <ClCompile Include="scene\SceneStage.cpp" />
     <ClCompile Include="scene\SceneStatus.cpp" />
     <ClCompile Include="scene\SceneTitle.cpp" />
+    <ClCompile Include="scene\SceneTutorial.cpp" />
     <ClCompile Include="SoundManager\SoundManager.cpp" />
     <ClCompile Include="UI\UIBar.cpp" />
     <ClCompile Include="util\Font.cpp" />
@@ -103,6 +104,7 @@
     <ClInclude Include="scene\SceneStage.h" />
     <ClInclude Include="scene\SceneStatus.h" />
     <ClInclude Include="scene\SceneTitle.h" />
+    <ClInclude Include="scene\SceneTutorial.h" />
     <ClInclude Include="SoundManager\SoundManager.h" />
     <ClInclude Include="UI\UIBar.h" />
     <ClInclude Include="util\Font.h" />

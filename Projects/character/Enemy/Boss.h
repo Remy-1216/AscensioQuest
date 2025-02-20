@@ -29,6 +29,12 @@ public:
 	void HitPlayer(Player& player);
 
 	/// <summary>
+	/// プレイヤーの度の攻撃に当たったのか
+	/// </summary>
+	/// <param name="player"></param>
+	void HitAnyPlayerAttack(Player& player);
+
+	/// <summary>
 	/// キャラクターの種類が何なのかを渡す
 	/// </summary>
 	/// <returns></returns>
@@ -51,6 +57,26 @@ private:
 	/// 当たり判定を更新
 	/// </summary>
 	void UpdateCol();
+
+	/// <summary>
+	/// 弱攻撃を行った時の当たり判定の更新
+	/// </summary>
+	void LightAttackCol();
+
+	/// <summary>
+	/// 強攻撃を行った時の当たり判定の更新
+	/// </summary>
+	void StorongAttackCol();
+
+	/// <summary>
+	/// 遠距離攻撃を行った時
+	/// </summary>
+	void ThrowingCol();
+
+	/// <summary>
+	/// 死んだ後の処理
+	/// </summary>
+	void Died();
 
 private:
 

@@ -247,7 +247,7 @@ public:
 	/// 死んだかどうかを渡す
 	/// </summary>
 	/// <returns></returns>
-	bool GetIsDie() const { return m_isDie; }
+	bool GetIsDie() const { return m_isKnockedDown; }
 
 	/// <summary>
 	/// キャラクターの座標を渡す
@@ -420,14 +420,14 @@ protected:
 	//キャラクターと当たったか
 	bool m_isHitCharacter;
 
-	//プレイヤーがガードしているかどうか
-	bool m_isPlayerGuard;
+	//キャラクターのアニメーションを止めるか
+	bool m_isStopAnimation;
 
-	//	攻撃が当たったかどうか
+	//攻撃が当たったかどうか
 	bool m_isHitAttack;
 
-	//死んだかどうか
-	bool m_isDie;
+	//倒れたかどうか
+	bool m_isKnockedDown;
 
 	//近距離型エネミーが攻撃を行ったかどうか
 	bool m_isShortDistanceEnemyAttack;

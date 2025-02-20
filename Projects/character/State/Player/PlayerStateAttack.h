@@ -4,7 +4,7 @@ class PlayerStateAttack :
     public PlayerStateBase
 {
 public:
-    PlayerStateAttack(std::shared_ptr<Player> player) : PlayerStateBase(player), m_aButtonCount(0), m_isAttacking(true){};
+    PlayerStateAttack(std::shared_ptr<Player> player) : PlayerStateBase(player), m_aButtonCount(0), m_isAttacking(true) { m_animTime = 0.0f; m_time = 0.0f; m_aButtonCount = 0; m_attacks = 0; m_isAttacking = false; m_isPush = false; };
 
     void Init();
 
@@ -33,20 +33,23 @@ public:
 #endif
 private:
 
+    /// <summary>
+    /// 攻撃を
+    /// </summary>
+    void Attack();
+private:
+
+    //アニメーションの進む時間
+    float m_animTime;
+
+    //時間
+    float m_time;
+
     //Aボタンを押した回数
     int m_aButtonCount;
 
     //攻撃を行った回数
     int m_attacks;
-
-    //ボタンを押して、経過した時間
-    int m_aPushTime;
-
-    //攻撃2の再生時間
-    float m_attack2Time;
-
-    //攻撃3の再生時間
-    float m_attack3Time;
 
     //攻撃中かどうか
     bool m_isAttacking;
@@ -54,4 +57,3 @@ private:
     //ボタンを押しているかどうか
     bool m_isPush;
 };
-

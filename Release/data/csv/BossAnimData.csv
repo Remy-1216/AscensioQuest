@@ -1,5 +1,5 @@
 ﻿AnimName,No,loopFrame,loopEndFrame,animSpeed
-Walk,0,0.0f,42.0f,1.0f
+Walk,0,0.0f,42.0f,0.75f
 Attack,1,0.0f,33.0f,0.75f
 StrongAttack,2,0.0f,80.0f,0.75f
 Throwing,3,0.0f,85.0f,0.75f

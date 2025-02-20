@@ -5,6 +5,7 @@
 #include "EnemyStateAttack.h"
 #include "EnemyStateStatusUp.h"
 #include "EnemyStateWalk.h"
+#include "LoadCsv.h"
 namespace
 {
 	//ボスの行動切り替え時のＨＰ
@@ -14,25 +15,19 @@ namespace
 	constexpr float kShortDistance = 200.0f;
 	constexpr float kLongDistance = 600.0f;
 
-	//ボスの残りHPが高く、プレイヤーが近い場所にいる場合の行動確率
-	constexpr int kHpHighlyRangeNearLightAttack = 70;
-	constexpr int kHpHighlyRangeNearStorongAttack = 90;
-	constexpr int kHpHighlyRangeNearStatusUp = 100;
+	//HPが高くプレイヤーが近い
+	const  char* const kHpHighlyRangeNear = "HpHighlyRangeNear";
 
-	//ボスの残りHPが高く、プレイヤーが遠い場所にいる場合の行動確率
-	constexpr int kHpHighlyRangeFarThrowing = 60;
-	constexpr int kHpHighlyRangeFarJump = 80;
-	constexpr int kHpHighlyRangeFarStatusUp = 100;
+	//HPが高くプレイヤーが遠い
+	const  char* const kHpHighlyRangeFar = "HpHighlyRangeFar";
 
-	//ボスの残りHPが低く、プレイヤーが近い場合の行動確率
-	constexpr int kHpLowRangeNearStorongAttack = 70;
-	constexpr int kHpLowRangeNearLightAttack = 80;
-	constexpr int kHpLowRangeNearStatusUp = 100;
+	//HPが低くプレイヤーが近い
+	const  char* const kHpLowRangeNear = "HpLowRangeNear";
 
-	//ボスの残りHPが低く、プレイヤーが遠い場所の行動確率
-	constexpr int kHpLowRangeFarThrowing = 70;	
-	constexpr int kHpLowRangeFarStatusUp = 90;
-	constexpr int kHpLowRangeFarJump = 100;
+	//HPは低くプレイヤーが遠い
+	const  char* const kHpLowRangeFar = "HpLowRangeFar";
+
+
 }
 
 BossAI::BossAI()
@@ -53,101 +48,56 @@ int BossAI::StateSet(CharacterBase& boss,const Player& player)
 	m_distance = VSize(VSub(boss.GetPos(), player.GetPos()));
 	if (boss.GetHp() >= kBossHp && m_distance <= kShortDistance)
 	{
-	 	 return HpHighlyRangeNear();
+		LoadCsv::GetInstance().LoadBossAIData(m_bossAI, kHpHighlyRangeNear);
+	 	 return AIMotion(m_bossAI);
 	}
 	if (boss.GetHp() >= kBossHp && m_distance >= kLongDistance)
 	{
-		return HpHighlyRangeFar();
+		LoadCsv::GetInstance().LoadBossAIData(m_bossAI, kHpHighlyRangeFar);
+		return AIMotion(m_bossAI);
 	}
 	if (boss.GetHp() <= kBossHp && m_distance <= kShortDistance)
 	{
-		return HpLowRangeNear();
+		LoadCsv::GetInstance().LoadBossAIData(m_bossAI, kHpLowRangeNear);
+		return AIMotion(m_bossAI);
 	}
 	if (boss.GetHp() <= kBossHp && m_distance >= kLongDistance)
 	{
-		return HpLowRangeFar();
+		LoadCsv::GetInstance().LoadBossAIData(m_bossAI, kHpLowRangeFar);
+		return AIMotion(m_bossAI);
 	}
 
 
 	return kWalk;
 }
 
-int BossAI::HpHighlyRangeNear()
+int BossAI::AIMotion(AI  bossAI)
 {
 	m_probability = GetRand(100);
-
-	if (m_probability < kHpHighlyRangeNearLightAttack)
+	if (m_probability < bossAI.rushAttackProbability)
 	{
-		m_state = kLightAttack;
-	}
-	//強攻撃を行う
-	else if (m_probability < kHpHighlyRangeNearStorongAttack)
-	{
-		m_state = kStorongAttack;
-	}
-	//自身の強化を行う
-	else if (m_probability < kHpHighlyRangeNearStatusUp)
-	{
-		m_state = kStatusUp;
+		return  kRushAttack;
 	}
 
-	return m_state;
-}
-
-int BossAI::HpHighlyRangeFar()
-{
-	m_probability = GetRand(100);
-	if (m_probability < kHpHighlyRangeFarThrowing)
+	if (m_probability <= bossAI.lightAttackProbability)
 	{
-		m_state = kThrowingAttack;
-	}
-	else if (m_probability < kHpHighlyRangeFarJump)
-	{
-		m_state = kJump;
-	}
-	else if (m_probability < kHpHighlyRangeFarStatusUp)
-	{
-		m_state = kStatusUp;
+		return  kLightAttack;
 	}
 
-	return m_state;
-}
-
-int BossAI::HpLowRangeNear()
-{
-	m_probability = GetRand(100);
-	if (m_probability < kHpLowRangeNearStorongAttack)
+	if (m_probability <= bossAI.storongAttackProbability)
 	{
-		m_state = kThrowingAttack;
-	}
-	else if (m_probability < kHpLowRangeNearLightAttack)
-	{
-		m_state = kLightAttack;
-	}
-	else if (m_probability < kHpLowRangeNearStatusUp)
-	{
-		m_state = kStatusUp;
+		return kStorongAttack;
 	}
 
-	return m_state;
-}
+	if (m_probability <= bossAI.statusUpProbability)
+	{
+		return kStatusUp;
+	}
 
-int BossAI::HpLowRangeFar()
-{
-	m_probability = GetRand(100);
-	if (m_probability < kHpLowRangeFarThrowing)
+	if (m_probability <= bossAI.throwingAttackProbability)
 	{
-		m_state = kThrowingAttack;
-	}
-	else if (m_probability < kHpLowRangeFarStatusUp)
-	{
-		m_state = kStatusUp;
-	}
-	else if (m_probability < kHpLowRangeFarJump)
-	{
-		m_state = kJump;
+		return kThrowingAttack;
 	}
 
 
-	return m_state;
 }

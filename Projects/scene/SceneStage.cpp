@@ -140,6 +140,12 @@ void SceneStage::Init()
 
 std::shared_ptr<SceneBase> SceneStage::Update(const Pad& pad)
 {
+	//プレイヤーの動き
+	m_pPlayer->Update(*m_pStage, pad, *m_pCamera);
+
+	//カメラの動き
+	m_pCamera->Update(m_pPlayer->GetPos());
+
 	//ステージ1の動き
 	if (m_stageKinds == Stage1)
 	{
@@ -203,8 +209,6 @@ void SceneStage::Draw()
 
 		//残り敵数を描画
 		DrawFormatStringFToHandle(kPosX, kPosY, GetColor(0, 0, 0), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize100_4)], "残り%4d\n", m_enemyNum);
-
-
 	}
 	if (m_stageKinds == Stage2)
 	{
@@ -281,6 +285,7 @@ void SceneStage::End()
 {
 }
 
+
 //ステージ1での処理
 void SceneStage::Stage1Update(const Pad& pad)
 {
@@ -300,10 +305,6 @@ void SceneStage::Stage1Update(const Pad& pad)
 	m_enemyNum = m_pEnemyManager->GetEnemyNum();
 
 	m_pEnemyManager->Update(*m_pStage, *m_pPlayer);
-
-	m_pPlayer->Update(*m_pStage, pad, *m_pCamera);
-
-	m_pCamera->Update(m_pPlayer->GetPos());
 }
 
 //ステージ2での処理
@@ -317,12 +318,6 @@ void SceneStage::Stage2Update(const Pad& pad)
 
 	//ボスの動き
 	m_pBoss->Update(*m_pStage, *m_pPlayer, m_pPlayer->GetPos());
-
-	//プレイヤーの動き
-	m_pPlayer->Update(*m_pStage, pad, *m_pCamera);
-
-	//カメラの動き
-	m_pCamera->Update(m_pPlayer->GetPos());
 }
 
 

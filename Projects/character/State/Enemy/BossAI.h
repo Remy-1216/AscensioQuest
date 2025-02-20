@@ -10,38 +10,33 @@ class BossAI
 {
 public:
 
+	struct AI
+	{
+		int rushAttackProbability = 0;		//突進攻撃の確率
+		int lightAttackProbability = 0;		//通常攻撃の確率
+		int storongAttackProbability = 0;	//強攻撃の確率
+		int throwingAttackProbability = 0;	//遠距離攻撃の確率
+		int jumpProbability = 0;			//ジャンプする確率
+		int statusUpProbability = 0;		//強化する確率
+	};
+
+public:
+
 	BossAI();
 	virtual ~BossAI();
 
 	void Init();
 
+	//	どのような状況下なのかを調べる
 	int StateSet(CharacterBase& boss,const  Player& player);
 
 private:
 
 	/// <summary>
-	/// ボスの残りHPが高く、プレイヤーが近い場合の行動
-	/// </summary>
-	int HpHighlyRangeNear();
-
-	/// <summary>
-	/// ボスの残りHPが高く、プレイヤーが遠い場合の行動
+	/// AIの動きを決める
 	/// </summary>
 	/// <returns></returns>
-	int HpHighlyRangeFar();
-
-	/// <summary>
-	/// ボスの残りHPが低く、プレイヤーが近い場所にいる場合の行動
-	/// </summary>
-	/// <returns></returns>
-	int HpLowRangeNear();
-
-
-	/// <summary>
-	/// ボスの残りHPが低く、プレイヤーが遠い場所に場合の行動
-	/// </summary>
-	/// <returns></returns>
-	int HpLowRangeFar();
+	int AIMotion(AI  bossAI);
 
 private:
 	/// <summary>
@@ -51,7 +46,7 @@ private:
 	{
 		kIdle,
 		kWalk,
-		kAttack,
+		kRushAttack,
 		kLightAttack,
 		kStorongAttack,
 		kThrowingAttack,
@@ -61,6 +56,8 @@ private:
 		kDie
 	};
 private:
+
+	AI m_bossAI;
 
 	//ランダム
 	int m_probability;

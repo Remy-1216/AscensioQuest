@@ -8,7 +8,7 @@ class EnemyStateWalk :public EnemyStateBase
 {
 public:
 
-	EnemyStateWalk(std::shared_ptr<CharacterBase>enemy):EnemyStateBase(enemy){}
+	EnemyStateWalk(std::shared_ptr<CharacterBase>enemy) :EnemyStateBase(enemy) { m_move = VGet(0.0f, 0.0f, 0.0f);  m_coolTime = 0; m_walkSpeed = 0.0f;}
 
 	/// <summary>
 	/// 初期化
@@ -61,6 +61,12 @@ private:
 	/// <param name="characterKinds"></param>
 	void BossWalk(Stage& stage, const Player& player, const int  characterKinds);
 
+	/// <summary>
+	/// 敵の位置からターゲット位置に向かうベクトルを生成する
+	/// </summary>
+	/// <returns></returns>
+	VECTOR GoToPlayer(VECTOR playerPos);
+
 private:
 
 	//ボスのAI
@@ -69,10 +75,11 @@ private:
 	//プレイヤーとの距離
 	VECTOR m_move;
 
+	//攻撃のクールタイム
+	int m_coolTime;
+
 	//歩く速さ
 	float m_walkSpeed;
 
-	//攻撃のクールタイム
-	int m_coolTime;
 };
 

@@ -4,7 +4,7 @@ class PlayerStateMagicAttack :
     public PlayerStateBase
 {
 public:
-    PlayerStateMagicAttack(std::shared_ptr<Player> player) : PlayerStateBase(player) ,m_animLoopEndTime(0.0f),m_animTime(0.0f),m_time(0.0f){};
+    PlayerStateMagicAttack(std::shared_ptr<Player> player) : PlayerStateBase(player) ,m_animTime(0.0f),m_time(0.0f){};
     
     void Init();
     
@@ -20,16 +20,11 @@ public:
     virtual std::string GetStateName() override { return "魔法攻撃"; }
 #endif
 private:
-    //アニメーションの最後の時間
-    float m_animLoopEndTime;
 
     //アニメーションの進む時間
     float m_animTime;
 
     //時間
     float m_time;
-
-    //攻撃中かどうか
-    bool m_isAttack;
 };
 

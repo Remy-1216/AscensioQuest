@@ -99,6 +99,8 @@ void Boss::Init(int handle)
  // モデルを受け取る
 	m_handle = handle;
 
+	m_isHitAttack = false;
+
 	// 初期位置設定
 	m_pos = VGet(m_characterPos.posX, m_characterPos.posY, m_characterPos.posZ);
 
@@ -122,7 +124,7 @@ void Boss::Init(int handle)
 	m_isLightAttack = false;
 	m_isStorongAttack = false;
 	m_isThrowing = false;
-	m_isDie = false;
+	m_isKnockedDown = false;
 	m_isGameClear = false;
 	m_isAttack = false;
 	m_isAttackMove = false;
@@ -168,30 +170,11 @@ void Boss::Update(Stage& stage, Player& player, VECTOR playerPos)
 	m_capsuleStart = VAdd(m_pos, m_capsuleStartPoint);
 	m_capsuleEnd = VAdd(m_pos, m_capsuleEndPoint);
 
-	if (!m_isHitAttack)
-	{
-		// プレイヤーの攻撃が当たったかどうか
-		HitPlayerAttack(player.GetAttackCapsuleStart(), player.GetAttackCapsuleEnd(),
-						player.GetAttackRadius(), player.GetAttackPower());
-		if (!m_isHitAttack)
-		{
-			// プレイヤーの魔法攻撃が当たったかどうか
-			HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
-							player.GetMagicCapsuleRadius(), player.GetMagicPower());
-			if (!m_isHitAttack)
-			{
-				// プレイヤーの必殺技に当たったかどうか
-				HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
-								player.GetSpecialMoveRadius(), player.GetAttackPower());
-			}
-		}
-	}
+	// プレイヤーと当たったかどうか
+	HitPlayer(player);
 
 	// プレイヤーの攻撃が当たったかどうかを渡す
 	player.HitAttack(m_isHitAttack);
-
-	// プレイヤーと当たったかどうか
-	HitPlayer(player);
 
 	// アニメーション
 	UpdateAnim();
@@ -202,10 +185,8 @@ void Boss::Update(Stage& stage, Player& player, VECTOR playerPos)
 	// 向いている方向
 	UpdateAngle(player.GetPos());
 
-	m_isDie = m_pEnemyState->GetIsDie();
-
-	// 死んだ瞬間の動き
-	Die();
+	//死んだ後の処理
+	Died();
 }
 
 //描画
@@ -215,7 +196,7 @@ void Boss::Draw()
 	MV1SetPosition(m_handle, m_pos);
 
 	//モデル描画
-	if (!m_isDie)
+	if (!m_isKnockedDown)
 	{
 		MV1DrawModel(m_handle);
 	}
@@ -248,24 +229,24 @@ void Boss::Draw()
 
 	//遠距離攻撃の当たり判定のカプセルを表示
 	DrawCapsule3D(m_attackCapsuleStart, m_attackCapsuleEnd, m_attackRadius, 40, GetColor(255, 255, 0), GetColor(0, 0, 0), false);
-
-	
-	
 #endif
 }
 
 //プレイヤーとの当たり判定
 void Boss::HitPlayer(Player& player)
 {
+	//プレイヤーと胴体が当たったかどうか
 	if (player.HitEnemy(m_pos, m_capsuleStart, m_capsuleEnd, m_radius))
 	{
 		player.Damage(kDamage, kShortDistanceEnemy);
 	}
 
+	//プレイヤーに攻撃が当たったかどうか
 	if (player.HitEnemyAttack(m_pos, m_attackCapsuleStart, m_attackCapsuleEnd, m_attackRadius))
 	{
 		player.Damage(m_attackPower, kShortDistanceEnemy);
 	}
+
 	//プレイヤーに自分の攻撃が当たったかどうか
 	if (player.HitEnemyAttack(m_pos, m_attackCapsuleStart, m_attackCapsuleEnd, m_attackRadius))
 	{
@@ -278,10 +259,47 @@ void Boss::HitPlayer(Player& player)
 		m_isAttackMove = false;
 		m_isThrowing = false;
 	}
+
+	HitAnyPlayerAttack(player);
+}
+
+//プレイヤーの度の攻撃に当たったのかの確認
+void Boss::HitAnyPlayerAttack(Player& player)
+{
+	// プレイヤーの攻撃が当たったかどうか
+	HitPlayerAttack(player.GetAttackCapsuleStart(), player.GetAttackCapsuleEnd(),
+					player.GetAttackRadius(), player.GetAttackPower());
+
+	// プレイヤーの魔法攻撃が当たったかどうか
+	HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
+					player.GetMagicCapsuleRadius(), player.GetMagicPower());
+
+	// プレイヤーの必殺技に当たったかどうか
+	HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
+				player.GetSpecialMoveRadius(), player.GetAttackPower());
 }
 
 //攻撃の当たり判定
 void Boss::UpdateCol()
+{
+	//弱攻撃の当たり判定の更新
+	LightAttackCol();
+
+	//強攻撃の当たり判定の更新
+	StorongAttackCol();
+
+	//遠距離攻撃の当たり判定の更新
+	ThrowingCol();
+
+	if (!m_isAttack && !m_isAttackMove)
+	{
+		m_attackCapsuleStart = VGet(0.0f, kAttackPosY, 0.0f);
+		m_attackCapsuleEnd = VGet(0.0f, kAttackPosY, 0.0f);
+	}
+
+}
+
+void Boss::LightAttackCol()
 {
 	//弱攻撃を行った時
 	if (m_isLightAttack)
@@ -297,7 +315,10 @@ void Boss::UpdateCol()
 		m_rightElbowPos = VGet(0.0f, kAttackPosY, 0.0f);
 		m_rightHandPos = VGet(0.0f, kAttackPosY, 0.0f);
 	}
+}
 
+void Boss::StorongAttackCol()
+{
 	//強攻撃を行った時
 	if (m_isStorongAttack)
 	{
@@ -311,7 +332,10 @@ void Boss::UpdateCol()
 		m_leftElbowPos = VGet(0.0f, kAttackPosY, 0.0f);
 		m_leftHandPos = VGet(0.0f, kAttackPosY, 0.0f);
 	}
+}
 
+void Boss::ThrowingCol()
+{
 	//投擲攻撃を行った時
 	if (m_isThrowing)
 	{
@@ -350,11 +374,20 @@ void Boss::UpdateCol()
 			}
 		}
 	}
+}
 
-	if (!m_isAttack && !m_isAttackMove)
+//死んだ後の処理
+void Boss::Died()
+{
+
+	m_isKnockedDown = m_pEnemyState->GetIsDie();
+
+	// 死んだ瞬間の動き
+	Die();
+
+	//倒れるモーションが終わったかどうか
+	if (m_isKnockedDown)
 	{
-		m_attackCapsuleStart = VGet(0.0f, kAttackPosY, 0.0f);
-		m_attackCapsuleEnd = VGet(0.0f, kAttackPosY, 0.0f);
+		m_isGameClear = true;
 	}
-
 }

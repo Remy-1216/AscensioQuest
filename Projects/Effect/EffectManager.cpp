@@ -62,7 +62,6 @@ void EffectManager::Draw()
 void EffectManager::ClearEffect()
 {
 	StopEffekseer3DEffect(m_playingEffectHandle);
-
 }
 
 void EffectManager::DrawMagicAttackEffect(VECTOR& magicAttackPos)

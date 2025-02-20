@@ -53,7 +53,7 @@ ShortDistanceEnemy::ShortDistanceEnemy():CharacterBase(m_handle)
 	m_attackCapsuleEndPoint = m_collisionInfo.attackCapsuleEndPoint;
 	m_attackRadius = m_collisionInfo.attackRadius;
 
-	m_isDie = false;
+	m_isKnockedDown = false;
 }
 
 ShortDistanceEnemy::~ShortDistanceEnemy()
@@ -88,7 +88,7 @@ void ShortDistanceEnemy::Init(int handle, VECTOR enemyPos)
 	m_isHitAttack = false;
 
 	//最初は死んでいないのでfalse
-	m_isDie = false;
+	m_isKnockedDown = false;
 
 	//最初は死んでいないので動けるためtrue
 	m_isMove = true;
@@ -145,7 +145,7 @@ void ShortDistanceEnemy::Update(Stage& stage, const Player& player,VECTOR player
 	//当たり判定の更新
 	UpdateCol();
 
-	m_isDie = m_pEnemyState->GetIsDie();
+	m_isKnockedDown = m_pEnemyState->GetIsDie();
 
 	//死んだ瞬間の動き
 	Die();
@@ -167,7 +167,7 @@ void ShortDistanceEnemy::Draw()
 	//m_pUIBar->DrawEnemyGaugeBar(*this);
 
 	//死んでいないときは表示し、死んだ後には表示しない(EnemyManagerが完成次第なくなる)
-	if (!m_isDie)
+	if (!m_isKnockedDown)
 	{
 		//モデルの表示
 		MV1DrawModel(m_handle);
@@ -186,6 +186,24 @@ void ShortDistanceEnemy::Draw()
 	DrawFormatString(0, 700, GetColor(255, 255, 255), "enemy_blackの座標(%.2f,%.2f,%.2f)", m_pos.x, m_pos.y, m_pos.z);
 
 #endif
+}
+
+void ShortDistanceEnemy::HitAnyPlayerAttack(Player& player)
+{
+	//プレイヤーの攻撃が当たったかどうか
+	HitPlayerAttack(player.GetAttackCapsuleStart(), player.GetAttackCapsuleEnd(),
+		player.GetAttackRadius(), player.GetAttackPower());
+
+
+	//プレイヤーの魔法攻撃が当たったかどうか
+	HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
+		player.GetMagicCapsuleRadius(), player.GetMagicPower());
+
+
+	//プレイヤー必殺技が当たったかどうか
+	HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
+		player.GetSpecialMoveRadius(), player.GetAttackPower());
+		
 }
 
 void ShortDistanceEnemy::HitPlayer(Player& player)

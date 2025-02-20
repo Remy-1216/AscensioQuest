@@ -37,6 +37,11 @@ public:
 	/// <param name="playar"></param>
 	void HitPlayer(Player& player);
 
+	/// <summary>
+	/// プレイヤーのどの攻撃に当たったのか
+	/// </summary>
+	void HitAnyPlayerAttack(Player& player);
+
 private:
 	/// <summary>
 	/// 当たり判定を更新

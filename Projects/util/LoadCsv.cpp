@@ -23,6 +23,7 @@ namespace
 	const char* const kEffectDataFileName = "data/csv/EffectData.csv";
 	const char* const kFontDataFileName = "data/csv/FontData.csv";
 	const char* const kMapPosFileName = "data/csv/MapPos.csv";
+	const char* const kBossAIFileName = "data/csv/BossAI.csv";
 
 	/// <summary>
 	/// 文字列を分割する
@@ -399,7 +400,7 @@ void LoadCsv::LoadWarpPointPos(Stage::WarpPointPos& data, const char* warpName)
 
 }
 
-//ステータスを読み込む
+//強化ステータスデータを読み込む
 void LoadCsv::LoadStatusUp(PlayerStatus::StatusUpValue& data)
 {
 	std::ifstream ifs(kStatusUpFileName);
@@ -529,6 +530,39 @@ void LoadCsv::LoadMapPosData(Stage::MapPos& data, const char* direction)
 	data.map4PosZ = std::stoi(strvec[8]);
 	data.map5PosX = std::stoi(strvec[9]);
 	data.map5PosZ = std::stoi(strvec[10]);
+}
+
+//ボスAIの上方を読み込む
+void LoadCsv::LoadBossAIData(BossAI::AI& data, const char* status)
+{
+	std::ifstream ifs(kBossAIFileName);
+	std::string line;
+	std::vector<std::string> strvec;
+	m_data.clear();
+
+	while (std::getline(ifs, line))
+	{
+		strvec = split(line, ',');
+		const char* str = strvec[0].c_str();
+
+		// 参照したいキャラが見つかっていたら処理をやめる
+		// MEMO:strcmp 文字列を比較する 第1引数 = 第2引数の場合0
+		if (strcmp(str, status) == 0)
+		{
+			break;
+		}
+		else
+		{
+			strvec.erase(strvec.begin(), strvec.end());
+		}
+	}
+	data.rushAttackProbability = std::stoi(strvec[1]);
+	data.lightAttackProbability = std::stoi(strvec[2]);
+	data.storongAttackProbability = std::stoi(strvec[3]);
+	data.throwingAttackProbability = std::stoi(strvec[4]);
+	data.jumpProbability = std::stoi(strvec[5]);
+	data.statusUpProbability = std::stoi(strvec[6]);
+
 }
 
 
