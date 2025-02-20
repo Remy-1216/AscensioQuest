@@ -1,0 +1,16 @@
+﻿AnimName,No,loopFrame,loopEndFrame,animSpeed
+Idle,0,0.0f,250.0f,1.0f
+Walk,1,0.0f,41.0f,0.75f
+Run,2,0.0f,18.0f,0.75f
+Attack1,3,0.0f,26.0f,0.55f
+Attack2,4,0.0f,31.0f,0.55f
+Attack3,5,0.0f,95.0f,0.55f
+MagicAttack,6,0.0f,69.0f,0.75f
+Damage,7,0.0f,36.0f,0.5f
+GuardDamage,8,0.0f,26.0f,0.5f
+Guard,9,0.0f,15.0f,0.5f
+Death,10,0.0f,78.0f,0.5f
+SpecialMove,11,0.0f,107.0f,0.5f
+WaveHand,0,0.0f,95.0f,0.5f
+FistPump,1,0.0f,114.0f,0.5f
+RaiseYourHand,2,0.0f,122.0f,0.5f
