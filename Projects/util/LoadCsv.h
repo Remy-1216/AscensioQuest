@@ -121,6 +121,12 @@ public:
 	/// <param name="map">方向</param>
 	void LoadMapPosData(Stage::MapPos& data, const char* direction);
 
+	/// <summary>
+	/// マップの左上,右下の座標位置を読み込む
+	/// </summary>
+	/// <param name="data">マップの座標位置</param>
+	/// <param name="map">方向</param>
+	void LoadMapPosData(EnemyManager::AreaPos& data, const char* direction);
 
 	/// <summary>
 	/// ボスの状態によって変わる、行動確率を読み込む

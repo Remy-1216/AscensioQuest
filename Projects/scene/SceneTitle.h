@@ -3,6 +3,7 @@
 
 class TitlePlayer;
 class PlayerStatus;
+class Stage;
 class SceneTitle : public SceneBase
 {
 public:
@@ -39,6 +40,13 @@ private:
 	std::shared_ptr<PlayerStatus> m_pPlayerStatus;
 
 	std::shared_ptr<TitlePlayer> m_pTitlePlayer;
+
+	std::shared_ptr<Stage>m_pStage;
+
+	/// <summary>
+	/// タイトルロゴのハンドル
+	/// </summary>
+	int m_logoHandle;
 
 	/// <summary>
 	/// カウント

@@ -46,6 +46,7 @@
     <ClCompile Include="character\State\Player\PlayerStateWalk.cpp" />
     <ClCompile Include="character\State\Player\TitlePlayer.cpp" />
     <ClCompile Include="Effect\EffectManager.cpp" />
+    <ClCompile Include="Game\GameManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="object\Apple.cpp" />
     <ClCompile Include="object\Stage.cpp" />
@@ -94,6 +95,7 @@
     <ClInclude Include="character\State\Player\PlayerStateWalk.h" />
     <ClInclude Include="character\State\Player\TitlePlayer.h" />
     <ClInclude Include="Effect\EffectManager.h" />
+    <ClInclude Include="Game\GameManager.h" />
     <ClInclude Include="object\Apple.h" />
     <ClInclude Include="object\Stage.h" />
     <ClInclude Include="scene\SceneBase.h" />

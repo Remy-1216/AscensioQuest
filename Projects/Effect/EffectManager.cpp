@@ -4,12 +4,14 @@
 
 namespace
 {
+	// CSVに書かれているエフェクトの名前
 	const char* const kPlayerDamageEffect = "playerdamage";
 	const char* const kEnemyDamageEffect = "enemydamage";
 	const char* const kMagicAttackEffect = "magicattack";
 	const char* const kWarpPointEffect = "warppoint";
 	const char* const kItemEffect = "item";
 	const char* const kPlayerGuardEffect = "playerguard";
+
 }
 
 EffectManager::EffectManager():m_playingEffectHandle(-1),m_warpPointEffectHandle(-1), m_magicAttackEffectHandle(-1),
@@ -68,6 +70,13 @@ void EffectManager::DrawMagicAttackEffect(VECTOR& magicAttackPos)
 {
 	LoadCsv::GetInstance().LoadEffectData(m_effectData, kMagicAttackEffect);
 
+	if (m_magicAttackEffectHandle <= -1)
+	{
+		m_magicAttackEffectHandle = LoadEffekseerEffect("data/Effect/MagicAttack.efkefc", 2.0f);
+	}
+
+	m_magicAttackEffectTime++;
+
 	// エフェクトが1回のみ表示されるようにする
 	if (m_magicAttackEffectTime >= m_effectData.EffectTime)
 	{
@@ -76,13 +85,6 @@ void EffectManager::DrawMagicAttackEffect(VECTOR& magicAttackPos)
 
 		return;
 	}
-
-	if (m_magicAttackEffectHandle <= -1)
-	{
-		m_magicAttackEffectHandle = LoadEffekseerEffect("data/Effect/MagicAttack.efkefc",2.0f);
-	}
-
-	m_magicAttackEffectTime++;
 
 	//エフェクトが再生されていない場合
 	if (!m_isMagicAttackEffect)
@@ -114,12 +116,13 @@ void EffectManager::DrawWarpPointEffect(VECTOR worpPos, int warpPointNum)
 		return;
 	}
 
+	//エフェクトを読み込む
 	if (m_warpPointEffectHandle <= -1)
 	{
 		m_warpPointEffectHandle = LoadEffekseerEffect("data/Effect/WarpPoint.efkefc", 2.0f);
 	}
 
-	m_warpPointEffectTime[warpPointNum] += 0.5f;
+	m_warpPointEffectTime[warpPointNum]++;
 
 	//エフェクトが再生されていない場合
 	if (!m_isWarpPointEffect[warpPointNum])
@@ -150,6 +153,7 @@ void EffectManager::DrawPlayerDamageEffect(VECTOR playerPos)
 		return;
 	}
 
+	//エフェクトを読み込む
 	if (m_playerDamageEffectHandle <= -1)
 	{
 		m_playerDamageEffectHandle = LoadEffekseerEffect("data/Effect/MagicAttack.efkefc", 2.0f);
@@ -182,6 +186,7 @@ void EffectManager::DrawEnemyDamageEffect(VECTOR enemyPos)
 		return;
 	}
 
+	//エフェクトを読み込む
 	if (m_enemyDamageEffectHandle <= -1)
 	{
 		m_enemyDamageEffectHandle = LoadEffekseerEffect("data/Effect/EnemyHit.efkefc", 2.0f);
@@ -214,6 +219,7 @@ void EffectManager::DrawPlayerGuardEffect(VECTOR playerPos)
 		return;
 	}
 
+	//エフェクトを読み込む
 	if (m_playerGuardEffectHandle <= -1)
 	{
 		m_playerGuardEffectHandle = LoadEffekseerEffect("data/Effect/GuardHit.efkefc", 2.0f);
@@ -246,6 +252,7 @@ void EffectManager::DrawItemEffect(VECTOR itemPos)
 		return;
 	}
 
+	//エフェクトを読み込む
 	if (m_itemEffectHandle <= -1)
 	{
 		m_itemEffectHandle = LoadEffekseerEffect("data/Effect/Item.efkefc", 2.0f);

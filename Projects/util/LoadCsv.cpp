@@ -532,6 +532,41 @@ void LoadCsv::LoadMapPosData(Stage::MapPos& data, const char* direction)
 	data.map5PosZ = std::stoi(strvec[10]);
 }
 
+void LoadCsv::LoadMapPosData(EnemyManager::AreaPos& data, const char* direction)
+{
+	std::ifstream ifs(kMapPosFileName);
+	std::string line;
+	std::vector<std::string> strvec;
+	m_data.clear();
+
+	while (std::getline(ifs, line))
+	{
+		strvec = split(line, ',');
+		const char* str = strvec[0].c_str();
+
+		// 参照したいキャラが見つかっていたら処理をやめる
+		// MEMO:strcmp 文字列を比較する 第1引数 = 第2引数の場合0
+		if (strcmp(str, direction) == 0)
+		{
+			break;
+		}
+		else
+		{
+			strvec.erase(strvec.begin(), strvec.end());
+		}
+	}
+	data.map1PosX = std::stoi(strvec[1]);
+	data.map1PosZ = std::stoi(strvec[2]);
+	data.map2PosX = std::stoi(strvec[3]);
+	data.map2PosZ = std::stoi(strvec[4]);
+	data.map3PosX = std::stoi(strvec[5]);
+	data.map3PosZ = std::stoi(strvec[6]);
+	data.map4PosX = std::stoi(strvec[7]);
+	data.map4PosZ = std::stoi(strvec[8]);
+	data.map5PosX = std::stoi(strvec[9]);
+	data.map5PosZ = std::stoi(strvec[10]);
+}
+
 //ボスAIの上方を読み込む
 void LoadCsv::LoadBossAIData(BossAI::AI& data, const char* status)
 {

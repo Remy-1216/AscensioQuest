@@ -16,6 +16,7 @@ public:
 	//ステージの種類
 	enum Stagekinds
 	{
+		Title,
 		Stage1,
 		Stage2,
 	};

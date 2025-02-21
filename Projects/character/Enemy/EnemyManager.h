@@ -40,6 +40,30 @@ public:
 		float enemyPosZ8 = 0.0f;		//座標位置Z
 	};
 
+	//エリアの敵数
+	struct Area
+	{
+		int area1EnemyNum = 0;
+		int area2EnemyNum = 0;
+		int area3EnemyNum = 0;
+		int area4EnemyNum = 0;
+	};
+
+	//マップの左上、右下の位置
+	struct AreaPos
+	{
+		float map1PosX;
+		float map1PosZ;
+		float map2PosX;
+		float map2PosZ;
+		float map3PosX;
+		float map3PosZ;
+		float map4PosX;
+		float map4PosZ;
+		float map5PosX;
+		float map5PosZ;
+	};
+
 public:
 	EnemyManager();
 	virtual ~EnemyManager();
@@ -93,6 +117,33 @@ private:
 	void CreateLongDistanceEnemy();
 
 	/// <summary>
+	/// 各エリアの敵を設定する
+	/// </summary>
+	void AreaDecide();
+
+	/// <summary>
+	/// 近距離タイプの敵が死んだときの処理
+	/// </summary>
+	void ShortEnemyDies(int enemyNum);
+
+	/// <summary>
+	/// どのエリアの近距離タイプの敵が死んだのか確認
+	/// </summary>
+	/// <param name="enemyNum"></param>
+	void ShortEnemyDiesArea(int enemyNum);
+
+	/// <summary>
+	/// 遠距離タイプの敵が死んだときの処理
+	/// </summary>
+	void LongEnemyDies(int enemyNum);
+
+	/// <summary>
+	/// どのエリアの近距離タイプの敵が死んだのか確認
+	/// </summary>
+	/// <param name="enemyNum"></param>
+	void LongEnemyDiesArea(int enemyNum);
+
+	/// <summary>
 	/// エネミーの座標を読み取る
 	/// </summary>
 	void LoadPos();
@@ -102,7 +153,11 @@ private:
 	/// </summary>
 	void DrapItem(VECTOR enemyPos);
 
+	
+
 private:
+
+	Area m_area;
 
 	/// <summary>
 	/// 遠距離エネミー
@@ -113,6 +168,13 @@ private:
 	/// 近距離エネミー
 	/// </summary>
 	std::shared_ptr<ShortDistanceEnemy> m_pShortDistanceEnemy[kEnemyNum];
+
+
+	//左上の座標
+	AreaPos m_upperLeft;
+
+	//右下の座標
+	AreaPos m_lowerRight;
 
 	/// <summary>
 	/// 近距離型エネミーのHP

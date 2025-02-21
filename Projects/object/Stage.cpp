@@ -52,17 +52,47 @@ Stage::Stage(int stageKinds)
     m_pEffectManager->Init();
 
     //ロード
+    if (stageKinds == Title)
+    {
+        m_stageHandle = MV1LoadModel("data/model/stage/TitleStage.mv1");
+        LoadCsv::GetInstance().LoadStageInfo(m_stage, "title");
+        m_posX = m_stage.posX;
+        m_posY = m_stage.posY;
+        m_posZ = m_stage.posZ;
+        m_size = m_stage.size;
+
+        m_stagePos = VGet(-m_posX, -m_posY, -m_posZ);
+    }
     if (m_stageKinds == Stage1)
     {
         m_stageHandle = MV1LoadModel("data/model/stage/stage.mv1");
 
         m_mapHandle = LoadGraph("data/UI/Map.png");
 
+        //ステージの情報を読み込む
+        LoadCsv::GetInstance().LoadStageInfo(m_stage, "gamestage");
+        m_posX = m_stage.posX;
+        m_posY = m_stage.posY;
+        m_posZ = m_stage.posZ;
+        m_size = m_stage.size;
+
+        m_stagePos = VGet(m_posX, -m_posY, m_posZ);
+
+
         m_playerPosHandle = LoadGraph("data/UI/playerPosition.png");
     }
     if (m_stageKinds == Stage2)
     {
         m_stageHandle = MV1LoadModel("data/model/stage/BossStage.mv1");
+
+        //ステージの情報を読み込む
+        LoadCsv::GetInstance().LoadStageInfo(m_stage, "gamestage");
+        m_posX = m_stage.posX;
+        m_posY = m_stage.posY;
+        m_posZ = m_stage.posZ;
+        m_size = m_stage.size;
+
+        m_stagePos = VGet(m_posX, -m_posY, m_posZ);
     }
     
     //背景の画像をロードする
@@ -75,18 +105,13 @@ Stage::Stage(int stageKinds)
         LoadWarpPointPos();
     }
    
-    //ステージの情報を読み込む
-    LoadCsv::GetInstance().LoadStageInfo(m_stage, "stage1");
-    m_posX = m_stage.posX;
-    m_posY = m_stage.posY;
-    m_posZ = m_stage.posZ;
-    m_size = m_stage.size;
+    
 
     //マップの端の位置を読み込む
     LoadCsv::GetInstance().LoadMapPosData(m_upperLeft, "upperLeft");
     LoadCsv::GetInstance().LoadMapPosData(m_lowerRight, "lowerRight");
 
-    m_stagePos = VGet(m_posX, -m_posY, m_posZ);
+    
 
     //モデルのサイズを調整する
     MV1SetScale(m_stageHandle, VGet(m_size, m_size, m_size));

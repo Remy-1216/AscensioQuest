@@ -114,19 +114,13 @@ public:
 	int GetSpecialMoveGauge() const { return m_specialMoveGauge; }
 
 	/// <summary>
-	/// 受けたダメージを渡す
-	/// </summary>
-	/// <returns></returns>
-	int GetDamage()const { return m_damage; }
-
-	/// <summary>
 	/// 足元にある球体の半径を渡す
 	/// </summary>
 	/// <returns></returns>
 	float GetSphereRadius() const { return m_sphereRadius; }
 
 	/// <summary>
-	/// 死んだかどうかを渡す
+	/// 倒れたかどうかを渡す
 	/// </summary>
 	/// <returns></returns>
 	bool GetIsPlayerDie() const { return m_isKnockedDown; }
@@ -142,6 +136,12 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	bool GetIsSpecialMove()const { return m_isSpecialMove; }
+
+	/// <summary>
+	/// 魔法攻撃が行われているかどうかを渡す
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsMagicAttack() const { return m_isMagicAttack; }
 
 	/// <summary>
 	/// プレイヤーがワープできる地点にいるかどうかを渡す

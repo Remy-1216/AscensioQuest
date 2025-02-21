@@ -90,22 +90,22 @@ private:
 	int m_itemEffectHandle;
 
 	// 魔法攻撃エフェクトを再生する時間
-	int m_magicAttackEffectTime;	
+	float m_magicAttackEffectTime;	
 
 	//プレイヤーがダメージを受けた時エフェクトを再生する時間
-	int m_playerDamageEffectTime;
+	float m_playerDamageEffectTime;
 
 	//敵がダメージを受けた時のエフェクトを再生する時間
-	int m_enemyDamageEffectTime;
+	float m_enemyDamageEffectTime;
 
 	//ワープポイントエフェクトを再生する時間
 	float m_warpPointEffectTime[kWarpPointNum];
 
 	// ガードエフェクトを再生する時間
-	int m_playerGuardEffectTime;
+	float m_playerGuardEffectTime;
 
 	//アイテムが落ちているときのエフェクトを再生する時間
-	int m_itemEffectTime;
+	float m_itemEffectTime;
 
 	//魔法攻撃エフェクトが再生されているか
 	bool m_isMagicAttackEffect;

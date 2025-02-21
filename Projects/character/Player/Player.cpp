@@ -56,7 +56,7 @@ namespace
 	constexpr float kAttackPosY = -200.0f;
 
 	//時間経過で回復するMPの量
-	constexpr float kMpRecovery = 0.01f;
+	constexpr float kMpRecovery = 0.1f;
 
 	//無敵時間
 	constexpr int  kInvincibleTime = 120;
@@ -358,9 +358,12 @@ void Player::Attack(int attackNum,float animTime)
 //魔法攻撃をした時の処理
 void Player::MagicAttack()
 {
-	m_mp -= kMp;
-	m_pSoundManager->MagicAttackSE();
-	m_isMagicAttack = true;
+	if (m_mp >= kMp)
+	{
+		m_mp -= kMp;
+		m_pSoundManager->MagicAttackSE();
+		m_isMagicAttack = true;
+	}
 }
 
 //必殺技を行った時の処理
@@ -397,7 +400,6 @@ void Player::Warp(const Pad& pad,VECTOR warpTarget)
 
 #endif
 }
-
 
 //敵の胴体か敵の攻撃によって変わるダメージ処理
 void Player::Damage(float damage,int enemyType)
@@ -509,7 +511,6 @@ void Player::InvincibleTime()
 		m_invincibleTime = kInvincibleTime;
 	}
 }
-
 
 //敵の胴体と当たったかどうか
 bool Player::HitEnemy(VECTOR enemyPos,VECTOR HitEnemyCollisionStart, VECTOR HitEnemyCollisionEnd, float HitEnemyRadius)
@@ -649,7 +650,7 @@ void Player::MagicAttackCol(MATRIX rotationMatrixY)
 		m_magicCapsuleEnd = VAdd(m_magicCapsuleEnd, VScale(m_magicDirection, kMagicAttackSpeed));
 
 		//エフェクトの演出を描画する
-		m_pEffectManager->DrawMagicAttackEffect(m_magicCapsuleStart);
+		m_pEffectManager->DrawMagicAttackEffect(m_magicCapsuleEnd);
 
 		// 最大距離に達したら停止
 		if (VSize(VSub(m_magicCapsuleStart, m_pos)) > kMagicAttackDistance)

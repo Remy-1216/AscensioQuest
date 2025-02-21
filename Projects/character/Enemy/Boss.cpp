@@ -43,7 +43,6 @@ namespace
 
 	//攻撃後の当たり判定の位置
 	constexpr float kAttackPosY = -200.0f;
-
 }
 
 Boss::Boss() :CharacterBase(m_handle), m_throwingHandle(-1), m_statusPoint(-1), m_isMove(false), m_isGameClear(false),
@@ -299,6 +298,7 @@ void Boss::UpdateCol()
 
 }
 
+//弱攻撃の当たり判定の更新
 void Boss::LightAttackCol()
 {
 	//弱攻撃を行った時
@@ -317,6 +317,7 @@ void Boss::LightAttackCol()
 	}
 }
 
+//強攻撃の当たり判定の更新
 void Boss::StorongAttackCol()
 {
 	//強攻撃を行った時
@@ -334,6 +335,7 @@ void Boss::StorongAttackCol()
 	}
 }
 
+//投擲攻撃の当たり判定の更新
 void Boss::ThrowingCol()
 {
 	//投擲攻撃を行った時

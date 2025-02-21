@@ -3,6 +3,7 @@
 #include"SoundManager.h"
 #include "PlayerStatus.h"
 #include "TitlePlayer.h"
+#include "Stage.h"
 #include "Pad.h"
 #include "Game.h"
 #include "Font.h"
@@ -54,7 +55,7 @@ namespace
 }
 
 SceneTitle::SceneTitle() :  m_count(0), m_isSelect(false), m_isPlayGame(false), m_isPressPad(false), m_isPressPadTime(false),m_cameraPos(VGet(0.0f,0.0f,0.0f)),m_cameraTarget(VGet(0.0f,0.0f,0.0f)),
-m_cursorPos(VGet(0.0f, kContinuePos, 0.0f)), m_newGamePos(VGet(0.0f, 0.0f, 0.0f)), m_loadGamePos(VGet(0.0f, 0.0f, 0.0f)), m_exitGamePos(VGet(0.0f, 0.0f, 0.0f))
+m_cursorPos(VGet(0.0f, 0.0f, 0.0f)), m_newGamePos(VGet(0.0f, 0.0f, 0.0f)), m_loadGamePos(VGet(0.0f, 0.0f, 0.0f)), m_exitGamePos(VGet(0.0f, 0.0f, 0.0f))
 {
 }
 
@@ -62,6 +63,12 @@ SceneTitle::~SceneTitle()
 {
 	m_pSoundManager.reset();
 	m_pSoundManager = nullptr;
+
+	m_pTitlePlayer.reset();
+	m_pTitlePlayer = nullptr;
+
+	m_pStage.reset();
+	m_pStage = nullptr;
 
 	//画像の削除
 	DeleteGraph(m_bgHandle);
@@ -71,6 +78,12 @@ void SceneTitle::Init()
 {
 	//画像のロード
 	m_bgHandle = LoadGraph("data/BG/title.png");
+
+	//タイトルロゴのロード
+	m_logoHandle = LoadGraph("data/UI/logo.png");
+
+	//ステージ
+	m_pStage = std::make_shared<Stage>(Title);
 
 	//BGMの再生
 	m_pSoundManager = std::make_shared<SoundManager>();
@@ -129,11 +142,17 @@ void SceneTitle::Draw()
 	//背景の描画
 	DrawGraph(0, 0, m_bgHandle, false);
 
-	//文字を描画する
-	DrawTitle();
+	//ステージを描画
+	m_pStage->Draw();
+
+	//ロゴの描画
+	DrawGraph(0, 0, m_logoHandle, true);
 
 	//プレイヤーの描画
 	m_pTitlePlayer->Draw();
+
+	//文字を描画する
+	DrawTitle();
 
 	//フェードの描画
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_fadeAlpha); //半透明で表示
@@ -214,16 +233,20 @@ void SceneTitle::CursorMotion(const Pad& pad)
 		m_cursorCount = kCursorMoveTime;
 	}
 
+	//カーソルが一番上に行った時に、一番下に戻る
 	if (m_cursorPos.y < kStartPos)
 	{
 		m_cursorPos.y = kGameEndPos;
 	}
 
+	//カーソルが一番下に行った時に、一番上に行く
 	if (m_cursorPos.y > kGameEndPos)
 	{
 		m_cursorPos.y = kStartPos;
 	}
 
+
+	//スティックを倒しているかどうか
 	if (m_isPressPad)
 	{
 		if (m_cursorCount >= kCursorMoveTime)
@@ -267,55 +290,31 @@ void SceneTitle::CursorMotion(const Pad& pad)
 	}
 }
 
+//タイトル画面に文字を描画する
 void SceneTitle::DrawTitle()
 {
 	if (m_cursorPos.y == kStartPos)
 	{
 		DrawFormatStringFToHandle(kCharacterPosX, m_newGamePos.y, GetColor(150, 150, 150), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize96_4)], "NewGame\n");
-		
-		m_newGamePos = VAdd(m_newGamePos, VGet(0.0f, sin(DX_PI_F * 2 / 60 * m_count) * 2, 0.0f));
-		m_loadGamePos = VGet(0.0f, kLoadGamePosY, 0.0f);
-		m_exitGamePos = VGet(0.0f, kExitGamePosY, 0.0f);
 	}
 	else
 	{
-		m_newGamePos = VGet(0.0f, kNewGamePosY, 0.0f);
-
 		DrawFormatStringFToHandle(kCharacterPosX, m_newGamePos.y, GetColor(0, 0, 0), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize96_4)], "NewGame\n");
-		
 	}
 	if (m_cursorPos.y == kContinuePos)
 	{
 		DrawFormatStringFToHandle(kCharacterPosX, m_loadGamePos.y, GetColor(150, 150, 150), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize96_4)], "LoadGame\n");
-		
-		m_loadGamePos = VAdd(m_loadGamePos, VGet(0.0f, sin(DX_PI_F * 2 / 60 * m_count) * 2, 0.0f));
-		m_newGamePos  = VGet(0.0f, kNewGamePosY, 0.0f);
-		m_exitGamePos = VGet(0.0f, kExitGamePosY, 0.0f);
 	}
 	else
 	{
-		m_loadGamePos = VGet(0.0f, kLoadGamePosY, 0.0f);
 		DrawFormatStringFToHandle(kCharacterPosX, m_loadGamePos.y, GetColor(0, 0, 0), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize96_4)], "LoadGame\n");
 	}
 	if (m_cursorPos.y == kGameEndPos)
 	{
 		DrawFormatStringFToHandle(kCharacterPosX, m_exitGamePos.y, GetColor(150, 150, 150), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize96_4)], "ExitGame\n");
-
-		m_exitGamePos = VAdd(m_exitGamePos, VGet(0.0f, sin(DX_PI_F * 2 / 60 * m_count) * 2, 0.0f));
-		m_newGamePos = VGet(0.0f,kNewGamePosY, 0.0f);
-		m_loadGamePos = VGet(0.0f, kLoadGamePosY, 0.0f);
 	}
 	else
 	{
 		DrawFormatStringFToHandle(kCharacterPosX, m_exitGamePos.y, GetColor(0, 0, 0), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize96_4)], "ExitGame\n");
-		m_exitGamePos = VGet(0.0f, kExitGamePosY, 0.0f);
 	}
-	
-	m_count++;
-
-	if (m_count > kMove)
-	{
-		m_count = 0;
-	}
-
 }

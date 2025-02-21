@@ -91,11 +91,10 @@ void Camera::Update(VECTOR mplayerPos)
 	// 注視点
 	m_cameraTarget = VAdd(mplayerPos, VGet(0.0f, kCameraTargetY, 0.0f));
 
-	SetCameraPositionAndTarget_UpVecY(m_cameraPos, m_cameraTarget);
-
 	// DXライブラリのカメラとEffekseerのカメラを同期する。
 	Effekseer_Sync3DSetting();
 
+	SetCameraPositionAndTarget_UpVecY(m_cameraPos, m_cameraTarget);
 }
 
 void Camera::Draw()

@@ -27,7 +27,8 @@ namespace
 	//HPは低くプレイヤーが遠い
 	const  char* const kHpLowRangeFar = "HpLowRangeFar";
 
-
+	//ランダム数値
+	constexpr int  kRandom = 100;
 }
 
 BossAI::BossAI()

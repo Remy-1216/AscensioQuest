@@ -47,8 +47,6 @@ void CharacterBase::DrawShadowModel()
 {
     //シャドウマップにモデルを描画する
     MV1DrawModel(m_handle);
-
-  
 }
 
 //アニメーションの更新
@@ -163,7 +161,6 @@ void CharacterBase::ChangeAnim(std::string animName)
 
 float CharacterBase::GetAnimTotalTime(std::string animName)
 {
-
 	int animIndex = m_animData[animName].number;
 	float totalTime = MV1GetAnimTotalTime(m_handle, animIndex);
 

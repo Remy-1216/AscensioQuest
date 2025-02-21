@@ -18,11 +18,11 @@ void PlayerStateMagicAttack::Init()
 
 void PlayerStateMagicAttack::Update(Stage& stage, const Pad&pad,const Camera& camera)
 {
-	//アニメーションのスピードを受け取る
-	m_animTime = m_pPlayer->GetAnimSpeed();
-
 	//ステージとの当たり判定
 	m_pPlayer->Move(stage, VGet(0.0f, 0.0f, 0.0f));
+
+	//アニメーションのスピードを受け取る
+	m_animTime = m_pPlayer->GetAnimSpeed();
 
 	//アニメーションがそれだけ進んでいるか
 	m_time += m_animTime;
@@ -37,10 +37,7 @@ void PlayerStateMagicAttack::Update(Stage& stage, const Pad&pad,const Camera& ca
 		state->Init();
 		return;
 	}
-
-	//状態からダメージを受ける状態
-
-	//状態から死亡状態
+	
 }
 
 void PlayerStateMagicAttack::Draw()

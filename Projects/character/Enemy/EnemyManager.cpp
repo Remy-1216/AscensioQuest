@@ -10,6 +10,10 @@
 
 namespace
 {
+	const char* const kUpperLeft = "upperLeft";
+	const char* const kLowerRight = "lowerRight";
+
+
 	//敵が死んだときにもらえるステータスポイント
 	constexpr int kStatusPoint = 5;
 
@@ -35,6 +39,10 @@ EnemyManager::EnemyManager()
 
 	//敵の位置を読み込む
 	LoadPos();
+
+	//マップの端(エリアの端)を読む込む
+	LoadCsv::GetInstance().LoadMapPosData(m_upperLeft, kUpperLeft);
+	LoadCsv::GetInstance().LoadMapPosData(m_lowerRight, kLowerRight);
 
 	m_enemyNum = kMaxEnemy;
 
@@ -73,6 +81,9 @@ void EnemyManager::Init()
 
 	//遠距離エネミーの生成
 	CreateLongDistanceEnemy();
+
+	//担当エリア決め
+	AreaDecide();
 }
 
 void EnemyManager::Update(Stage& stage, Player& player)
@@ -96,16 +107,8 @@ void EnemyManager::Update(Stage& stage, Player& player)
 			//もし死んでいたら削除する
 			if (m_pShortDistanceEnemy[i]->GetIsDie())
 			{
-				m_statusPoint += kStatusPoint;
-
-				m_isDeadEnemy = true;
-
-				DrapItem(m_pShortDistanceEnemy[i]->GetPos());
-
-				m_enemyNum--;
-
-				m_pShortDistanceEnemy[i].reset();
-				m_pShortDistanceEnemy[i] = nullptr;
+				//死んだときの処理
+				ShortEnemyDies(i);
 			}
 		}
 
@@ -123,16 +126,7 @@ void EnemyManager::Update(Stage& stage, Player& player)
 			//死んでいた場合削除する
 			if (m_pLongDistanceEnemy[i]->GetIsDie())
 			{
-				m_statusPoint += kStatusPoint;
-
-				m_isDeadEnemy = true;
-
-				DrapItem(m_pLongDistanceEnemy[i]->GetPos());
-
-				m_enemyNum--;
-
-				m_pLongDistanceEnemy[i].reset();
-				m_pLongDistanceEnemy[i] = nullptr;
+				LongEnemyDies(i);
 			}
 		}
 	}
@@ -177,6 +171,13 @@ void EnemyManager::Draw()
 	{
 		m_pApple->Draw();
 	}
+
+#ifdef _DEBUG
+	DrawFormatString(0, 850, GetColor(0, 0, 0), "エリア1の敵の数:%4d", m_area.area1EnemyNum);
+	DrawFormatString(0, 900, GetColor(0, 0, 0), "エリア2の敵の数:%4d", m_area.area2EnemyNum);
+	DrawFormatString(0, 950, GetColor(0, 0, 0), "エリア3の敵の数:%4d", m_area.area3EnemyNum);
+	DrawFormatString(0, 100, GetColor(0, 0, 0), "エリア4の敵の数:%4d", m_area.area4EnemyNum);
+#endif
 }
 
 void EnemyManager::DrawShadowModel()
@@ -195,6 +196,115 @@ void EnemyManager::DrawShadowModel()
 		}
 	}
 
+}
+
+//敵の位置によって担当エリアを決める
+void EnemyManager::AreaDecide()
+{
+	for (int i = 0; i < kEnemyNum; i++)
+	{
+		if (m_pShortDistanceEnemy[i]->GetPos().x >= m_upperLeft.map2PosX && m_pShortDistanceEnemy[i]->GetPos().z <= m_upperLeft.map2PosZ && 
+			m_pShortDistanceEnemy[i]->GetPos().x <= m_lowerRight.map2PosX && m_pShortDistanceEnemy[i]->GetPos().z >= m_lowerRight.map2PosZ)
+		{
+			m_area.area1EnemyNum++;
+		}
+		else if (m_pShortDistanceEnemy[i]->GetPos().x >= m_upperLeft.map3PosX && m_pShortDistanceEnemy[i]->GetPos().z <= m_upperLeft.map3PosZ &&
+			m_pShortDistanceEnemy[i]->GetPos().x <= m_lowerRight.map3PosX && m_pShortDistanceEnemy[i]->GetPos().z >= m_lowerRight.map3PosZ)
+		{
+			m_area.area2EnemyNum++;
+		}
+		else if (m_pShortDistanceEnemy[i]->GetPos().x >= m_upperLeft.map4PosX && m_pShortDistanceEnemy[i]->GetPos().z <= m_upperLeft.map4PosZ &&
+			m_pShortDistanceEnemy[i]->GetPos().x <= m_lowerRight.map4PosX && m_pShortDistanceEnemy[i]->GetPos().z >= m_lowerRight.map4PosZ)
+		{
+			m_area.area3EnemyNum++;
+		}
+		else if (m_pShortDistanceEnemy[i]->GetPos().x >= m_upperLeft.map5PosX && m_pShortDistanceEnemy[i]->GetPos().z <= m_upperLeft.map5PosZ &&
+			m_pShortDistanceEnemy[i]->GetPos().x <= m_lowerRight.map5PosX && m_pShortDistanceEnemy[i]->GetPos().z >= m_lowerRight.map5PosZ)
+		{
+			m_area.area4EnemyNum++;
+		}
+
+		if (m_pLongDistanceEnemy[i]->GetPos().x >= m_upperLeft.map2PosX && m_pLongDistanceEnemy[i]->GetPos().z <= m_upperLeft.map2PosZ &&
+			m_pLongDistanceEnemy[i]->GetPos().x <= m_lowerRight.map2PosX && m_pLongDistanceEnemy[i]->GetPos().z >= m_lowerRight.map2PosZ)
+		{
+			m_area.area1EnemyNum++;
+		}
+		else if (m_pLongDistanceEnemy[i]->GetPos().x >= m_upperLeft.map3PosX && m_pLongDistanceEnemy[i]->GetPos().z <= m_upperLeft.map3PosZ &&
+			m_pLongDistanceEnemy[i]->GetPos().x <= m_lowerRight.map3PosX && m_pLongDistanceEnemy[i]->GetPos().z >= m_lowerRight.map3PosZ)
+		{
+			m_area.area2EnemyNum++;
+		}
+		else if (m_pLongDistanceEnemy[i]->GetPos().x >= m_upperLeft.map4PosX && m_pLongDistanceEnemy[i]->GetPos().z <= m_upperLeft.map4PosZ &&
+			m_pLongDistanceEnemy[i]->GetPos().x <= m_lowerRight.map4PosX && m_pLongDistanceEnemy[i]->GetPos().z >= m_lowerRight.map4PosZ)
+		{
+			m_area.area3EnemyNum++;
+		}
+		else if (m_pLongDistanceEnemy[i]->GetPos().x >= m_upperLeft.map5PosX && m_pLongDistanceEnemy[i]->GetPos().z <= m_upperLeft.map5PosZ &&
+			m_pLongDistanceEnemy[i]->GetPos().x <= m_lowerRight.map5PosX && m_pLongDistanceEnemy[i]->GetPos().z >= m_lowerRight.map5PosZ)
+		{
+			m_area.area4EnemyNum++;
+		}
+	}
+	
+}
+
+//近距離タイプの敵が死んだときの処理
+void EnemyManager::ShortEnemyDies(int enemyNum)
+{
+	ShortEnemyDiesArea(enemyNum);
+
+	m_statusPoint += kStatusPoint;
+
+	m_isDeadEnemy = true;
+
+	DrapItem(m_pShortDistanceEnemy[enemyNum]->GetPos());
+
+	m_enemyNum--;
+
+	m_pShortDistanceEnemy[enemyNum].reset();
+	m_pShortDistanceEnemy[enemyNum] = nullptr;	
+}
+
+//どのエリアの敵が死んだのか確認
+void EnemyManager::ShortEnemyDiesArea(int enemyNum)
+{
+	if (m_pShortDistanceEnemy[enemyNum]->GetPos().x >= m_upperLeft.map2PosX && m_pShortDistanceEnemy[enemyNum]->GetPos().z <= m_upperLeft.map2PosZ &&
+			m_pShortDistanceEnemy[enemyNum]->GetPos().x <= m_lowerRight.map2PosX && m_pShortDistanceEnemy[enemyNum]->GetPos().z >= m_lowerRight.map2PosZ)
+	{
+		m_area.area1EnemyNum--;
+	}
+	else if (m_pShortDistanceEnemy[enemyNum]->GetPos().x >= m_upperLeft.map3PosX && m_pShortDistanceEnemy[enemyNum]->GetPos().z <= m_upperLeft.map3PosZ &&
+		m_pShortDistanceEnemy[enemyNum]->GetPos().x <= m_lowerRight.map3PosX && m_pShortDistanceEnemy[enemyNum]->GetPos().z >= m_lowerRight.map3PosZ)
+	{
+		m_area.area2EnemyNum--;
+	}
+	else if (m_pShortDistanceEnemy[enemyNum]->GetPos().x >= m_upperLeft.map4PosX && m_pShortDistanceEnemy[enemyNum]->GetPos().z <= m_upperLeft.map4PosZ &&
+		m_pShortDistanceEnemy[enemyNum]->GetPos().x <= m_lowerRight.map4PosX && m_pShortDistanceEnemy[enemyNum]->GetPos().z >= m_lowerRight.map4PosZ)
+	{
+		m_area.area3EnemyNum--;
+	}
+	else if (m_pShortDistanceEnemy[enemyNum]->GetPos().x >= m_upperLeft.map5PosX && m_pShortDistanceEnemy[enemyNum]->GetPos().z <= m_upperLeft.map5PosZ &&
+		m_pShortDistanceEnemy[enemyNum]->GetPos().x <= m_lowerRight.map5PosX && m_pShortDistanceEnemy[enemyNum]->GetPos().z >= m_lowerRight.map5PosZ)
+	{
+		m_area.area4EnemyNum--;
+	}
+}
+
+//遠距離タイプの敵が死んだときの処理
+void EnemyManager::LongEnemyDies(int enemyNum)
+{
+	LongEnemyDiesArea(enemyNum);
+
+	m_statusPoint += kStatusPoint;
+
+	m_isDeadEnemy = true;
+
+	DrapItem(m_pLongDistanceEnemy[enemyNum]->GetPos());
+
+	m_enemyNum--;
+
+	m_pLongDistanceEnemy[enemyNum].reset();
+	m_pLongDistanceEnemy[enemyNum] = nullptr;
 }
 
 //近距離型の敵の生成
@@ -222,6 +332,31 @@ void EnemyManager::CreateLongDistanceEnemy()
 
 			m_pLongDistanceEnemy[i]->Init(MV1DuplicateModel(m_longDistanceEnemyHandle),m_longDistanceEnemyPos[i]);
 		}
+	}
+}
+
+//どのエリアの敵が死んだのか確認
+void EnemyManager::LongEnemyDiesArea(int enemyNum)
+{
+	if (m_pLongDistanceEnemy[enemyNum]->GetPos().x >= m_upperLeft.map2PosX && m_pLongDistanceEnemy[enemyNum]->GetPos().z <= m_upperLeft.map2PosZ &&
+		m_pLongDistanceEnemy[enemyNum]->GetPos().x <= m_lowerRight.map2PosX && m_pLongDistanceEnemy[enemyNum]->GetPos().z >= m_lowerRight.map2PosZ)
+	{
+		m_area.area1EnemyNum--;
+	}
+	else if (m_pLongDistanceEnemy[enemyNum]->GetPos().x >= m_upperLeft.map3PosX && m_pLongDistanceEnemy[enemyNum]->GetPos().z <= m_upperLeft.map3PosZ &&
+		m_pLongDistanceEnemy[enemyNum]->GetPos().x <= m_lowerRight.map3PosX && m_pLongDistanceEnemy[enemyNum]->GetPos().z >= m_lowerRight.map3PosZ)
+	{
+		m_area.area2EnemyNum--;
+	}
+	else if (m_pLongDistanceEnemy[enemyNum]->GetPos().x >= m_upperLeft.map4PosX && m_pLongDistanceEnemy[enemyNum]->GetPos().z <= m_upperLeft.map4PosZ &&
+		m_pLongDistanceEnemy[enemyNum]->GetPos().x <= m_lowerRight.map4PosX && m_pLongDistanceEnemy[enemyNum]->GetPos().z >= m_lowerRight.map4PosZ)
+	{
+		m_area.area3EnemyNum--;
+	}
+	else if (m_pLongDistanceEnemy[enemyNum]->GetPos().x >= m_upperLeft.map5PosX && m_pLongDistanceEnemy[enemyNum]->GetPos().z <= m_upperLeft.map5PosZ &&
+		m_pLongDistanceEnemy[enemyNum]->GetPos().x <= m_lowerRight.map5PosX && m_pLongDistanceEnemy[enemyNum]->GetPos().z >= m_lowerRight.map5PosZ)
+	{
+		m_area.area4EnemyNum--;
 	}
 }
 
@@ -298,6 +433,7 @@ void EnemyManager::LoadPos()
 	
 }
 
+//ドロップ品を落とすか
 void EnemyManager::DrapItem(VECTOR enemyPos)
 {
 	if (m_isDeadEnemy&& !m_pApple)
