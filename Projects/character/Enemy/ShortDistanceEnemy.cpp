@@ -24,6 +24,9 @@ namespace
 
 	//攻撃後の当たり判定の位置
 	constexpr float kAttackPosY = -200.0f;
+
+	//無敵時間の長さ
+	constexpr int kInvincibleTime = 120;
 }
 
 ShortDistanceEnemy::ShortDistanceEnemy():CharacterBase(m_handle)
@@ -54,6 +57,9 @@ ShortDistanceEnemy::ShortDistanceEnemy():CharacterBase(m_handle)
 	m_attackRadius = m_collisionInfo.attackRadius;
 
 	m_isKnockedDown = false;
+
+	//無敵時間の長さ
+	m_invincibleTimeLimit = kInvincibleTime;
 }
 
 ShortDistanceEnemy::~ShortDistanceEnemy()
@@ -145,6 +151,9 @@ void ShortDistanceEnemy::Update(Stage& stage, const Player& player,VECTOR player
 	//当たり判定の更新
 	UpdateCol();
 
+	//無敵時間関係
+	InvincibleTime();
+
 	m_isKnockedDown = m_pEnemyState->GetIsDie();
 
 	//死んだ瞬間の動き
@@ -188,28 +197,30 @@ void ShortDistanceEnemy::Draw()
 #endif
 }
 
+//プレイヤーの攻撃が当たったかどうか
 void ShortDistanceEnemy::HitAnyPlayerAttack(Player& player)
 {
 	//プレイヤーの攻撃が当たったかどうか
 	HitPlayerAttack(player.GetAttackCapsuleStart(), player.GetAttackCapsuleEnd(),
 		player.GetAttackRadius(), player.GetAttackPower());
-
-
-	//プレイヤーの魔法攻撃が当たったかどうか
-	HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
-		player.GetMagicCapsuleRadius(), player.GetMagicPower());
-
-
-	//プレイヤー必殺技が当たったかどうか
-	HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
-		player.GetSpecialMoveRadius(), player.GetAttackPower());
-		
+	if (!m_isHitAttack)
+	{
+		//プレイヤーの魔法攻撃が当たったかどうか
+		HitPlayerAttack(player.GetMagicCapsuleStart(), player.GetMagicCapsuleEnd(),
+			player.GetMagicCapsuleRadius(), player.GetMagicPower());
+		if (!m_isHitAttack)
+		{
+			//プレイヤー必殺技が当たったかどうか
+			HitPlayerAttack(player.GetSpecialMoveStart(), player.GetSpecialMoveEnd(),
+				player.GetSpecialMoveRadius(), player.GetAttackPower());
+		}
+	}
 }
 
 void ShortDistanceEnemy::HitPlayer(Player& player)
 {
 	//胴体がプレイヤーに当たったか
-	if (player.HitEnemy(m_pos,m_capsuleStart, m_capsuleEnd, m_radius))
+	if (player.HitEnemyBody(m_pos,m_capsuleStart, m_capsuleEnd, m_radius))
 	{
 		player.Damage(kDamage,kShortDistanceEnemy);
 	}

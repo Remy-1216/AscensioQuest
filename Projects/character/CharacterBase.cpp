@@ -17,12 +17,17 @@ namespace
 	//ノックバック
 	constexpr float kKnockBack = 0.5f; 
 
-	
+    //無敵時間
+    constexpr int kInvincibleTime = 60;
 }
 
-CharacterBase::CharacterBase(int handle):m_status(),m_animData(),m_currentPlayAnim(0),m_prevPlayAnim(0.0f),m_animBlendRate(0.0f), m_currentAnimTime(0), m_prevAnimTime(0.0f), m_totalAnimTime(0.0f),
-m_animPlaySpeed(0.0f),m_animLoopStartTime(0.0f),m_animLoopEndTime(0.0f),m_isLoopAnim(false), m_isAttack(false), m_isAttackMove(false),m_hp(0),m_mp(0),m_attackPower(0),m_magicAttackPower(0), m_defensePower(0),m_walkSpeed(0.0f), m_runSpeed(0.0f), m_handle(-1),
-m_modelPolygon(0),m_pos(VGet(0.0f,0.0f,0.0f)),m_moveDir(VGet(0.0f, 0.0f, 0.0f)), m_knockBack(VGet(0.0f,0.0f,0.0f))
+CharacterBase::CharacterBase(int handle):m_status(),m_animData(),m_currentPlayAnim(0), m_invincibleTime(0), m_invincibleTimeLimit(0),m_prevPlayAnim(0.0f),m_animBlendRate(0.0f), m_currentAnimTime(0), m_prevAnimTime(0.0f), m_totalAnimTime(0.0f),
+m_animPlaySpeed(0.0f),m_animLoopStartTime(0.0f),m_animLoopEndTime(0.0f),m_isLoopAnim(false), m_hp(0), m_mp(0.0f), m_attackPower(0), m_magicAttackPower(0), m_defensePower(0), m_walkSpeed(0.0f), m_runSpeed(0.0f),
+m_capsuleStartPoint(VGet(0.0f,0.0f,0.0f)), m_capsuleEndPoint(VGet(0.0f, 0.0f, 0.0f)), m_attackCapsuleStartPoint(VGet(0.0f,0.0f,0.0f)), m_magicCapsuleStartPoint(VGet(0.0f,0.0f,0.0f)), m_magicCapsuleEndPoint(VGet(0.0f,0.0f,0.0f)),
+m_specialMoveStartPoint(VGet(0.0f,0.0f,0.0f)), m_specialMoveEndPoint(VGet(0.0f,0.0f,0.0f)), m_radius(0.0f), m_attackRadius(0.0f), m_magicRadius(0.0f), m_specialMoveRadius(0.0f), m_capsuleStart(VGet(0.0f,0.0f,0.0f)), m_capsuleEnd(VGet(0.0f,0.0f,0.0f)),
+m_attackCapsuleStart(VGet(0.0f,0.0f,0.0f)), m_attackCapsuleEnd(VGet(0.0f,0.0f,0.0f)), m_magicCapsuleStart(VGet(0.0f,0.0f,0.0f)), m_magicCapsuleEnd(VGet(0.0f,0.0f,0.0f)), m_specialMoveStart(VGet(0.0f,0.0f,0.0f)),
+m_specialMoveEnd(VGet(0.0f,0.0f,0.0f)),m_characterKind(0), m_handle(-1), m_modelPolygon(0), m_gravity(0), m_maxHp(0), m_characterAngle(0.0f),m_attackAngle(0.0f), m_isHitCharacter(false), m_isStopAnimation(false), m_isHitAttack(false), m_isKnockedDown(false), m_isInvincible(false), m_isShortDistanceEnemyAttack(false),
+m_isLongDistanceEnemyAttack(false), m_isAttack(false), m_isAttackMove(false), m_isLightAttack(false), m_isStorongAttack(false), m_isThrowing(false), m_isHitEnemy(false),m_isMove(false),m_isFourTutorial(false), m_pos(VGet(0.0f, 0.0f, 0.0f)), m_moveDir(VGet(0.0f, 0.0f, 0.0f)), m_distance(VGet(0.0f, 0.0f, 0.0f)), m_knockBack(VGet(0.0f, 0.0f, 0.0f)), m_subVector(VGet(0.0f, 0.0f, 0.0f))
 {
 	//エフェクト
 	m_pEffectManager = std::make_shared<EffectManager>();
@@ -94,10 +99,10 @@ void CharacterBase::UpdateAnim()
     {
         MV1SetAttachAnimBlendRate(m_handle, m_prevPlayAnim, kAnimBlendMax - m_animBlendRate);
     }
+
+
     MV1SetAttachAnimBlendRate(m_handle, m_currentPlayAnim, m_animBlendRate);
 }
-
-
 
 //アニメーションの変更
 void CharacterBase::ChangeAnim(std::string animName)
@@ -225,6 +230,29 @@ void CharacterBase::KnockBack(VECTOR m_vector)
 	m_pos = VAdd(m_pos, VScale(m_knockBack, kKnockBack));
 }
 
+//無敵時間関係
+void CharacterBase::InvincibleTime()
+{
+    if (!m_isInvincible && m_isHitAttack || m_isHitEnemy)
+    {
+        m_isInvincible = true;
+    }
+
+    //無敵状態の場合
+    if (m_isInvincible)
+    {
+        //無敵時間を減らす
+        m_invincibleTime--;
+    }
+
+    //無敵時間が0になった場合
+    if (m_invincibleTime <= 0)
+    {
+        m_isInvincible = false;
+        m_invincibleTime = m_invincibleTimeLimit;
+    }
+}
+
 //キャラクターの向いている方向
 void CharacterBase::UpdateAngle(VECTOR playerpos)
 {
@@ -239,18 +267,19 @@ void CharacterBase::UpdateAngle(VECTOR playerpos)
 
 
 //プレイヤーの攻撃を受けた時の処理
-void CharacterBase::HitPlayerAttack(VECTOR attackStart, VECTOR attackEnd, float radius, int attackPower)
+bool CharacterBase::HitPlayerAttack(VECTOR attackStart, VECTOR attackEnd, float radius, int attackPower)
 {
-	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, attackStart, attackEnd, radius) && m_isMove)
+	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, attackStart, attackEnd, radius) && m_isMove &&!m_isInvincible)
 	{
 		m_hp -= attackPower;
-		m_isHitAttack = true;
+        m_isHitAttack = true;
 		m_pEffectManager->DrawEnemyDamageEffect(m_pos);
 		KnockBack(m_subVector);
 	}
 	else
 	{
 		m_isHitAttack = false;
+        m_isMove = true;
 	}
 
 	if (m_hp <= 0)
@@ -258,11 +287,14 @@ void CharacterBase::HitPlayerAttack(VECTOR attackStart, VECTOR attackEnd, float 
 		m_hp = 0;
 		m_isMove = false;
 	}
+
+    return m_isHitAttack;
 }
 
 //死んだときの処理
 void CharacterBase::Die()
 {
+    
 	if (!m_isMove)
 	{
 		m_capsuleStart = VGet(0.0f, -100.0f, 0.0f);

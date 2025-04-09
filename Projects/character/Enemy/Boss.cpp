@@ -235,7 +235,7 @@ void Boss::Draw()
 void Boss::HitPlayer(Player& player)
 {
 	//プレイヤーと胴体が当たったかどうか
-	if (player.HitEnemy(m_pos, m_capsuleStart, m_capsuleEnd, m_radius))
+	if (player.HitEnemyBody(m_pos, m_capsuleStart, m_capsuleEnd, m_radius))
 	{
 		player.Damage(kDamage, kShortDistanceEnemy);
 	}

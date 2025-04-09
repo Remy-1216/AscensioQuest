@@ -17,6 +17,8 @@ void PlayerStateGuard::Update(Stage& stage, const Pad&pad,const Camera& camsra)
 {
 	m_pPlayer->Move(stage, VGet(0.0f, 0.0f, 0.0f));
 
+	m_pPlayer->Guard(pad);
+
 	//ガード状態から待機状態に変更
 	if (pad.IsRelase("LB"))
 	{

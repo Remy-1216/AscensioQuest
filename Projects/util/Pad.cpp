@@ -129,6 +129,15 @@ Pad::Pad()
 	m_commandTable["LB"] = { { InputType::keybd, KEY_INPUT_Q },
 									{InputType::pad, PAD_INPUT_Y } },
 
+	m_commandTable["RT"] = { { InputType::keybd, KEY_INPUT_O },
+										{InputType::pad, PAD_INPUT_R } },	
+
+	m_commandTable["LT"] = { { InputType::keybd, KEY_INPUT_U },
+										{InputType::pad, PAD_INPUT_L } },
+
+	m_commandTable["START"] = { {InputType::keybd, KEY_INPUT_SPACE},
+									{InputType::pad, PAD_INPUT_8} };
+	
 	//キーボードと、コントローラーのスティックのコマンドの種類
 	m_commandTable["up"] = { {InputType::keybd, KEY_INPUT_UP},
 								 {InputType::pad, PAD_INPUT_UP} };

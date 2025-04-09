@@ -36,6 +36,7 @@ public:
 	virtual void Update(Stage& stage,const Pad& pad, const Camera& camera) = 0;
 
 	virtual void Draw() = 0;
+
 	// 現在の状態を取得
 	virtual StateKind GetKind() = 0;
 
@@ -44,6 +45,8 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	bool GetIsDie() const { return m_isDie; }
+
+
 
 #ifdef _DEBUG
 	// 現在の状態名を取得

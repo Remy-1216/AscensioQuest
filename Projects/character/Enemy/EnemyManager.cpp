@@ -95,17 +95,17 @@ void EnemyManager::Update(Stage& stage, Player& player)
 			//近距離型の動き
 			m_pShortDistanceEnemy[i]->Update(stage, player, player.GetPos());
 			
+			//プレイヤーの攻撃に当たったかどうか
+			m_pShortDistanceEnemy[i]->HitAnyPlayerAttack(player);
+
 			//プレイヤーに胴体や攻撃が当たったかどうか
 			m_pShortDistanceEnemy[i]->HitPlayer(player);
 
 			//プレイヤーに攻撃が当たったかどうか
 			player.HitAttack(m_pShortDistanceEnemy[i]->GetHitCharacterAttack());
 
-			//プレイヤーの攻撃に当たったかどうか
-			m_pShortDistanceEnemy[i]->HitAnyPlayerAttack(player);
-
 			//もし死んでいたら削除する
-			if (m_pShortDistanceEnemy[i]->GetIsDie())
+			if (m_pShortDistanceEnemy[i]->GetIsKnockedDown())
 			{
 				//死んだときの処理
 				ShortEnemyDies(i);
@@ -120,11 +120,14 @@ void EnemyManager::Update(Stage& stage, Player& player)
 			//プレイヤーの攻撃に当たったかどうか
 			m_pLongDistanceEnemy[i]->HitAnyPlayerAttack(player);
 
-			//プレイヤー胴体や攻撃が当たったかどうか
+			//プレイヤーに自身の胴体や攻撃が当たったかどうか
 			m_pLongDistanceEnemy[i]->HitPlayer(player);
 
+			//プレイヤーに攻撃が当たったかどうか
+			player.HitAttack(m_pLongDistanceEnemy[i]->GetHitCharacterAttack());
+
 			//死んでいた場合削除する
-			if (m_pLongDistanceEnemy[i]->GetIsDie())
+			if (m_pLongDistanceEnemy[i]->GetIsKnockedDown())
 			{
 				LongEnemyDies(i);
 			}

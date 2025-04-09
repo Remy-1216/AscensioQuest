@@ -55,6 +55,13 @@ void EnemyStateAttack::Update(Stage& stage, const Player& player, const int char
 	{
 		BossAttack(stage, player, kBoss);
 	}
+
+	if (characterKinds == kTutorialEnemy)
+	{
+		TutorialEnemyAttack(stage, player, kTutorialEnemy);
+	}
+
+
 }
 
 void EnemyStateAttack::Draw(const int characterKinds)
@@ -188,4 +195,32 @@ void EnemyStateAttack::BossAttack(Stage& stage, const Player& player, const int 
 		}
 	}
 
+}
+
+void EnemyStateAttack::TutorialEnemyAttack(Stage& stage, const Player& player, const int characterKinds)
+{
+	//エネミーの動き
+	m_pEnemy->ComingCharacter(stage, VGet(0.0f, 0.0f, 0.0f));
+
+	//エネミーが攻撃を行う
+	m_pEnemy->ShortDistanceEnemyAttack(m_pEnemy->GetCurrentAnimTime());
+
+	//状態遷移
+	//攻撃から待機状態に変更
+	if (m_pEnemy->GetAnimLoopEndTime() <= m_pEnemy->GetCurrentAnimTime())
+	{
+		m_nextState = std::make_shared<EnemyStateWalk>(m_pEnemy);
+		auto state = std::dynamic_pointer_cast<EnemyStateWalk>(m_nextState);
+		state->Init(kShortDistanceEnemy);
+
+		return;
+	}
+
+	if (m_pEnemy->GetHitCharacterAttack())
+	{
+		m_nextState = std::make_shared<EnemyStateDamage>(m_pEnemy);
+		auto state = std::dynamic_pointer_cast<EnemyStateDamage>(m_nextState);
+		state->Init(characterKinds);
+		return;
+	}
 }

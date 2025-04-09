@@ -3,3 +3,4 @@ player,100,100,15,50,0,6.0f,12.0f
 shortdistanceenemy,50,0,5,0,0,2.0ｆ,0.0ｆ
 longdistanceenemy,50,0,5,0,0,2.0ｆ,0.0ｆ
 boss,450,0,20,0,0,2.0f,0.0f
+tutorialenemy,100,0,10,0,0,2.0f,0.0f

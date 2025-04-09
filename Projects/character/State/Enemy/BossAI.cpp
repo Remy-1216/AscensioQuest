@@ -46,7 +46,9 @@ void BossAI::Init()
 
 int BossAI::StateSet(CharacterBase& boss,const Player& player)
 {
+	//敵とプレイヤーの距離
 	m_distance = VSize(VSub(boss.GetPos(), player.GetPos()));
+	
 	if (boss.GetHp() >= kBossHp && m_distance <= kShortDistance)
 	{
 		LoadCsv::GetInstance().LoadBossAIData(m_bossAI, kHpHighlyRangeNear);
@@ -67,7 +69,6 @@ int BossAI::StateSet(CharacterBase& boss,const Player& player)
 		LoadCsv::GetInstance().LoadBossAIData(m_bossAI, kHpLowRangeFar);
 		return AIMotion(m_bossAI);
 	}
-
 
 	return kWalk;
 }

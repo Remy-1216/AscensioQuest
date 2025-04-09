@@ -91,12 +91,6 @@
     <Filter Include="ソース ファイル\UI">
       <UniqueIdentifier>{3f807ed3-2b3e-4d37-9d50-7dd7000943a6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\Game">
-      <UniqueIdentifier>{8c9d21b4-3512-49a2-be1e-b7f30ab9040a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Game">
-      <UniqueIdentifier>{2639b527-6912-40c8-89c0-1f97eb7a19d0}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -131,9 +125,6 @@
     </ClCompile>
     <ClCompile Include="util\LoadCsv.cpp">
       <Filter>ソース ファイル\util</Filter>
-    </ClCompile>
-    <ClCompile Include="scene\SceneStage.cpp">
-      <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
     <ClCompile Include="character\Player\Player.cpp">
       <Filter>ソース ファイル\character\Player</Filter>
@@ -234,8 +225,17 @@
     <ClCompile Include="scene\SceneTutorial.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameManager.cpp">
-      <Filter>ソース ファイル\Game</Filter>
+    <ClCompile Include="character\Enemy\TutorialEnemy.cpp">
+      <Filter>ソース ファイル\character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneStageBase.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneFirstStage.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneSecondStage.cpp">
+      <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -274,9 +274,6 @@
     </ClInclude>
     <ClInclude Include="character\CharacterBase.h">
       <Filter>ヘッダー ファイル\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="scene\SceneStage.h">
-      <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
     <ClInclude Include="character\Player\Player.h">
       <Filter>ヘッダー ファイル\Character\Player</Filter>
@@ -377,8 +374,17 @@
     <ClInclude Include="scene\SceneTutorial.h">
       <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Game\GameManager.h">
-      <Filter>ヘッダー ファイル\Game</Filter>
+    <ClInclude Include="character\Enemy\TutorialEnemy.h">
+      <Filter>ヘッダー ファイル\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneStageBase.h">
+      <Filter>ヘッダー ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneFirstStage.h">
+      <Filter>ヘッダー ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneSecondStage.h">
+      <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

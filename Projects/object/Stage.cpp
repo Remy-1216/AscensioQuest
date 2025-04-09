@@ -22,7 +22,7 @@ namespace
 
     //マップを描画する位置
     constexpr float kMapPosX = 1550.0f;
-    constexpr float kMapPosY =  50.0f;
+    constexpr float kMapPosY = 50.0f;
 
     //プレイヤーの位置表示を描画する位置
 
@@ -47,12 +47,30 @@ namespace
 Stage::Stage(int stageKinds)
 {
     m_stageKinds = stageKinds;
+}
 
-    m_pEffectManager =  std::make_shared<EffectManager>();
+Stage::~Stage()
+{
+    m_pEffectManager->ClearEffect();
+    m_pEffectManager.reset();
+    m_pEffectManager = nullptr;
+
+    //画像の削除
+    DeleteGraph(m_bgHandle);
+
+    //マップ画像の削除
+    DeleteGraph(m_mapHandle);
+
+    //モデルの削除
+    MV1DeleteModel(m_stageHandle);
+}
+void Stage::Init()
+{
+    m_pEffectManager = std::make_shared<EffectManager>();
     m_pEffectManager->Init();
 
     //ロード
-    if (stageKinds == Title)
+    if (m_stageKinds == Title || m_stageKinds == Select)
     {
         m_stageHandle = MV1LoadModel("data/model/stage/TitleStage.mv1");
         LoadCsv::GetInstance().LoadStageInfo(m_stage, "title");
@@ -63,9 +81,21 @@ Stage::Stage(int stageKinds)
 
         m_stagePos = VGet(-m_posX, -m_posY, -m_posZ);
     }
+    if (m_stageKinds == Tutorial)
+    {
+        m_stageHandle = MV1LoadModel("data/model/stage/TutorialStage.mv1");
+        LoadCsv::GetInstance().LoadStageInfo(m_stage, "tutorial");
+        m_posX = m_stage.posX;
+        m_posY = m_stage.posY;
+        m_posZ = m_stage.posZ;
+        m_size = m_stage.size;
+
+        m_stagePos = VGet(-m_posX, -m_posY, -m_posZ);
+    }
+
     if (m_stageKinds == Stage1)
     {
-        m_stageHandle = MV1LoadModel("data/model/stage/stage.mv1");
+        m_stageHandle = MV1LoadModel("data/model/stage/Stage.mv1");
 
         m_mapHandle = LoadGraph("data/UI/Map.png");
 
@@ -94,7 +124,7 @@ Stage::Stage(int stageKinds)
 
         m_stagePos = VGet(m_posX, -m_posY, m_posZ);
     }
-    
+
     //背景の画像をロードする
     m_bgHandle = LoadGraph("data/BG/bg.png");
 
@@ -104,36 +134,16 @@ Stage::Stage(int stageKinds)
         //ワープ地点を読み込む
         LoadWarpPointPos();
     }
-   
-    
 
     //マップの端の位置を読み込む
     LoadCsv::GetInstance().LoadMapPosData(m_upperLeft, "upperLeft");
     LoadCsv::GetInstance().LoadMapPosData(m_lowerRight, "lowerRight");
-
-    
 
     //モデルのサイズを調整する
     MV1SetScale(m_stageHandle, VGet(m_size, m_size, m_size));
 
     //モデルと座標位置を設定する
     MV1SetPosition(m_stageHandle, m_stagePos);
-}
-
-Stage::~Stage()
-{
-    m_pEffectManager->ClearEffect();
-    m_pEffectManager.reset();
-    m_pEffectManager = nullptr;
-
-    //画像の削除
-    DeleteGraph(m_bgHandle);
-
-    //マップ画像の削除
-    DeleteGraph(m_mapHandle);
-
-    //モデルの削除
-    MV1DeleteModel(m_stageHandle);   
 }
 
 void Stage::Draw()
@@ -166,34 +176,43 @@ void Stage::DrawShadowModel()
 
 }
 
+//プレイヤーの位置をマップに描画する
 void Stage::DrawMap(Player& player)
 {
     m_playerPos = player.GetPos();
 
+    //敵のいないステージにいる場合
     if (m_playerPos.x >= m_upperLeft.map1PosX && m_playerPos.z <= m_upperLeft.map1PosZ && m_playerPos.x <= m_lowerRight.map1PosX && m_playerPos.z >= m_lowerRight.map1PosZ)
     {
-        DrawGraph(kSafeAreaPosX, kSafeAreaPosY, m_playerPosHandle,true);
+        DrawGraph(kSafeAreaPosX, kSafeAreaPosY, m_playerPosHandle, true);
     }
 
+    //ステージ1にいる場合
     else if (m_playerPos.x >= m_upperLeft.map2PosX && m_playerPos.z <= m_upperLeft.map2PosZ && m_playerPos.x <= m_lowerRight.map2PosX && m_playerPos.z >= m_lowerRight.map2PosZ)
     {
         DrawGraph(kMap1_3PosX, kMap1_2PosY, m_playerPosHandle, true);
     }
 
+    //ステージ2にいる場合
     else if (m_playerPos.x >= m_upperLeft.map3PosX && m_playerPos.z <= m_upperLeft.map3PosZ && m_playerPos.x <= m_lowerRight.map3PosX && m_playerPos.z >= m_lowerRight.map3PosZ)
     {
         DrawGraph(kMap2_4PosX, kMap1_2PosY, m_playerPosHandle, true);
     }
+
+    //ステージ3にいる場合
     else if (m_playerPos.x >= m_upperLeft.map4PosX && m_playerPos.z <= m_upperLeft.map4PosZ && m_playerPos.x <= m_lowerRight.map4PosX && m_playerPos.z >= m_lowerRight.map4PosZ)
     {
         DrawGraph(kMap1_3PosX, kMap3_4PosY, m_playerPosHandle, true);
     }
+
+    //ステージ4にいる場合
     else if (m_playerPos.x >= m_upperLeft.map5PosX && m_playerPos.z <= m_upperLeft.map5PosZ && m_playerPos.x <= m_lowerRight.map5PosX && m_playerPos.z >= m_lowerRight.map5PosZ)
     {
         DrawGraph(kMap2_4PosX, kMap3_4PosY, m_playerPosHandle, true);
     }
 }
 
+//ワープポイントの情報を読み込む
 void Stage::LoadWarpPointPos()
 {
     for (int i = 0; i < kWarpPointNum; i++)
@@ -206,6 +225,7 @@ void Stage::LoadWarpPointPos()
     }
 }
 
+//プレイヤーがワープポイントに触れたかどうかを判定する
 void Stage::WarpPoint(Player& player, const Pad& pad)
 {
     m_playerPos = player.GetPos();
@@ -216,7 +236,7 @@ void Stage::WarpPoint(Player& player, const Pad& pad)
 
         if (VSize(m_distance) < kWarpPointSphereRadius + player.GetSphereRadius())
         {
-            player.Warp(pad,m_warpTarger[i]);
+            player.Warp(pad, m_warpTarger[i]);
         }
     }
 
@@ -226,7 +246,7 @@ void Stage::WarpPoint(Player& player, const Pad& pad)
 
         if (VSize(m_distance) < kWarpPointSphereRadius + player.GetSphereRadius())
         {
-            player.Warp(pad,m_warpSource[i]);
+            player.Warp(pad, m_warpSource[i]);
         }
     }
 }
@@ -254,6 +274,7 @@ VECTOR Stage::CheckObjectCol(CharacterBase& character, const VECTOR& moveVec)
     return m_nextPos;
 }
 
+//プレイヤーとマップの壁の当たり判定
 void Stage::AnalyzeWallAndFloor(MV1_COLL_RESULT_POLY_DIM hitDim, const VECTOR& checkPosition)
 {
     // 壁ポリゴンと床ポリゴンの数を初期化する
@@ -298,6 +319,7 @@ void Stage::AnalyzeWallAndFloor(MV1_COLL_RESULT_POLY_DIM hitDim, const VECTOR& c
     }
 }
 
+// 壁ポリゴンと床ポリゴンの数を取得する
 VECTOR Stage::CheckHitPlayerWithWall(const VECTOR& checkPosition)
 {
     // 補正後の位置
@@ -349,6 +371,7 @@ VECTOR Stage::CheckHitPlayerWithWall(const VECTOR& checkPosition)
     return fixedPos;
 }
 
+//
 VECTOR Stage::CheckHitPlayerWithFloor(const VECTOR& checkPosition)
 {
     VECTOR fixedPos = checkPosition;

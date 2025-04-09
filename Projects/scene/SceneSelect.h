@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "SceneBase.h"
 
+class Stage;
 class SoundManager;
 class SceneSelect :public SceneBase
 {
@@ -19,36 +20,43 @@ public:
 private:
 
 	/// <summary>
-	/// カーソルの動き
+	/// タイトル画面に戻る
 	/// </summary>
-	/// <param name="pad"></param>
-	void CursorMotion(const Pad& pad);
+	void BackToTitle(const Pad& pad);
 
 	/// <summary>
-	/// 選択できる文字を描画する
+	///	矢印を描画する
 	/// </summary>
-	void DrawCharacter();
+	void DrawArrow();
 
 	/// <summary>
-	/// 選択肢が動く
+	/// ステージを選ぶ際の処理
 	/// </summary>
-	void MoveChatracter();
-
-	/// <summary>
-	/// ステージの説明を描画する
-	/// </summary>
-	void DrawStageExplanation();
+	void StageSelect(const Pad& pad);
 
 	/// <summary>
 	/// 説明文を描画する
 	/// </summary>
 	void DrawExplanation();
-	
+
+	/// <summary>
+	/// メニュー画面を描画する
+	/// </summary>
+	void DrawMenu();
+
+	/// <summary>
+	/// 選択ステージによって、再生する動画を変更する
+	/// </summary>
+	void DrawStageMovie();
+
+	/// <summary>
+	/// 動画を繰り返し流す
+	/// </summary>
+	void RepeatVideo();
+
 	/// <summary>
 	/// カーソルの位置によって遷移するシーンを変更する
 	/// </summary>
-	/// <param name="pad"></param>
-	/// <returns></returns>
 	std::shared_ptr<SceneBase>SceneChange(const Pad& pad);
 
 	/// <summary>
@@ -58,38 +66,22 @@ private:
 
 private:
 
-	//ステージ1文字のハンドル
-	int m_stage1Handle;
+	std::shared_ptr<Stage>m_pStage;
 
-	//ステージ2文字のハンドル
-	int m_stage2Handle;
-
-	//ステータス文字のハンドル
-	int m_statusHandle;
-
-	//操作方法文字のハンドル
-	int m_operationHandle;
-
-	//ゲーム終了文字のハンドル
-	int m_gameEndHandle;
-
-	//ステージ1の説明付き画面のハンドル
-	int m_stage1DescriptionHandle;
-
-	//ステージ2の説明付き画面のハンドル
-	int m_stage2DescriptionHandle;
-
-	//ステータスの説明付き画面のハンドル
-	int m_statusDescriptionHandle;
-
-	//操作説明の説明付き画面のハンドル
-	int m_operationDescriptionHandle;
+	//セレクト画面のUIハンドル
+	int m_uiHandle;
 
 	//操作説明画面
 	int m_operationInstructionsHandle;
 
-	//注意書き画面
-	int m_cautionaryNoteHandle;
+	//メニュー画面
+	int m_menuHandle;
+
+	//ステージ1の動画
+	int m_firstStageVideoHandle;
+
+	//ステージ2の動画
+	int m_secondStageVideoHandle;
 
 	/// <summary>
 	/// カウント
@@ -101,10 +93,8 @@ private:
 	/// </summary>
 	int m_cursorCount;
 
-	/// <summary>
-	/// バージョンがデバッグかどうか
-	/// </summary>
-	bool m_isDebug;
+	//カーソル位置
+	float m_cursorPosY;
 
 	/// <summary>
 	/// ステージ1に遷移するかどうか
@@ -127,11 +117,6 @@ private:
 	bool m_isExplanation;
 
 	/// <summary>
-	/// 注意書き画面を描画するかどうか
-	/// </summary>
-	bool m_isCautionaryNote;
-
-	/// <summary>
 	/// ボタンを押したかどうか
 	/// </summary>
 	bool m_isPishAButton;
@@ -145,6 +130,16 @@ private:
 	/// スティックを一定時間倒した
 	/// </summary>
 	bool m_isPressPadTime;
+
+	/// <summary>
+	/// スティックを上に倒したかどうか
+	/// </summary>
+	bool m_isPressUp;
+
+	/// <summary>
+	/// スティックを下に倒したかどうか
+	/// </summary>
+	bool m_isPressDown;
 
 	//カーソルの位置
 	VECTOR m_cursorPos;

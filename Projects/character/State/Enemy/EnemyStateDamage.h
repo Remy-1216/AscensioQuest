@@ -16,23 +16,24 @@ class EnemyStateDamage : public EnemyStateBase
 private:
 
 	/// <summary>
-	/// 近距離型エネミーがダメージを受けた時の動き
+	/// 近距離型エネミーがダメージを受けた時の処理
 	/// </summary>
 	void ShortDistanveEnemyDamage(Stage& stage, const Player& player, const int  characterKinds);
 
 	/// <summary>
-	/// 遠距離型エネミーがダメージを受けた時の動き
+	/// 遠距離型エネミーがダメージを受けた時の処理
 	/// </summary>
 	void LongDistanveEnemyDamage(Stage& stage, const Player& player, const int  characterKinds);
 
 	/// <summary>
-	/// ボスがダメージ受けた時の動き
+	/// ボスがダメージ受けた時の処理
 	/// </summary>
-	/// <param name="stage">ステージ</param>
-	/// <param name="player">プレイヤー</param>
-	/// <param name="characterKinds">エネミーの種類</param>
 	void BossDamage(Stage& stage, const Player& player, const int  characterKinds);
 
+	/// <summary>
+	/// チュートリアル用の敵がダメージを受けた時の処理
+	/// </summary>
+	void TutorialEnemyDamage(Stage& stage, const Player& player, const int  characterKinds);
 
 private:
 };

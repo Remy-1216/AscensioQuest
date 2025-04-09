@@ -17,7 +17,7 @@ void EnemyStateStatusUp::Update(Stage& stage, const Player& playerconst,const in
 	{
 		m_nextState = std::make_shared<EnemyStateWalk>(m_pEnemy);
 		auto state = std::dynamic_pointer_cast<EnemyStateWalk>(m_nextState);
-		state->Init(kShortDistanceEnemy);
+		state->Init(kBoss);
 	}
 }
 

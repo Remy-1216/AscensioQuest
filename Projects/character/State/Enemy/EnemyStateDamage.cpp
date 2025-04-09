@@ -1,5 +1,6 @@
 ﻿#include "EnemyStateDamage.h"
 #include "EnemyStateWalk.h"
+#include "EnemyStateIdle.h"
 #include "EnemyStateDie.h"
 #include "Player.h"
 
@@ -23,6 +24,10 @@ void EnemyStateDamage::Update(Stage& stage,const Player& player, const int chara
 	{
 		BossDamage(stage, player, kBoss);
 	}
+	if (characterKinds == kTutorialEnemy)
+	{
+		TutorialEnemyDamage(stage, player, kTutorialEnemy);
+	}
 }
 
 void EnemyStateDamage::Draw(const int characterKinds)
@@ -37,7 +42,7 @@ void EnemyStateDamage::ShortDistanveEnemyDamage(Stage& stage, const Player& play
 
 
 	//状態遷移
-	//ダメージ受けていた状態から待機状態に遷移
+	//ダメージ受けていた状態から歩く状態に遷移
 	if (m_pEnemy->GetAnimLoopEndTime() <= m_pEnemy->GetCurrentAnimTime())
 	{
 		m_nextState = std::make_shared<EnemyStateWalk>(m_pEnemy);
@@ -61,7 +66,7 @@ void EnemyStateDamage::LongDistanveEnemyDamage(Stage& stage, const Player& playe
 
 
 	//状態遷移
-	//ダメージ受けていた状態から待機状態に遷移
+	//ダメージ受けていた状態から歩く状態に遷移
 	if (m_pEnemy->GetAnimLoopEndTime() <= m_pEnemy->GetCurrentAnimTime())
 	{
 		m_nextState = std::make_shared<EnemyStateWalk>(m_pEnemy);
@@ -93,7 +98,7 @@ void EnemyStateDamage::BossDamage(Stage& stage, const Player& player, const int 
 	}
 
 	//状態遷移
-	//ダメージ受けていた状態から待機状態に遷移
+	//ダメージ受けていた状態から歩く状態に遷移
 	if (m_pEnemy->GetAnimLoopEndTime() <= m_pEnemy->GetCurrentAnimTime())
 	{
 		m_nextState = std::make_shared<EnemyStateWalk>(m_pEnemy);
@@ -102,4 +107,28 @@ void EnemyStateDamage::BossDamage(Stage& stage, const Player& player, const int 
 	}
 
 	
+}
+
+void EnemyStateDamage::TutorialEnemyDamage(Stage& stage, const Player& player, const int characterKinds)
+{
+	//エネミーの動き
+	m_pEnemy->ComingCharacter(stage, VGet(0.0f, 0.0f, 0.0f));
+
+
+	//ダメージを受けていた状態から死亡状態に遷移
+	if (m_pEnemy->GetHp() <= 0)
+	{
+		m_nextState = std::make_shared<EnemyStateDie>(m_pEnemy);
+		auto state = std::dynamic_pointer_cast<EnemyStateDie>(m_nextState);
+		state->Init(characterKinds);
+	}
+
+	//状態遷移
+	//ダメージ受けていた状態から歩く状態に遷移
+	if (m_pEnemy->GetAnimLoopEndTime() <= m_pEnemy->GetCurrentAnimTime())
+	{
+		m_nextState = std::make_shared<EnemyStateIdle>(m_pEnemy);
+		auto state = std::dynamic_pointer_cast<EnemyStateIdle>(m_nextState);
+		state->Init(characterKinds);
+	}
 }

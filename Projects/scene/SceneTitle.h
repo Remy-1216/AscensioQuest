@@ -64,6 +64,11 @@ private:
 	bool m_isSelect;
 
 	/// <summary>
+	/// 新しくゲームを始めるかどうか
+	/// </summary>
+	bool m_isNewGame;
+
+	/// <summary>
 	/// ゲームをプレイするかどうか
 	/// </summary>
 	bool m_isPlayGame;
@@ -77,12 +82,6 @@ private:
 	/// スティックを一定時間倒した
 	/// </summary>
 	bool m_isPressPadTime;
-
-	/// <summary>
-	/// カメラの座標
-	/// </summary>
-	VECTOR m_cameraPos;
-	VECTOR m_cameraTarget;
 
 	/// <summary>
 	/// カーソルの位置

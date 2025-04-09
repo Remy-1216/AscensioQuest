@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "CharacterBase.h"
-#include "SceneStage.h"
 #include "EnemyManager.h"
 #include "EffectManager.h"
 #include "Player.h"

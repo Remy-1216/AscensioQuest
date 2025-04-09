@@ -21,6 +21,9 @@ namespace
 	//描画する座標位置
 	constexpr float kPosY = 10.0f;
 
+	//UIバーの位置
+	constexpr float kPlayerBarX = 10.0f;
+
 }
 
 
@@ -63,17 +66,17 @@ void UIBar::Update()
 
 void UIBar::DrawPlayerGaugeBar(const Player& player)
 {
-	DrawExtendGraphF(0.0f, 0.0f, Game::kScreenWindidth, Game::kScreenHeight, m_playerBarHandle, true);
+	DrawExtendGraphF(kPlayerBarX, 0.0f, Game::kScreenWindidth, Game::kScreenHeight, m_playerBarHandle, true);
 	
 	float damageBar = static_cast<float>(player.GetHp()) / static_cast<float>(player.GetMaxHp());
 	damageBar = std::max(0.0f, damageBar);
 	float hpBar = Game::kScreenWindidth * damageBar; // HPバーの長さを計算
 
 	// ダメージバーの描画
-	DrawExtendGraphF(0.0f, 0.0f, hpBar, Game::kScreenHeight, m_playerHpBarHandle, true);
+	DrawExtendGraphF(kPlayerBarX, 0.0f, hpBar, Game::kScreenHeight, m_playerHpBarHandle, true);
 
 	// HPバーを左端固定で描画（左端を 0.0f にする）
-	DrawExtendGraphF(0.0f, 0.0f, hpBar, Game::kScreenHeight, m_playerHpBarHandle, true);
+	DrawExtendGraphF(kPlayerBarX, 0.0f, hpBar, Game::kScreenHeight, m_playerHpBarHandle, true);
 
 	// MPバーの計算
 	float mpBar = static_cast<float>(player.GetMp()) / static_cast<float>(player.GetMaxMp());
@@ -81,7 +84,7 @@ void UIBar::DrawPlayerGaugeBar(const Player& player)
 	float mpBarWidth = kUIBar * mpBar;
 
 	// MPバーの描画
-	DrawExtendGraphF(0.0f, 0.0f, mpBarWidth, Game::kScreenHeight, m_playerMpBarHandle, true);
+	DrawExtendGraphF(kPlayerBarX, 0.0f, mpBarWidth, Game::kScreenHeight, m_playerMpBarHandle, true);
 
 	// 必殺技ゲージの計算
 	float specialMoveGaugeBar = static_cast<float>(player.GetSpecialMoveGauge()) / 100.0f;
@@ -91,7 +94,7 @@ void UIBar::DrawPlayerGaugeBar(const Player& player)
 	// 必殺技ゲージの描画
 	if (specialMoveGaugeBar > 0.0f)
 	{
-		DrawExtendGraphF(0.0f, 0.0f, specialMoveGaugeWidth, Game::kScreenHeight, m_playerSpecialMoveGaugeHandle, true);
+		DrawExtendGraphF(kPlayerBarX, 0.0f, specialMoveGaugeWidth, Game::kScreenHeight, m_playerSpecialMoveGaugeHandle, true);
 	}
 }
 

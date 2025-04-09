@@ -38,34 +38,30 @@ public:
 private:
 
 	/// <summary>
-	/// 近距離エネミーの歩いているときの動き
+	/// 近距離エネミーの歩いているときの処理
 	/// </summary>
-	/// <param name="stage"></param>
-	/// <param name="player"></param>
-	/// <param name="characterKinds"></param>
 	void ShortDistanceEnemyWalk(Stage& stage, const Player& player, const int  characterKinds);
 
 	/// <summary>
-	/// 遠距離エネミーの歩いているときの動き
+	/// 遠距離エネミーの歩いているときの処理
 	/// </summary>
-	/// <param name="stage"></param>
-	/// <param name="player"></param>
-	/// <param name="characterKinds"></param>
 	void LongDistanceEnemyWalk(Stage& stage, const Player& player, const int  characterKinds);
 
 	/// <summary>
-	/// ボスの歩いているときの動き
+	/// ボスの歩いているときの処理
 	/// </summary>
-	/// <param name="stage"></param>
-	/// <param name="player"></param>
-	/// <param name="characterKinds"></param>
 	void BossWalk(Stage& stage, const Player& player, const int  characterKinds);
+
+	/// <summary>
+	/// チュートリアル用の敵が歩いているときの処理
+	/// </summary>
+	void TutorialEnemyWalk(Stage& stage, const Player& player, const int  characterKinds);
 
 	/// <summary>
 	/// 敵の位置からターゲット位置に向かうベクトルを生成する
 	/// </summary>
-	/// <returns></returns>
 	VECTOR GoToPlayer(VECTOR playerPos);
+
 
 private:
 
@@ -74,6 +70,9 @@ private:
 
 	//プレイヤーとの距離
 	VECTOR m_move;
+
+	//プレイヤーの方向
+	VECTOR m_direction;
 
 	//攻撃のクールタイム
 	int m_coolTime;

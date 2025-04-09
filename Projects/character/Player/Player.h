@@ -55,6 +55,11 @@ public:
 	void SpecialMove(const Pad& pad, bool isSpecialMove);
 
 	/// <summary>
+	/// ガード中の処理
+	/// </summary>
+	void Guard(const Pad& pad);
+
+	/// <summary>
 	/// ワープ地点に入った場合の処理
 	/// </summary>
 	/// <param name="warpTarget"></param>
@@ -72,17 +77,12 @@ public:
 	void RecoverHp(int recoveryQuantity);
 
 	/// <summary>
-	/// 無敵時間
-	/// </summary>
-	void InvincibleTime();
-
-	/// <summary>
 	/// プレイヤーと敵が当たったかどうか
 	/// </summary>
 	/// <param name="HitCollisionStart">当たり判定時に使うカプセルの二点中の一点の座標</param>
 	/// <param name="HitCollisionEnd">当たり判定時に使うカプセルの二点中の一点の座標</param>
 	/// <param name="HitRadius">カプセルの半径</param>
-	bool HitEnemy(VECTOR enemyPos,VECTOR HitEnemyCollisionStart, VECTOR HitEnemyCollisionEnd, float HitEnemyRadius);
+	bool HitEnemyBody(VECTOR enemyPos,VECTOR HitEnemyCollisionStart, VECTOR HitEnemyCollisionEnd, float HitEnemyRadius);
 
 	/// <summary>
 	/// プレイヤーに敵の攻撃が当たったかどうか
@@ -102,6 +102,17 @@ public:
 	void HitAttack(bool hitAttack);
 
 	/// <summary>
+	/// 敵の胴体と当たった時に押しのけあう処理
+	/// </summary>
+	void PushAway(VECTOR HitEnemyAttackCollisionStart, VECTOR HitEnemyAttackCollisionEnd, float HitEnemyRadius);
+
+	/// <summary>
+	/// 現在の状態を渡す
+	/// </summary>
+	/// <returns></returns>
+	int GetStateKinds() const { return m_stateKinds; }
+
+	/// <summary>
 	/// 最大MPを渡す
 	/// </summary>
 	/// <returns></returns>
@@ -114,13 +125,19 @@ public:
 	int GetSpecialMoveGauge() const { return m_specialMoveGauge; }
 
 	/// <summary>
+	/// ガード成功回数を渡す
+	/// </summary>
+	/// <returns></returns>
+	int GetGuardSuccess() const { return m_guardSuccess; }
+
+	/// <summary>
 	/// 足元にある球体の半径を渡す
 	/// </summary>
 	/// <returns></returns>
 	float GetSphereRadius() const { return m_sphereRadius; }
 
 	/// <summary>
-	/// 倒れたかどうかを渡す
+	/// 死んで倒れたかどうかを渡す
 	/// </summary>
 	/// <returns></returns>
 	bool GetIsPlayerDie() const { return m_isKnockedDown; }
@@ -155,6 +172,11 @@ public:
 	/// <returns></returns>
 	bool GetIsSpecialMoveAvailable() const { return m_isSpecialMoveAvailable; }
 
+	/// <summary>
+	/// プレイヤーの位置を受け取る
+	/// </summary>
+	/// <returns></returns>
+	void SetPlayerPos(VECTOR playerPos) {m_pos = playerPos; }
 
 private:
 
@@ -194,6 +216,9 @@ private:
 	int m_magicAttackUp;	//魔法攻撃力UP
 	int m_defensePowerUp;	//防御力UP
 
+	//現在の状態
+	int m_stateKinds;
+
 	//最大ステータス
 	int m_maxMp;
 
@@ -203,8 +228,8 @@ private:
 	//必殺技ゲージ
 	int m_specialMoveGauge;
 
-	//無敵時間
-	int m_invincibleTime;
+	//ガード成功回数
+	int m_guardSuccess;
 
 	//足元にある球体の半径
 	float m_sphereRadius;
@@ -230,17 +255,8 @@ private:
 	//必殺技をしているかどうか
 	bool m_isSpecialMove;
 
-	//エネミーの胴体に当たっているか
-	bool m_isHitEnemy;
-
-	//エネミーの攻撃が当たっているか
-	bool m_isHitEnemyAttack;
-
 	//ワープできる地点にいるかどうか
 	bool m_isWarpPoint;
-
-	//プレイヤーが無敵かどうか
-	bool m_isInvincible;
 
 	//カメラの方向を変換した値
 	VECTOR m_movementDirection;

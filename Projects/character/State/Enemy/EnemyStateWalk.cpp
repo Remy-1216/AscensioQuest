@@ -26,10 +26,11 @@ void EnemyStateWalk::Init(const int characterKinds)
 {
 	m_pEnemy->ChangeAnim("Walk");
 
-	
-	m_pBossAI = std::make_shared<BossAI>();
-	m_pBossAI->Init();
-	
+	if (characterKinds == kBoss)
+	{
+		m_pBossAI = std::make_shared<BossAI>();
+		m_pBossAI->Init();
+	}
 	
 	m_coolTime = 0;
 }
@@ -52,6 +53,12 @@ void EnemyStateWalk::Update(Stage& stage, const Player& player, const int charac
 	if (characterKinds == kBoss)
 	{
 		BossWalk(stage, player, kBoss);
+	}
+
+	//チュートリアル用の敵の処理
+	if (characterKinds == kTutorialEnemy)
+	{
+		TutorialEnemyWalk(stage,player,kTutorialEnemy);
 	}
 
 }
@@ -221,6 +228,38 @@ void EnemyStateWalk::BossWalk(Stage& stage, const Player& player, const int char
 		return;
 	}
 
+}
+
+void EnemyStateWalk::TutorialEnemyWalk(Stage& stage, const Player& player, const int characterKinds)
+{
+	//攻撃のクールタイム
+	m_coolTime++;
+
+	//プレイヤーとの距離を計算する
+	m_distance = VSize(VSub(m_pEnemy->GetPos(), player.GetPos()));
+
+	//敵の初期位置からターゲット位置に向かうベクトルを生成する
+	m_move = GoToPlayer(player.GetPos());
+
+	m_pEnemy->ComingCharacter(stage, m_move);
+
+	//攻撃可能域に近づくと歩く状態から攻撃状態に遷移
+	if (m_distance <= kLongDistanceEnemyMove && m_coolTime >= kCoolTime && m_pEnemy->GetFourTutorial())
+	{
+		m_nextState = std::make_shared<EnemyStateAttack>(m_pEnemy);
+		auto state = std::dynamic_pointer_cast<EnemyStateAttack>(m_nextState);
+		state->Init(characterKinds, kLightAttack);
+		return;
+	}
+
+	//歩く状態からダメージを受けた状態に遷移
+	if (m_pEnemy->GetHitCharacterAttack())
+	{
+		m_nextState = std::make_shared<EnemyStateDamage>(m_pEnemy);
+		auto state = std::dynamic_pointer_cast<EnemyStateDamage>(m_nextState);
+		state->Init(characterKinds);
+		return;
+	}
 }
 
 //敵の初期位置からターゲット位置に向かうベクトルを生成する

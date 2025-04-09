@@ -12,6 +12,8 @@ public:
 	enum Stagekinds
 	{
 		Title,
+		Tutorial,
+		Select,
 		Stage1,
 		Stage2,
 	};
@@ -20,9 +22,6 @@ public:
 	virtual ~SceneBase();
 
 	virtual void Init() = 0;	//シーンに入るときの初期化処理
-
-	//virtual SceneBase* Update() = 0;	//シーンを変更する場合は遷移先のシーンのポインタ
-										//シーン変更しない場合は自身のポインタ
 
 	virtual std::shared_ptr<SceneBase>Update(const Pad& pad) = 0;	//シーンを変更する場合は遷移先のシーンのポインタ
 	//シーン変更しない場合は自身のポインタ
@@ -37,10 +36,36 @@ protected:
 	//画像のハンドル
 	int m_bgHandle;
 
+	/// <summary>
+	/// 動画を再生した回数
+	/// </summary>
+	int m_playVideo;
+
+	/// <summary>
+	/// シャドウマップのハンドル
+	/// </summary>
+	int m_shadowMapHandle;
+
 	//フェードイン、アウト
 	int m_fadeAlpha;
 
+	/// <summary>
+	/// メニュー画面を開くかどうか
+	/// </summary>
+	bool m_isOpenMenu;
+
+	/// <summary>
+	/// タイトル画面にもどるか
+	/// </summary>
+	bool m_isBackToTheTitle;
+
 	//プレイヤーの座標
 	VECTOR m_playerPos;
+
+	/// <summary>
+	/// カメラの座標
+	/// </summary>
+	VECTOR m_cameraPos;
+	VECTOR m_cameraTarget;
 };
 

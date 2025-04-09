@@ -29,10 +29,12 @@ private:
 	/// <summary>
 	/// ボスの攻撃
 	/// </summary>
-	/// <param name="stage"></param>
-	/// <param name="player"></param>
-	/// <param name="characterKinds"></param>
 	void BossAttack(Stage& stage, const Player& player, const int  characterKinds);
+
+	/// <summary>
+	/// チュートリアル用のエネミーの攻撃
+	/// </summary>
+	void TutorialEnemyAttack(Stage& stage, const Player& player, const int  characterKinds);
 
 private:
 

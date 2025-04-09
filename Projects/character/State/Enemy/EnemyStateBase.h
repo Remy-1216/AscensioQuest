@@ -32,7 +32,8 @@ public:
 	{
 		kShortDistanceEnemy,
 		kLongDistanceEnemy,
-		kBoss
+		kBoss,
+		kTutorialEnemy
 	};
 
 	EnemyStateBase(std::shared_ptr<CharacterBase>pEnemy) { m_pEnemy = pEnemy; m_isDie = false; }

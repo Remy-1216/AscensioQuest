@@ -17,6 +17,8 @@ public:
 	enum Stagekinds
 	{
 		Title,
+		Tutorial,
+		Select,
 		Stage1,
 		Stage2,
 	};
@@ -67,6 +69,8 @@ public:
 
 	virtual ~Stage();
 
+	void Init();
+
 	void Draw();
 
 	/// <summary>
@@ -88,7 +92,7 @@ public:
 	/// ワープ関係の処理
 	/// </summary>
 	/// <param name="playerPos">プレイヤーの座標位置</param>
-	void WarpPoint(Player&player, const Pad& pad);
+	void WarpPoint(Player& player, const Pad& pad);
 
 	/// <summary>
 	/// オブジェクトと当たり判定を行う
@@ -112,15 +116,13 @@ private:
 	/// <param name="checkPosition">移動後の座標</param>
 	void AnalyzeWallAndFloor(MV1_COLL_RESULT_POLY_DIM hitDim, const VECTOR& checkPosition);
 
-
-
 	/// <summary>
 	/// オブジェクトと壁ポリゴンとの当たりをチェックする
 	/// </summary>
 	/// <param name="obj">オブジェクト参照</param>
 	/// <param name="checkPosition">移動後の座標</param>
 	/// <returns>補正すべきベクトル</returns>
-	VECTOR CheckHitPlayerWithWall( const VECTOR& checkPosition);
+	VECTOR CheckHitPlayerWithWall(const VECTOR& checkPosition);
 
 	/// <summary>
 	/// オブジェクトと床ポリゴンとの当たりをチェックする

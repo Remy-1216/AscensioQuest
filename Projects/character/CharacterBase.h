@@ -78,7 +78,8 @@ public:
 	{
 		kShortDistanceEnemy,
 		kLongDistanceEnemy,
-		kBoss
+		kBoss,
+		kTutorialEnemy
 	};
 
 	/// <summary>
@@ -157,19 +158,15 @@ public:
 	void KnockBack(VECTOR m_vector);
 
 	/// <summary>
+	/// 無敵時間
+	/// </summary>
+	void InvincibleTime();
+
+	/// <summary>
 	/// 向いている方向の更新
 	/// </summary>
 	/// <param name="playerpos"></param>
 	void UpdateAngle(VECTOR playerpos);
-
-	/// <summary>
-	/// プレイヤーの攻撃が当たった時の処理
-	/// </summary>
-	/// <param name="attackStart"></param>
-	/// <param name="attackEnd"></param>
-	/// <param name="radius"></param>
-	/// <param name="attackPower"></param>
-	void HitPlayerAttack(VECTOR attackStart, VECTOR attackEnd, float radius, int attackPower);
 
 	/// <summary>
 	/// 死んだときの動き
@@ -178,6 +175,11 @@ public:
 
 	//シーンを抜けるときの処理
 	void End();		
+
+	/// <summary>
+	/// プレイヤーの攻撃が当たった時の処理
+	/// </summary>
+	bool HitPlayerAttack(VECTOR attackStart, VECTOR attackEnd, float radius, int attackPower);
 
 	/// <summary>
 	/// HPを渡す
@@ -228,7 +230,6 @@ public:
 	/// <summary>
 	/// 歩く速さを渡す
 	/// </summary>
-	/// <returns></returns>
 	float GetWalkSpeed() const { return m_walkSpeed; }
 
 	/// <summary>
@@ -240,14 +241,17 @@ public:
 	/// <summary>
 	/// キャラクターに攻撃が当たったかどうかを渡す
 	/// </summary>
-	/// <returns></returns>
 	bool GetHitCharacterAttack() const { return m_isHitAttack; }
 
 	/// <summary>
 	/// 死んだかどうかを渡す
 	/// </summary>
-	/// <returns></returns>
-	bool GetIsDie() const { return m_isKnockedDown; }
+	bool GetIsKnockedDown() const { return m_isKnockedDown; }
+
+	/// <summary>
+	/// チュートリアル4を行っているかどうか
+	/// </summary>
+	bool GetFourTutorial()const { return m_isFourTutorial; }
 
 	/// <summary>
 	/// キャラクターの座標を渡す
@@ -332,9 +336,6 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	Status GetStatus() const { return m_status; }
-
-
-
 protected:
 
 	CharacterPos m_characterPos;
@@ -411,6 +412,12 @@ protected:
 	//最大ステータス
 	int m_maxHp;
 
+	//無敵時間
+	int m_invincibleTime;
+
+	//無敵時間の上限
+	int m_invincibleTimeLimit;
+
 	//キャラクター向いている方向
 	float m_characterAngle;
 
@@ -428,6 +435,9 @@ protected:
 
 	//倒れたかどうか
 	bool m_isKnockedDown;
+
+	//無敵かどうか
+	bool m_isInvincible;
 
 	//近距離型エネミーが攻撃を行ったかどうか
 	bool m_isShortDistanceEnemyAttack;
@@ -450,8 +460,14 @@ protected:
 	//ボスが遠距離攻撃を行ったかどうか
 	bool m_isThrowing;
 
+	//敵の胴体に当たっているか
+	bool m_isHitEnemy;
+
 	//死んだと同時に動かさないためのbool
 	bool m_isMove;
+
+	//チュートリアル4かどうか
+	bool m_isFourTutorial;
 
 	//モデルの座標
 	VECTOR m_pos;

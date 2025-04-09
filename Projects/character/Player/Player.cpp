@@ -56,7 +56,7 @@ namespace
 	constexpr float kAttackPosY = -200.0f;
 
 	//時間経過で回復するMPの量
-	constexpr float kMpRecovery = 0.1f;
+	constexpr float kMpRecovery = 0.03f;
 
 	//無敵時間
 	constexpr int  kInvincibleTime = 120;
@@ -70,12 +70,15 @@ namespace
 
 	//落ちてしまうと死んでしまう位置
 	constexpr float kMinimumAltitude = 1000.0f;
+
+	//無敵時間の長さ
+	constexpr int kInvincibleTimeLimit = 120;
+
 }
 
 Player::Player() :CharacterBase(m_handle),m_hpUp(0), m_attackUp(0), m_magicAttackUp(0), m_defensePowerUp(0),
-m_maxMp(0), m_damage(0),m_specialMoveGauge(0), m_sphereRadius(0.0f), m_isAttack(false), m_isAttackCollision(false),m_isMagicAttack(false),
-m_isMagicAttackMove(false), m_isSpecialMoveAvailable(false), m_isSpecialMove(false), m_isHitEnemy(false),
-m_isHitEnemyAttack(false), m_isWarpPoint(false),m_movementDirection(VGet(0.0f, 0.0f, 0.0f)), m_spherePos(VGet(0.0f,0.0f,0.0f)),
+m_maxMp(0), m_damage(0),m_specialMoveGauge(0), m_guardSuccess(0),m_sphereRadius(0.0f), m_isPlayerGuard(false), m_isAttack(false), m_isAttackCollision(false),m_isMagicAttack(false),
+m_isMagicAttackMove(false), m_isSpecialMoveAvailable(false), m_isSpecialMove(false), m_isWarpPoint(false),m_movementDirection(VGet(0.0f, 0.0f, 0.0f)), m_spherePos(VGet(0.0f,0.0f,0.0f)),
 m_magicDirection(VGet(0.0f,0.0f,0.0f))
 {
 	//モデルをロード
@@ -121,6 +124,8 @@ m_magicDirection(VGet(0.0f,0.0f,0.0f))
 	m_specialMoveStartPoint = m_collisionInfo.specialMoveStartPoint;
 	m_specialMoveEndPoint = m_collisionInfo.specialMoveEndPoint;
 	m_specialMoveRadius = m_collisionInfo.specialMoveRadius;
+
+
 }
 
 Player::~Player()
@@ -150,17 +155,19 @@ void Player::Init()
 
 	m_isSpecialMoveAvailable = false;
 
-	m_isInvincible = false;
-
 	m_characterAngle = 0.0f;
 
 	m_sphereRadius = kSpherePosY;
 
-	//無敵時間の初期化
-	m_invincibleTime = kInvincibleTime;
+	//無敵時間の長さ
+	m_invincibleTimeLimit = kInvincibleTimeLimit;
+
 
 	//座標の初期化
 	m_pos = VGet(m_characterPos.posX, m_characterPos.posY, m_characterPos.posZ);
+
+	//モデルの位置
+	MV1SetPosition(m_handle, m_pos);
 
 	//重力の設定
 	m_gravity = kGravity;
@@ -205,7 +212,11 @@ void Player::Update(Stage& stage, const Pad&pad,const Camera& camera)
 
 	// stateの更新
 	m_pState->Update(stage, pad, camera);
+	
+	// 現在の状態を取得
+	m_stateKinds = m_pState->GetKind();
 
+	//エフェクトの更新
 	m_pEffectManager->Update();
 
 	// 重力を足す
@@ -352,7 +363,6 @@ void Player::Attack(int attackNum,float animTime)
 	{
 		m_isAttackCollision = false;
 	}
-
 }
 
 //魔法攻撃をした時の処理
@@ -382,6 +392,16 @@ void Player::SpecialMove(const Pad& pad,bool isSpecialMove)
 	}
 }
 
+void Player::Guard(const Pad& pad)
+{
+	m_isPlayerGuard = true;
+
+	if (pad.IsRelase("LB") || m_isHitAttack)
+	{
+		m_isPlayerGuard = false;
+	}
+}
+
 //ワープ移動時の処理
 void Player::Warp(const Pad& pad,VECTOR warpTarget)
 {
@@ -405,7 +425,7 @@ void Player::Warp(const Pad& pad,VECTOR warpTarget)
 void Player::Damage(float damage,int enemyType)
 {
 	//近距離攻撃が当たった時の処理
-	if (m_isHitEnemyAttack && !m_isPlayerGuard && enemyType == kShortDistanceEnemy)
+	if (m_isHitAttack && !m_isPlayerGuard && enemyType == kShortDistanceEnemy)
 	{
 		m_pSoundManager->HitShortDistanceAttackSE();
 		m_damage = damage;
@@ -415,18 +435,19 @@ void Player::Damage(float damage,int enemyType)
 		KnockBack(m_subVector);
 	}
 	//ガード中に近距離攻撃が当たった時の処理
-	else if (m_isHitEnemyAttack && m_isPlayerGuard && enemyType == kShortDistanceEnemy)
+	else if (m_isHitAttack && m_isPlayerGuard && enemyType == kShortDistanceEnemy)
 	{
 		m_pSoundManager->HitShortDistanceAttackSE();
 		m_damage = damage * 0.5;
 		m_hp -= damage * 0.5;
 		m_pEffectManager->DrawPlayerGuardEffect(m_pos);
 		m_pSoundManager->GuardSE();
+		m_guardSuccess++;
 		KnockBack(m_subVector);
 	}
 	
 	//遠距離攻撃が当たった時の処理
-	if (m_isHitEnemyAttack && !m_isPlayerGuard &&enemyType == kLongDistanceEnemy)
+	if (m_isHitAttack && !m_isPlayerGuard &&enemyType == kLongDistanceEnemy)
 	{
 		m_pSoundManager->HitLongDistanceAttackSE();
 		m_damage = damage;
@@ -436,7 +457,7 @@ void Player::Damage(float damage,int enemyType)
 		KnockBack(m_subVector);
 	}
 	//ガード中に遠距離攻撃に当たった時の処理
-	else if (m_isHitEnemyAttack && m_isPlayerGuard && enemyType == kLongDistanceEnemy)
+	else if (m_isHitAttack && m_isPlayerGuard && enemyType == kLongDistanceEnemy)
 	{
 		m_pSoundManager->HitLongDistanceAttackSE();
 		m_hp -= damage*0.5f;
@@ -464,7 +485,7 @@ void Player::Damage(float damage,int enemyType)
 		KnockBack(m_subVector);
 	}
 
-	if (!m_isHitEnemy && !m_isHitEnemyAttack && m_hp > 0)
+	if (!m_isHitEnemy && !m_isHitAttack && m_hp > 0)
 	{
 		m_damage = 0;
 		m_isMove = true;
@@ -482,50 +503,25 @@ void Player::RecoverHp(int recoveryQuantity)
 	}
 }
 
-//無敵時間
-void Player::InvincibleTime()
-{
-	//敵の攻撃を受けた時に無敵状態ではなかった時
-	if (m_isHitEnemyAttack && !m_isInvincible)
-	{
-		m_isInvincible = true;
-	}
-
-	//敵の胴体に当たった時に無敵状態ではなかった時の処理
-	if(m_isHitEnemy && !m_isInvincible)
-	{
-		m_isInvincible = true;
-	}
-
-	//無敵状態の場合
-	if (m_isInvincible)
-	{
-		//無敵時間を減らす
-		m_invincibleTime--;
-	}
-
-	//無敵時間が0になった場合
-	if (m_invincibleTime <= 0)
-	{
-		m_isInvincible = false;
-		m_invincibleTime = kInvincibleTime;
-	}
-}
-
-//敵の胴体と当たったかどうか
-bool Player::HitEnemy(VECTOR enemyPos,VECTOR HitEnemyCollisionStart, VECTOR HitEnemyCollisionEnd, float HitEnemyRadius)
+//敵の胴体に当たったかそうか
+bool Player::HitEnemyBody(VECTOR enemyPos, VECTOR HitEnemyCollisionStart, VECTOR HitEnemyCollisionEnd, float HitEnemyRadius)
 {
 	m_subVector = VSub(enemyPos, m_pos);
 
+	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyCollisionStart, HitEnemyCollisionEnd, HitEnemyRadius))
+	{
+		PushAway(HitEnemyCollisionStart, HitEnemyCollisionEnd, HitEnemyRadius);
+	}
 	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyCollisionStart, HitEnemyCollisionEnd, HitEnemyRadius) && !m_isInvincible)
 	{
 		m_isHitEnemy = true;
 		m_isMove = false;
 	}
-	else if(!HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyCollisionStart, HitEnemyCollisionEnd, HitEnemyRadius))
+	else if (!HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyCollisionStart, HitEnemyCollisionEnd, HitEnemyRadius))
 	{
 		m_isHitEnemy = false;
 	}
+	
 
 	return m_isHitEnemy;
 }
@@ -537,14 +533,14 @@ bool Player::HitEnemyAttack(VECTOR enemyPos, VECTOR HitEnemyAttackCollisionStart
 
 	if (HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyAttackCollisionStart, HitEnemyAttackCollisionEnd, HitAttackEnemyRadius) && !m_isInvincible)
 	{
-		m_isHitEnemyAttack = true;
+		m_isHitAttack = true;
 	}
 	else if(!HitCheck_Capsule_Capsule(m_capsuleStart, m_capsuleEnd, m_radius, HitEnemyAttackCollisionStart, HitEnemyAttackCollisionEnd, HitAttackEnemyRadius))
 	{
-		m_isHitEnemyAttack = false;
+		m_isHitAttack = false;
 	}
 
-	return m_isHitEnemyAttack;
+	return m_isHitAttack;
 }
 
 //攻撃が当たった時の処理
@@ -576,6 +572,36 @@ void Player::HitAttack(bool hitAttack)
 	}
 }
 
+//敵の胴体に当たった時に押しのけあう処理
+void Player::PushAway(VECTOR HitEnemyCollisionStart, VECTOR HitEnemyCollisionEnd, float HitEnemyRadius)
+{
+	//敵の胴体に当たった時の処理
+	VECTOR centerA = VScale(VAdd(m_capsuleStart, HitEnemyCollisionStart), 0.5f);
+	VECTOR centerB = VScale(VAdd(m_capsuleEnd, HitEnemyCollisionEnd), 0.5f);
+
+
+	VECTOR pushVec = VSub(centerA, centerB);
+	float len = VSize(pushVec);
+
+	if (len > 0.0001f) 
+	{
+		pushVec = VGet(0.5f, 0.0f, 0.0f);
+		len = 1.0f;
+	}
+
+	float overlap = (m_radius + HitEnemyRadius) - len;
+	pushVec = VNorm(pushVec); // 単位ベクトル化
+	pushVec = VScale(pushVec, overlap); // 押し出し量を掛ける
+
+	//位置をずらす
+	m_pos.x += pushVec.x;
+	//m_pos.y += pushVec.y;
+	m_pos.z +=pushVec.z;
+
+}
+
+
+
 //向いている方向を変更する処理
 void Player::UpdateCol()
 {
@@ -589,7 +615,7 @@ void Player::UpdateCol()
 	SpecialMoveCol(rotationMatrixY);
 
 	//敵の胴体にも攻撃にも当たっていないときの処理
-	if (!m_isHitEnemy && !m_isHitEnemyAttack && m_hp > 0)
+	if (!m_isHitEnemy && !m_isHitAttack && m_hp > 0)
 	{
 		m_isMove = true;
 	}

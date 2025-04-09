@@ -1,5 +1,6 @@
 ﻿#include "SceneTitle.h"
 #include "SceneSelect.h"
+#include "SceneTutorial.h"
 #include"SoundManager.h"
 #include "PlayerStatus.h"
 #include "TitlePlayer.h"
@@ -12,7 +13,7 @@
 namespace
 {
 	//フェードイン、フェードアウトの数値
-	constexpr int kFadeValue = 255;
+	constexpr int kFadeValue = 256;
 
 	//フェード値の増減
 	constexpr int kFadeUpDown = 8;
@@ -52,9 +53,18 @@ namespace
 
 	//カーソルが動く時間
 	constexpr int kCursorMoveTime = 25;
+
+	//シャドウマップを制作するときに使用する値
+	constexpr int kShadowMap = 2048;
+
+	//シャドウマップの描画範囲
+	constexpr float kShadowMapRange = 7500.0f;
+
+	//ライトの方向
+	constexpr float kLight = 0.5f;
 }
 
-SceneTitle::SceneTitle() :  m_count(0), m_isSelect(false), m_isPlayGame(false), m_isPressPad(false), m_isPressPadTime(false),m_cameraPos(VGet(0.0f,0.0f,0.0f)),m_cameraTarget(VGet(0.0f,0.0f,0.0f)),
+SceneTitle::SceneTitle() :  m_count(0), m_isSelect(false), m_isNewGame(false), m_isPlayGame(false), m_isPressPad(false), m_isPressPadTime(false),
 m_cursorPos(VGet(0.0f, 0.0f, 0.0f)), m_newGamePos(VGet(0.0f, 0.0f, 0.0f)), m_loadGamePos(VGet(0.0f, 0.0f, 0.0f)), m_exitGamePos(VGet(0.0f, 0.0f, 0.0f))
 {
 }
@@ -67,11 +77,16 @@ SceneTitle::~SceneTitle()
 	m_pTitlePlayer.reset();
 	m_pTitlePlayer = nullptr;
 
+	m_pPlayerStatus.reset();
+	m_pPlayerStatus = nullptr;
+
 	m_pStage.reset();
 	m_pStage = nullptr;
 
 	//画像の削除
 	DeleteGraph(m_bgHandle);
+	DeleteGraph(m_logoHandle);
+
 }
 
 void SceneTitle::Init()
@@ -84,6 +99,7 @@ void SceneTitle::Init()
 
 	//ステージ
 	m_pStage = std::make_shared<Stage>(Title);
+	m_pStage->Init();
 
 	//BGMの再生
 	m_pSoundManager = std::make_shared<SoundManager>();
@@ -113,6 +129,15 @@ void SceneTitle::Init()
 	m_fadeAlpha = kFadeValue;
 
 	m_isSelect = false;
+
+	//シャドウマップの作成
+	m_shadowMapHandle = MakeShadowMap(kShadowMap, kShadowMap);
+
+	// シャドウマップが想定するライトの方向もセット
+	SetShadowMapLightDirection(m_shadowMapHandle, VGet(kLight, -kLight, kLight));
+
+	// シャドウマップに描画する範囲を設定
+	SetShadowMapDrawArea(m_shadowMapHandle, VGet(-kShadowMapRange, -1.0f, -kShadowMapRange), VGet(kShadowMapRange, kShadowMapRange, kShadowMapRange));
 }
 
 std::shared_ptr<SceneBase> SceneTitle::Update(const Pad&pad)
@@ -129,6 +154,11 @@ std::shared_ptr<SceneBase> SceneTitle::Update(const Pad&pad)
 	//カメラの位置設定
 	SetCameraPositionAndTarget_UpVecY(m_cameraPos, m_cameraTarget);
 
+	if (m_isNewGame && m_fadeAlpha >= kFadeValue)
+	{
+		return std::make_shared<SceneTutorial>();
+	}
+
 	if (m_isSelect && m_fadeAlpha >= kFadeValue)
 	{
 		return std::make_shared<SceneSelect>();
@@ -139,6 +169,19 @@ std::shared_ptr<SceneBase> SceneTitle::Update(const Pad&pad)
 
 void SceneTitle::Draw()
 {
+	// シャドウマップへの描画の準備
+	ShadowMap_DrawSetup(m_shadowMapHandle);
+
+	m_pStage->DrawShadowModel();
+
+	m_pTitlePlayer->DrawShadowModel();
+
+	//シャドウマップへの描画を終了
+	ShadowMap_DrawEnd();
+
+	// 描画に使用するシャドウマップを設定
+	SetUseShadowMap(0, m_shadowMapHandle);
+
 	//背景の描画
 	DrawGraph(0, 0, m_bgHandle, false);
 
@@ -172,7 +215,7 @@ void SceneTitle::End()
 void SceneTitle::Fade()
 {
 	//フェードイン、フェードアウト
-	if (m_isSelect)
+	if (m_isSelect|| m_isNewGame)
 	{
 		m_fadeAlpha += kFadeUpDown;
 		if (m_fadeAlpha > kFadeValue)
@@ -180,7 +223,7 @@ void SceneTitle::Fade()
 			m_fadeAlpha = kFadeValue;
 		}
 	}
-	else
+	if(!m_isSelect && !m_isNewGame)
 	{
 		m_fadeAlpha -= kFadeUpDown;
 		if (m_fadeAlpha < 0)
@@ -276,7 +319,7 @@ void SceneTitle::CursorMotion(const Pad& pad)
 		//SEの再生
 		m_pSoundManager->DeterminationSE();
 
-		m_isSelect = true;
+		m_isNewGame = true;
 	}
 	else if (m_cursorPos.y == kContinuePos && pad.IsTrigger("A"))
 	{
