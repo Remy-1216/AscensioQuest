@@ -21,11 +21,11 @@ namespace
 	constexpr float kBackToTitle = 1.0f;
 
 	//ゲームに戻る文字位置
-	constexpr float kGameCharacterPosX = 600.0f;
+	constexpr float kGameCharacterPosX = 605.0f;
 	constexpr float kGameCharacterPosY = 450.0f;
 
 	//タイトルに戻る文字位置
-	constexpr float kTitleCharacterPosX = 525.0f;
+	constexpr float kTitleCharacterPosX = 535.0f;
 	constexpr float kTitleCharacterPosY = 700.0f;
 }
 
@@ -107,15 +107,17 @@ void SceneStageBase::BackToTitle(const Pad& pad)
 				m_isBackToTheTitle = true;
 			}
 		}
+
+
 	}
 
 	if (m_cursorPosY < 0.0f)
 	{
-		m_cursorPosY = 0.0f;
+		m_cursorPosY = kBackToTitle;
 	}
 	if (m_cursorPosY > kBackToTitle)
 	{
-		m_cursorPosY = kBackToTitle;
+		m_cursorPosY = 0.0f;
 	}
 
 }

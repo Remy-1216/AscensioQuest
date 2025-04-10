@@ -78,10 +78,17 @@ void SceneSecondStage::Init()
 std::shared_ptr<SceneBase> SceneSecondStage::Update(const Pad& pad)
 {
 	//プレイヤーの動き
-	m_pPlayer->Update(*m_pStage, pad, *m_pCamera);
+	if (!m_isOpenMenu)
+	{
+		m_pPlayer->Update(*m_pStage, pad, *m_pCamera);
 
-	//カメラの動き
-	m_pCamera->Update(m_pPlayer->GetPos());
+		//カメラの動き
+		m_pCamera->Update(m_pPlayer->GetPos());
+
+		//ボスの動き
+		m_pBoss->Update(*m_pStage, *m_pPlayer, m_pPlayer->GetPos());
+	}
+
 
 	//ゲームをクリアしたかどうかを受け取る
 	m_isGameClear = m_pBoss->GetGameClear();
@@ -89,11 +96,12 @@ std::shared_ptr<SceneBase> SceneSecondStage::Update(const Pad& pad)
 	//プレイヤーが倒れたかどうか
 	m_isGameOver = m_pPlayer->GetIsKnockedDown();
 
-	//ボスの動き
-	m_pBoss->Update(*m_pStage, *m_pPlayer, m_pPlayer->GetPos());
-
 	//フェード関係
 	Fade();
+
+	//タイトルに戻る処理
+	BackToTitle(pad);
+
 
 	if (m_pPlayer->GetIsPlayerDie() && m_fadeAlpha >= kFadeValue)
 	{
@@ -150,6 +158,9 @@ void SceneSecondStage::Draw()
 
 	//HPバーなどを表示する
 	m_pUIBar->DrawPlayerGaugeBar(*m_pPlayer);
+
+	//メニュー画面を表示
+	DrawMenu();
 
 	if (!m_pPlayer->GetIsPlayerDie())
 	{

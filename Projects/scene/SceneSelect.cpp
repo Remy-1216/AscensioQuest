@@ -45,7 +45,7 @@ namespace
 
 	//ステージの難易度を描画する位置
 	constexpr float kStageLevelX = 750.0f;
-	constexpr float kStageLevelY = 840.0f;
+	constexpr float kStageLevelY = 850.0f;
 
 	//動画の左上の座標
 	constexpr int kUpLeftX = 150;
@@ -105,6 +105,7 @@ SceneSelect::~SceneSelect()
 	DeleteGraph(m_operationInstructionsHandle);
 	DeleteGraph(m_menuHandle);
 	DeleteGraph(m_firstStageVideoHandle);
+	DeleteGraph(m_secondStageVideoHandle);
 }
 
 void SceneSelect::Init()
@@ -121,8 +122,11 @@ void SceneSelect::Init()
 	//メニュー画面の画像をロード
 	m_menuHandle = LoadGraph("data/UI/selectmenu.png");
 
-	//ステージ1の動画のロード
+	//ステージ1の動画をロード
 	m_firstStageVideoHandle = LoadGraph("data/mp4/stage1.mp4");
+
+	//ステージ2の動画をロード
+	m_secondStageVideoHandle = LoadGraph("data/mp4/stage2.mp4");
 
 	//ステージ
 	m_pStage = std::make_shared<Stage>(Select);
@@ -408,7 +412,7 @@ void SceneSelect::DrawStageMovie()
 	//ステージ2
 	if (m_cursorPos.y == kStage2PosY)
 	{
-		//DrawExtendGraph(kUpLeftX, kUpLeftY, kLowRightX, kLowRightY, m_secondStageVideoHandle, FALSE);
+		DrawExtendGraph(kUpLeftX, kUpLeftY, kLowRightX, kLowRightY, m_secondStageVideoHandle, FALSE);
 	}
 
 	//動画を繰り返し流す
@@ -435,7 +439,7 @@ void SceneSelect::RepeatVideo()
 	}
 	if (m_cursorPos.y == kStage2PosY)
 	{
-		/*if (m_playVideo == 0)
+		if (m_playVideo == 0)
 		{
 			PlayMovieToGraph(m_secondStageVideoHandle);
 			m_playVideo++;
@@ -445,7 +449,7 @@ void SceneSelect::RepeatVideo()
 		{
 			SeekMovieToGraph(m_secondStageVideoHandle, 0);
 			PlayMovieToGraph(m_secondStageVideoHandle);
-		}*/
+		}
 	}
 }
 

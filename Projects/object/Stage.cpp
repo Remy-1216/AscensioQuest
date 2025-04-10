@@ -212,6 +212,12 @@ void Stage::DrawMap(Player& player)
     }
 }
 
+//ワープ先のステージ名を描画する
+void Stage::DrawWarpDestinationName()
+{
+
+}
+
 //ワープポイントの情報を読み込む
 void Stage::LoadWarpPointPos()
 {

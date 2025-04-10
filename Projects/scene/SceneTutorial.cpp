@@ -541,6 +541,11 @@ void SceneTutorial::ManualUpdate(const Pad& pad)
 			m_playVideo = 0;
 		}
 
+		if (m_manualCount <= 0)
+		{
+			m_manualCount = 0;
+		}
+
 		if (m_isFourtutorial && !m_isFifthManual && m_manualCount == kSixthManual)
 		{
 			m_manualCount = 0;

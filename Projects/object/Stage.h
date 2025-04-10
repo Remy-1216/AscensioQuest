@@ -83,6 +83,12 @@ public:
 	/// </summary>
 	void DrawMap(Player& player);
 
+
+	/// <summary>
+	/// ワープ先のステージ名を描画する
+	/// </summary>
+	void DrawWarpDestinationName();
+
 	/// <summary>
 	/// ワープポイントの情報を読み取る
 	/// </summary>
