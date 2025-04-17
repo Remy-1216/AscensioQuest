@@ -500,7 +500,7 @@ void SceneTutorial::ThirdTutorial()
 {
 	m_specialMoveCount = m_pTutorialEnemy->GetSpecialMoveHitTimes();
 
-	if (m_specialMoveCount >= kMaxSpecialMoveCount)
+	if (m_specialMoveCount >= kMaxSpecialMoveCount && !m_pPlayer->GetIsSpecialMove())
 	{
 		m_isTutorialClear = true;
 		m_isThirdTutorial = true;

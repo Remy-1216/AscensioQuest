@@ -184,7 +184,7 @@ void TutorialEnemy::TutorialUpdate(int tutorialKinds)
 	//チュートリアル4限定の処理
 	if (tutorialKinds == kFourTutorial)
 	{
-		PlayerGuardTutorial();
+		m_isFourTutorial = true;
 	}
 
 }
@@ -223,13 +223,6 @@ void TutorialEnemy::HitAnyPlayerAttack(Player & player)
 	{
 		m_specialMoveHitTimes++;
 	}
-}
-
-//プレイヤーがガードを行うチュートリアル中の処理
-void TutorialEnemy::PlayerGuardTutorial()
-{
-	
-	m_isFourTutorial = true;
 }
 
 void TutorialEnemy::UpdateCol()

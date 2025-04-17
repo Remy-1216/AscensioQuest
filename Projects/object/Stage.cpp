@@ -22,7 +22,7 @@ namespace
 
     //マップを描画する位置
     constexpr float kMapPosX = 1550.0f;
-    constexpr float kMapPosY = 50.0f;
+    constexpr float kMapPosY = 40.0f;
 
     //プレイヤーの位置表示を描画する位置
 

@@ -26,7 +26,7 @@ namespace
 	constexpr float kAttackPosY = -200.0f;
 
 	//無敵時間の長さ
-	constexpr int kInvincibleTime = 120;
+	constexpr int kInvincibleTime = 30;
 }
 
 ShortDistanceEnemy::ShortDistanceEnemy():CharacterBase(m_handle)

@@ -35,7 +35,7 @@ namespace
 	constexpr float kAttackPosY = -200.0f;
 
 	//無敵時間の長さ
-	constexpr int kInvincibleTime =120;
+	constexpr int kInvincibleTime =30;
 }
 
 LongDistanceEnemy::LongDistanceEnemy() :CharacterBase(m_handle),m_throwingHandle(-1),m_attackDirection(VGet(0.0f,0.0f,0.0f))

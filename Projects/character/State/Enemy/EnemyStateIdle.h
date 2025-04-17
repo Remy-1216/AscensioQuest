@@ -14,7 +14,7 @@ public:
 	void Init(const int characterKinds);
 
 	/// <summary>
-	/// 歩いているときの動き
+	/// 待機中の動き
 	/// </summary>
 	/// <param name="player">プレイヤー</param>
 	/// <param name="characterKinds">敵の種類</param>
@@ -31,5 +31,11 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	virtual StateKind GetKind() override { return StateKind::kIdle; }
+
+private:
+	VECTOR GoToPlayer(VECTOR playerPos);
+
+private:
+	VECTOR m_move;
 };
 

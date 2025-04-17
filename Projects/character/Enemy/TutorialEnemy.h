@@ -58,9 +58,6 @@ private:
 	/// <param name="player"></param>
 	void HitAnyPlayerAttack(Player& player);
 
-	//プレイヤーがガード関係のチュートリアルを行っているときの処理
-	void PlayerGuardTutorial();
-
 	/// <summary>
 	/// 当たり判定の更新
 	/// </summary>

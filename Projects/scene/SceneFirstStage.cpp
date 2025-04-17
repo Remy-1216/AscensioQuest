@@ -102,13 +102,16 @@ std::shared_ptr<SceneBase> SceneFirstStage::Update(const Pad& pad)
 	//ゲームをクリアしたかどうか
 	m_isGameClear = m_pEnemyManager->GetGameClear();
 
+	//ゲームオーバーかどうか
+	m_isGameOver = m_pPlayer->GetIsPlayerDie();
+
 	//フェード関係
 	Fade();
 	
 	//タイトルに戻る処理
 	BackToTitle(pad);
 
-	if (m_pPlayer->GetIsPlayerDie() && m_fadeAlpha >= kFadeValue)
+	if (m_isGameOver && m_fadeAlpha >= kFadeValue)
 	{
 		m_pPlayerStatus->StatOutput(m_pEnemyManager->GetStatusPoint());
 
@@ -183,7 +186,7 @@ void SceneFirstStage::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); //不透明に戻しておく
 	}
 	//ゲームオーバー時のフェードの描画
-	if (m_pPlayer->GetIsPlayerDie())
+	if (m_isGameOver)
 	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_fadeAlpha); //半透明で表示
 		DrawBoxAA(0, 0, Game::kScreenWindidth, Game::kScreenHeight, GetColor(157, 9, 12), true);

@@ -69,7 +69,7 @@ namespace
 	constexpr int kAttack2 = 2;
 
 	//落ちてしまうと死んでしまう位置
-	constexpr float kMinimumAltitude = 1000.0f;
+	constexpr float kMinimumAltitude = -500.0f;
 
 	//無敵時間の長さ
 	constexpr int kInvincibleTimeLimit = 120;
@@ -223,7 +223,7 @@ void Player::Update(Stage& stage, const Pad&pad,const Camera& camera)
 	m_pos = VAdd(m_pos, VGet(0.0f, m_gravity, 0.0f));
 
 	//ステージから落ちると、ゲームオーバー
-	if (m_pos.y <= -kMinimumAltitude)
+	if (m_pos.y <= kMinimumAltitude)
 	{
 		m_isKnockedDown = true;
 	}
