@@ -1,5 +1,5 @@
-﻿,kLightAttack,kStorongAttack,kThrowingAttack,kStatusUp
-HpHighlyRangeNear,70,80,0,100
-HpHighlyRangeFar,0,0,80,100
-HpLowRangeNear,80,70,0,100
-HpLowRangeFar,0,0,70,100
+﻿,kRushAttack,kLightAttack,kStorongAttack,kThrowingAttack,kJump,kStatusUp
+HpHighlyRangeNear,0,70,80,0,0,100
+HpHighlyRangeFar,0,0,0,80,0,100
+HpLowRangeNear,0,80,70,0,0,100
+HpLowRangeFar,0,0,0,70,0,100

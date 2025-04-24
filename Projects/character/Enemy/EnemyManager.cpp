@@ -13,15 +13,32 @@ namespace
 	const char* const kUpperLeft = "upperLeft";
 	const char* const kLowerRight = "lowerRight";
 
-
 	//敵が死んだときにもらえるステータスポイント
 	constexpr int kStatusPoint = 5;
 
 	//最大敵数
 	constexpr int kMaxEnemy = 16;
 
+	//エリアごとの敵の人数
+	constexpr int kFour = 4;
+	constexpr int kThree = 3;
+	constexpr int kTwo = 2;
+	constexpr int kOne = 1;
+	constexpr int kZero = 0;
+
 	//アイテムドロップ率
 	constexpr int kDropRate = 50;
+
+	//テキストを描画する位置
+	constexpr int kPosX = 800;
+	constexpr int kPosY = 10;
+	constexpr int kTextPosX = 800;
+	constexpr int kTextPosY = 200;
+
+	//アイコンの位置
+	constexpr int kIconPosX = 1000;
+	constexpr int kIconPosY = 0;
+
 }
 
 EnemyManager::EnemyManager()
@@ -61,6 +78,12 @@ EnemyManager::~EnemyManager()
 	MV1DeleteModel(m_shortDistanceEnemyHandle);
 	MV1DeleteModel(m_longDistanceEnemyHandle);
 
+	DeleteGraph(m_fullEnemyHandle);
+	DeleteGraph(m_threeEnemysHandle);
+	DeleteGraph(m_twoEnemysHandle);
+	DeleteGraph(m_oneEnemyHandle);
+	DeleteGraph(m_zeroEnemyHandle);
+
 	for (int i = 0; i < kEnemyNum; i++)
 	{
 		m_pShortDistanceEnemy[i].reset();
@@ -76,6 +99,21 @@ EnemyManager::~EnemyManager()
 
 void EnemyManager::Init()
 {
+	//敵が全員残っているときのアイコンをロードする
+	m_fullEnemyHandle = LoadGraph("data/UI/FullEnemy.png");
+
+	//残り敵数が3人の時のアイコンをロードする
+	m_threeEnemysHandle = LoadGraph("data/UI/threeenemys.png");
+
+	//残り敵数が2人の時のアイコンをロードする
+	m_twoEnemysHandle = LoadGraph("data/UI/twoenemys.png");
+
+	//残り敵数が1人の時のアイコンをロードする
+	m_oneEnemyHandle = LoadGraph("data/UI/oneenemy.png");
+
+	//敵が全滅した時のアイコンをロードする
+	m_zeroEnemyHandle = LoadGraph("data/UI/zeroenemy.png");
+
 	//近距離エネミーの生成
 	CreateShortDistanceEnemy();
 
@@ -88,6 +126,9 @@ void EnemyManager::Init()
 
 void EnemyManager::Update(Stage& stage, Player& player)
 {		
+	//プレイヤーの座標を受け取る
+	m_playerPos = player.GetPos();
+
 	for (int i = 0; i < kEnemyNum; i++)
 	{
 		if (m_pShortDistanceEnemy[i])
@@ -175,6 +216,12 @@ void EnemyManager::Draw()
 		m_pApple->Draw();
 	}
 
+	//エリアにいる残り敵数アイコンの描画
+	DrawEnemuNum();
+
+	//全体に残っている敵の数
+	DrawFormatStringFToHandle(kTextPosX, kTextPosY, GetColor(0, 0, 0), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize55_4)], "全エリアに残った敵の数%4d\n", m_enemyNum);
+
 #ifdef _DEBUG
 	DrawFormatString(0, 850, GetColor(0, 0, 0), "エリア1の敵の数:%4d", m_area.area1EnemyNum);
 	DrawFormatString(0, 900, GetColor(0, 0, 0), "エリア2の敵の数:%4d", m_area.area2EnemyNum);
@@ -249,6 +296,63 @@ void EnemyManager::AreaDecide()
 		}
 	}
 	
+}
+
+void EnemyManager::DrawEnemuNum()
+{
+	//エリア1にいる時
+	if (m_playerPos.x >= m_upperLeft.map2PosX && m_playerPos.z <= m_upperLeft.map2PosZ &&
+			m_playerPos.x <= m_lowerRight.map2PosX && m_playerPos.z >= m_lowerRight.map2PosZ)
+	{
+		DrawEnemyNumArea(m_area.area1EnemyNum);
+	}
+	//エリア2にいる時
+	else if (m_playerPos.x >= m_upperLeft.map3PosX && m_playerPos.z <= m_upperLeft.map3PosZ &&
+			m_playerPos.x <= m_lowerRight.map3PosX && m_playerPos.z >= m_lowerRight.map3PosZ)
+	{
+		DrawEnemyNumArea(m_area.area2EnemyNum);
+	}
+	//エリア3にいる時
+	else if (m_playerPos.x >= m_upperLeft.map4PosX && m_playerPos.z <= m_upperLeft.map4PosZ &&
+			m_playerPos.x <= m_lowerRight.map4PosX && m_playerPos.z >= m_lowerRight.map4PosZ)
+	{
+		DrawEnemyNumArea(m_area.area3EnemyNum);
+	}
+	//エリア4にいる時
+	else if (m_playerPos.x >= m_upperLeft.map5PosX && m_playerPos.z <= m_upperLeft.map5PosZ &&
+		m_playerPos.x <= m_lowerRight.map5PosX && m_playerPos.z >= m_lowerRight.map5PosZ)
+	{
+		DrawEnemyNumArea(m_area.area4EnemyNum);
+	}
+
+}
+
+void EnemyManager::DrawEnemyNumArea(int enemyNum)
+{	
+	//残り敵数を描画
+	DrawFormatStringFToHandle(kPosX, kPosY, GetColor(0, 0, 0), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize64_4)], "残りエリア敵数\n");
+
+
+	if (enemyNum == kFour)
+	{
+		DrawGraph(kIconPosX, kIconPosY, m_fullEnemyHandle, true);
+	}
+	else if (enemyNum == kThree)
+	{
+		DrawGraph(kIconPosX, kIconPosY, m_threeEnemysHandle, true);
+	}
+	else if (enemyNum == kTwo)
+	{
+		DrawGraph(kIconPosX, kIconPosY, m_twoEnemysHandle, true);
+	}
+	else if (enemyNum == kOne)
+	{
+		DrawGraph(kIconPosX, kIconPosY, m_oneEnemyHandle, true);
+	}
+	else if (enemyNum == kZero)
+	{
+		DrawGraph(kIconPosX, kIconPosY, m_zeroEnemyHandle, true);
+	}
 }
 
 //近距離タイプの敵が死んだときの処理

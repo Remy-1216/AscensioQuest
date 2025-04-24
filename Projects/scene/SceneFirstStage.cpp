@@ -155,9 +155,6 @@ void SceneFirstStage::Draw()
 	//ステージの描画
 	m_pStage->Draw();
 
-	//残り敵数を描画
-	DrawFormatStringFToHandle(kPosX, kPosY, GetColor(0, 0, 0), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize100_4)], "残り%4d\n", m_enemyNum);
-
 	//マップの描画
 	m_pStage->DrawMap(*m_pPlayer);
 

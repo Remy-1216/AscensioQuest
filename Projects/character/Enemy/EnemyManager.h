@@ -64,6 +64,16 @@ public:
 		float map5PosZ;
 	};
 
+	//エリアの名前
+
+	enum AreaName
+	{
+		Area1,
+		Area2,
+		Area3,
+		Area4
+	};
+
 public:
 	EnemyManager();
 	virtual ~EnemyManager();
@@ -122,6 +132,16 @@ private:
 	void AreaDecide();
 
 	/// <summary>
+	/// プレイヤーの位置によって変更する
+	/// </summary>
+	void DrawEnemuNum();
+
+	/// <summary>
+	/// 各エリアの敵の数を描画する
+	/// </summary>
+	void DrawEnemyNumArea(int enemyNum);
+
+	/// <summary>
 	/// 近距離タイプの敵が死んだときの処理
 	/// </summary>
 	void ShortEnemyDies(int enemyNum);
@@ -153,8 +173,6 @@ private:
 	/// </summary>
 	void DrapItem(VECTOR enemyPos);
 
-	
-
 private:
 
 	Area m_area;
@@ -168,7 +186,6 @@ private:
 	/// 近距離エネミー
 	/// </summary>
 	std::shared_ptr<ShortDistanceEnemy> m_pShortDistanceEnemy[kEnemyNum];
-
 
 	//左上の座標
 	AreaPos m_upperLeft;
@@ -211,6 +228,11 @@ private:
 	Pos m_longDistanveEnemyPos;
 
 	/// <summary>
+	/// エリア名
+	/// </summary>
+	AreaName m_areaName;
+
+	/// <summary>
 	/// 近距離型エネミーのハンドル
 	/// </summary>
 	int m_shortDistanceEnemyHandle;
@@ -219,6 +241,31 @@ private:
 	/// 遠距離型エネミーのハンドル
 	/// </summary>
 	int m_longDistanceEnemyHandle;
+
+	/// <summary>
+	/// 全員敵が残っているときのハンドル
+	/// </summary>
+	int m_fullEnemyHandle;
+
+	/// <summary>
+	/// 敵数が残り3人の時のハンドル
+	/// </summary>
+	int m_threeEnemysHandle;
+
+	/// <summary>
+	/// 敵数が残り2人の時のハンドル
+	/// </summary>
+	int m_twoEnemysHandle;
+
+	/// <summary>
+	/// 敵数が残り1人の時のハンドル
+	/// </summary>
+	int m_oneEnemyHandle;
+
+	/// <summary>
+	/// 敵が全滅しているときのハンドル
+	/// </summary>
+	int m_zeroEnemyHandle;
 
 	/// <summary>
 	/// エネミーの人数
@@ -264,5 +311,10 @@ private:
 	/// ゲームをクリアしたかどうか
 	/// </summary>
 	bool m_isGameClear;
+
+	/// <summary>
+	/// プレイヤーの位置
+	/// </summary>
+	VECTOR m_playerPos;
 };
 
