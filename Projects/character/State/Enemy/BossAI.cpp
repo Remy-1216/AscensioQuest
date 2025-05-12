@@ -44,6 +44,7 @@ void BossAI::Init()
 	m_state = kWalk;
 }
 
+//どのような状況下か
 int BossAI::StateSet(CharacterBase& boss,const Player& player)
 {
 	//敵とプレイヤーの距離

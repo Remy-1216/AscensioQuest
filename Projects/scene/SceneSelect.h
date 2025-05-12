@@ -141,6 +141,12 @@ private:
 	/// </summary>
 	bool m_isPressDown;
 
+
+	/// <summary>
+	/// Aボタンを一時的に無効化するかどうか
+	/// </summary>
+	bool m_ignoreNextAInput;
+
 	//カーソルの位置
 	VECTOR m_cursorPos;
 

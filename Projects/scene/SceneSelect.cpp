@@ -86,7 +86,7 @@ namespace
 }
 
 SceneSelect::SceneSelect() :m_uiHandle(-1), m_operationInstructionsHandle(-1), m_menuHandle(-1),m_count(0), m_cursorCount(0), m_cursorPosY(0.0f),
-m_isStage1(false), m_isStage2(false), m_isStatus(false), m_isExplanation(false),  m_isPishAButton(false), m_isPressPad(false), m_isPressUp(false), m_isPressDown(false), m_cursorPos(VGet(0.0f, 0.0f, 0.0f)), m_stage1DescriptionPos(VGet(0.0f, 0.0f, 0.0f)),
+m_isStage1(false), m_isStage2(false), m_isStatus(false), m_isExplanation(false),  m_isPishAButton(false), m_isPressPad(false), m_isPressUp(false), m_isPressDown(false), m_ignoreNextAInput(false),m_cursorPos(VGet(0.0f, 0.0f, 0.0f)), m_stage1DescriptionPos(VGet(0.0f, 0.0f, 0.0f)),
 m_stage2DescriptionPos(VGet(0.0f, 0.0f, 0.0f)), m_statusDescriptionPos(VGet(0.0f, 0.0f, 0.0f)), m_operationDescriptionPos(VGet(0.0f, 0.0f, 0.0f)), m_stage1Pos(VGet(0.0f, 0.0f, 0.0f)), m_stage2Pos(VGet(0.0f, 0.0f, 0.0f)),
 m_statusPos(VGet(0.0f, 0.0f, 0.0f)), m_explanationPos(VGet(0.0f, 0.0f, 0.0f)), m_gameEndPos(VGet(0.0f, 0.0f, 0.0f))
 {
@@ -219,8 +219,10 @@ void SceneSelect::End()
 
 }
 
+//タイトルに戻る
 void SceneSelect::BackToTitle(const Pad& pad)
 {
+	//メニューを開いていた場合
 	if (m_isOpenMenu)
 	{
 		if (pad.IsTrigger("down"))
@@ -241,6 +243,8 @@ void SceneSelect::BackToTitle(const Pad& pad)
 			if (m_cursorPosY == kBackToSelect)
 			{
 				m_isOpenMenu = false;
+				m_ignoreNextAInput = true;
+				
 			}
 		}
 	}
@@ -297,6 +301,7 @@ void SceneSelect::StageSelect(const Pad& pad)
 		//カーソル移動が行われているとき
 		if (m_isPressPad)
 		{
+			//一定時間スティックを倒した場合
 			if (m_cursorCount >= kCursorMoveTime)
 			{
 				if (pad.IsPress("up"))
@@ -375,12 +380,16 @@ void SceneSelect::DrawExplanation()
 
 }
 
+//メニュー画面を描画する
 void SceneSelect::DrawMenu()
 {
+	//メニュー画面を表示する場合の処理
 	if (m_isOpenMenu)
 	{
 		DrawGraph(0, 0, m_menuHandle, true);
 
+
+		//カーソルの位置によって文字の色が変わる
 		if (m_cursorPosY == 0.0f)
 		{
 			DrawFormatStringFToHandle(kDecisionCharacterPosX, kDecisionCharacterPosY, GetColor(150, 150, 150), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize96_4)], "はい\n");
@@ -389,7 +398,6 @@ void SceneSelect::DrawMenu()
 		{
 			DrawFormatStringFToHandle(kDecisionCharacterPosX, kDecisionCharacterPosY, GetColor(0, 0, 0), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize96_4)], "はい\n");
 		}
-
 		if (m_cursorPosY == kBackToSelect)
 		{
 			DrawFormatStringFToHandle(kCancelCharacterPosX, kCancelCharacterPosY, GetColor(150, 150, 150), Font::m_fontHandle[static_cast<int>(Font::FontId::kSize96_4)], "いいえ\n");
@@ -457,8 +465,7 @@ void SceneSelect::RepeatVideo()
 std::shared_ptr<SceneBase> SceneSelect::SceneChange(const Pad& pad)
 {
 	//ステージの遷移する
-	
-	if (!m_isExplanation && !m_isOpenMenu)
+	if (!m_isExplanation && !m_isOpenMenu && !m_ignoreNextAInput)
 	{
 		if (pad.IsTrigger("A"))
 		{
@@ -503,6 +510,15 @@ std::shared_ptr<SceneBase> SceneSelect::SceneChange(const Pad& pad)
 		{
 			m_isOpenMenu = true;
 		}
+	}
+
+	if (m_ignoreNextAInput)
+	{
+		if (!pad.IsPress("A"))  // 押されてない状態になるまで待つ
+		{
+			m_ignoreNextAInput = false; // 押されてないので通常処理再開
+		}
+		return shared_from_this(); // それ以外は何もしない
 	}
 
 	if (m_isStatus && m_fadeAlpha >= kFadeValue)
