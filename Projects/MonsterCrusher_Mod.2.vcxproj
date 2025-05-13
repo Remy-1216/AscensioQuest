@@ -177,13 +177,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)DxLib;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)object;$(ProjectDir)util;$(ProjectDir)camera;$(ProjectDir)character;$(ProjectDir)character/State;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)scene;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(ProjectDir)SoundManager;$(ProjectDir)Effect</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)object;$(ProjectDir)util;$(ProjectDir)camera;$(ProjectDir)character;$(ProjectDir)character/State;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)scene;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)DxLib;$(ProjectDir)SoundManager;$(ProjectDir)Effect</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -212,13 +212,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)camera;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)character;$(ProjectDir)util;$(ProjectDir)scene;$(ProjectDir)character/State;$(ProjectDir)DxLib;$(PRojectDir)object;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)SoundManager;$(ProjectDir)Effect;$(PrijectDir)UI</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)object;$(ProjectDir)util;$(ProjectDir)camera;$(ProjectDir)character;$(ProjectDir)character/State;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)scene;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)プロジェクトに追加すべきファイル_VC用;$(ProjectDir)SoundManager;$(ProjectDir)Effect</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)object;$(ProjectDir)util;$(ProjectDir)camera;$(ProjectDir)character;$(ProjectDir)character/State;$(ProjectDir)character/Enemy;$(ProjectDir)character/Player;$(ProjectDir)scene;$(ProjectDir)character/State/Player;$(ProjectDir)character/State/Enemy;$(ProjectDir)DxLib;$(ProjectDir)SoundManager;$(ProjectDir)Effect</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
