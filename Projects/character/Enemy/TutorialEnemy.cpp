@@ -24,6 +24,9 @@ namespace
 
 	//無敵時間
 	constexpr int kInvincibleTime =80;
+
+	//モデルを回転させる
+	constexpr float kRotate = 160.0f;
 }
 
 TutorialEnemy::TutorialEnemy() :CharacterBase(m_handle), m_attackHitTimes(0), m_magicAttackHitTimes(0), m_specialMoveHitTimes(0)
@@ -77,6 +80,9 @@ void TutorialEnemy::Init(int handle, VECTOR enemyPos)
 
 	//初期位置設定
 	m_pos = enemyPos;
+
+	//モデルを回転させる
+	MV1SetRotationXYZ(m_handle, VGet(0.0f, kRotate, 0.0f));
 
 	//アニメーションを読み込む
 	LoadCsv::GetInstance().LoadShortDistanceEnemyAnimData(m_animData);
@@ -146,12 +152,7 @@ void TutorialEnemy::Update(Stage& stage, Player& player, int tutorialKinds)
 
 	//アニメーション
 	UpdateAnim();
-
-	//向いている方向
-	if (m_isMove)
-	{
-		UpdateAngle(player.GetPos());
-	}
+	
 
 	//当たり判定の更新
 	UpdateCol();
@@ -225,6 +226,7 @@ void TutorialEnemy::HitAnyPlayerAttack(Player & player)
 	}
 }
 
+//当たり判定の更新
 void TutorialEnemy::UpdateCol()
 {
 	// プレイヤーの向きをもとに当たり判定の位置を調整する

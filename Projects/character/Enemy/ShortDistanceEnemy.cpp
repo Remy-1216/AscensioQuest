@@ -236,6 +236,7 @@ void ShortDistanceEnemy::HitPlayer(Player& player)
 	}
 }
 
+//当たり判定の更新
 void ShortDistanceEnemy::UpdateCol()
 {
 	// プレイヤーの向きをもとに当たり判定の位置を調整する
