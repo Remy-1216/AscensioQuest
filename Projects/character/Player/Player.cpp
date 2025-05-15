@@ -220,7 +220,7 @@ void Player::Update(Stage& stage, const Pad&pad,const Camera& camera)
 	m_pEffectManager->Update();
 
 	// 重力を足す
-	m_pos = VAdd(m_pos, VGet(0.0f, m_gravity, 0.0f));
+	m_pos.y =m_pos.y += m_gravity;
 
 	//ステージから落ちると、ゲームオーバー
 	if (m_pos.y <= kMinimumAltitude)

@@ -32,6 +32,8 @@ private:
 	int m_enemyHpBarHandle;					//敵HPバーのハンドル
 	int m_enemyDamageBarHandle;				//敵ダメージバーのハンドル
 
+	//UI背景のハンドル
+	int m_stageUIBGHandle;
 
 	//バーをどれだけ表示するか
 	float m_hpBarX;

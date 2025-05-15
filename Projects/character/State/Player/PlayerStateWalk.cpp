@@ -64,6 +64,15 @@ void PlayerStateWalk::Update(Stage& stage,const Pad& pad, const Camera& camera)
 		return;
 	}
 
+	//歩いている状態から攻撃攻撃状態に変更
+	if (pad.IsTrigger("A"))
+	{
+		m_nextState = std::make_shared<PlayerStateAttack>(m_pPlayer);
+		auto state = std::dynamic_pointer_cast<PlayerStateAttack>(m_nextState);
+		state->Init();
+		return;
+	}
+
 	//歩いている状態から魔法攻撃状態に変更
 	if (pad.IsTrigger("B"))
 	{

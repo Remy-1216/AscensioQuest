@@ -37,5 +37,7 @@ private:
 	std::shared_ptr<Stage>m_pStage;
 
 
+	//UI背景のハンドル
+	int m_stageUIBGHandle;
 };
 

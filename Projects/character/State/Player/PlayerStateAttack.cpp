@@ -5,6 +5,15 @@
 #include "Player.h"
 #include "Pad.h"
 
+namespace
+{
+    //
+    constexpr int kAttackTime1 = 26;
+    constexpr int kAttackTime2 = 13;
+    constexpr int kAttackTime3 = 40;
+
+}
+
 void PlayerStateAttack::Init()
 {
 	m_pPlayer->ChangeAnim("Attack1");
@@ -45,25 +54,6 @@ void PlayerStateAttack::Update(Stage& stage, const Pad& pad, const Camera& camer
 
         return;
     }
-
-    //攻撃状態から走る状態に変更
-    if (pad.IsPress("RB") && (pad.IsPress("left") || pad.IsPress("right") || pad.IsPress("up") || pad.IsPress("down")))
-    {
-        m_nextState = std::make_shared<PlayerStateRun>(m_pPlayer);
-        auto state = std::dynamic_pointer_cast<PlayerStateRun>(m_nextState);
-        state->Init();
-        return;
-    }
-
-    // 攻撃状態から歩く状態に変更
-    else if (pad.IsPress("left") || pad.IsPress("right") || pad.IsPress("up") || pad.IsPress("down"))
-    {
-        m_nextState = std::make_shared<PlayerStateWalk>(m_pPlayer);
-        auto state = std::dynamic_pointer_cast<PlayerStateWalk>(m_nextState);
-        state->Init();
-        return;
-    }
-
 }
 void PlayerStateAttack::Draw()
 {
@@ -83,19 +73,19 @@ void PlayerStateAttack::Attack()
         m_pPlayer->Attack(m_attacks, m_pPlayer->GetCurrentAnimTime());
     }
 
-    if (m_aButtonCount >= 1 && m_attacks == 0)
+    if (m_aButtonCount >= 1 && m_attacks == 0 && m_time >= kAttackTime1)
     {
         m_pPlayer->ChangeAnim("Attack2");
         m_time = 0;
         m_attacks++;
     }
-    else if (m_aButtonCount >= 2 && m_attacks == 1)
+    else if (m_aButtonCount >= 2 && m_attacks == 1 && m_time >= kAttackTime2)
     {
         m_pPlayer->ChangeAnim("Attack3");
         m_time = 0;
         m_attacks++;
     }
-    else if (m_aButtonCount >= 3 && m_attacks == 2)
+    else if (m_aButtonCount >= 3 && m_attacks == 2 && m_time >= kAttackTime3)
     {
         // 攻撃終了
         m_attacks = 0;

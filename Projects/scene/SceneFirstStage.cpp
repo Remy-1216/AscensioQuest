@@ -28,6 +28,9 @@ namespace
 	//残りの敵数を表示する位置
 	constexpr float kPosX = 1000.0f;
 	constexpr float kPosY = 50.0f;
+
+	//UI背景の位置
+	constexpr float kUIBGPosX = 980.0f;
 }
 
 SceneFirstStage::SceneFirstStage()
@@ -44,6 +47,9 @@ SceneFirstStage::~SceneFirstStage()
 
 	// シャドウマップの削除
 	DeleteShadowMap(m_shadowMapHandle);
+
+	//画像の削除
+	DeleteGraph(m_stageUIBGHandle);
 }
 
 void SceneFirstStage::Init()
@@ -61,6 +67,8 @@ void SceneFirstStage::Init()
 	m_pPlayerStatus->Init();
 
 	m_pUIBar->Init();
+
+	m_stageUIBGHandle = LoadGraph("data/BG/StageUIBG.png");
 
 	//シャドウマップの作成
 	m_shadowMapHandle = MakeShadowMap(kShadowMap, kShadowMap);
@@ -157,6 +165,8 @@ void SceneFirstStage::Draw()
 
 	//マップの描画
 	m_pStage->DrawMap(*m_pPlayer);
+
+	DrawGraph(kUIBGPosX, 0, m_stageUIBGHandle, true);
 
 	//エネミーの描画
 	m_pEnemyManager->Draw();
