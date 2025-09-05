@@ -121,9 +121,6 @@ void PlayerStateRun::Update(Stage&stage,const Pad& pad, const Camera& camera)
 
 	m_move = VGet(analogX, 0.0f, -analogZ);	//ベクトルの長さは0～1000
 
-	m_analogX = analogX;
-	m_analogZ = analogZ;
-
 	//0.00 ~ 0.01の長さにする
 	//ベクトルの長さを取得する
 	float len = VSize(m_move);
@@ -135,6 +132,7 @@ void PlayerStateRun::Update(Stage&stage,const Pad& pad, const Camera& camera)
 	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
 	rate = std::min(rate, 1.0f);
 	rate = std::max(rate, 0.0f);
+
 	//速度が決定できるので移動ベクトルに反映する
 	m_move = VNorm(m_move);
 	float speed = m_runSpeed * rate;
